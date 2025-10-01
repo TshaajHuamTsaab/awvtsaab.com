@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>通用阅读器完整版</title>
+<style>
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #fdf6e3;
+  margin: 0;
+  padding: 0;
+  color: #333;
+  overflow-x: hidden;
+}
+
+#bookTitle {
+  text-align: center;
+  padding: 15px;
+  font-size: 20px;
+  font-weight: bold;
+}
+#book {
+  padding: 20px;
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto 500px auto; 
+}
+#error { color:red; text-align:center; }
+
+/* 彩虹外圈 */
+#outer-ring {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  border: 8px solid transparent;
+  background: conic-gradient(red, orange, yellow, green, blue, purple, red);
+  animation: rotateOuter 20s linear infinite, hueShift 10s linear infinite;
+  z-index: 899;
+  pointer-events: none;
+}
+
+/* 圆形导航内圈 */
+#nav-circle {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(16px);
+  border: 3.5px solid rgba(255,255,255,0.5);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+/* 中间遥控器 */
+.remote {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.remote .btn-play {
+  position: absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  font-size: 36px;
+  font-weight: bold;
+  background: #96dd13;
+  border: 3px solid #e6c200;
+  color: #191f1a;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(39,192,28,0.95);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.remote .btn-play:hover { transform: translate(-50%, -50%) scale(1.1); }
+
+.remote .btn {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  font-size: 22px;
+  font-weight: bold;
+  border: 2px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #222;
+  text-align: center;
+  line-height: 90px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+.remote .btn:hover { transform: scale(1.15); box-shadow:0 0 16px rgba(0,0,0,0.45); }
+
+/* 按钮颜色 */
+.btn-prev { background: #ff6b6b; border-color: #ff4c4c; color:#fff; }
+.btn-next { background: #4ecdc4; border-color: #38b2ac; color:#fff; }
+.btn-font-plus { background: #a29bfe; border-color: #6c5ce7; color:#fff; }
+.btn-font-minus { background: #6c5ce7; border-color: #341f97; color:#fff; }
+.btn-speed { background: #ff9ff3; border-color: #ff6f91; color:#000; }
+.btn-theme { background: #81ecec; border-color: #00b894; color:#000; }
+.btn-home { background: #fd79a8; border-color: #d63031; color:#fff; }
+.btn-light { background: #ffe066; border-color: #ffb703; color:#000; }
+
+/* 按钮环绕 */
+.btn-prev { top:50%; left:5%; transform: translateY(-50%); }
+.btn-next { top:50%; right:5%; transform: translateY(-50%); }
+.btn-font-plus { top:8%; left:50%; transform: translateX(-50%); }
+.btn-font-minus { bottom:8%; left:50%; transform: translateX(-50%); }
+.btn-speed { top:18%; right:18%; }
+.btn-theme { bottom:18%; left:18%; }
+.btn-home { bottom:18%; right:18%; }
+.btn-light { top:18%; left:18%; }
+
+/* 按钮光效 */
+.remote .btn:active,
+.remote .btn:focus {
+  box-shadow:0 0 20px currentColor,0 0 40px currentColor,0 0 60px currentColor;
+}
+@keyframes rainbowGlow {
+  0%{ box-shadow:0 0 10px red,0 0 20px orange,0 0 30px yellow; }
+  25%{ box-shadow:0 0 10px orange,0 0 20px yellow,0 0 30px green; }
+  50%{ box-shadow:0 0 10px yellow,0 0 20px green,0 0 30px blue; }
+  75%{ box-shadow:0 0 10px green,0 0 20px blue,0 0 30px purple; }
+  100%{ box-shadow:0 0 10px red,0 0 20px orange,0 0 30px yellow; }
+}
+.btn-light:active { animation: rainbowGlow 1s linear infinite; }
+
+/* 八方形旋转 */
+#square-rotation{
+  position: fixed;
+  bottom:30px;
+  left:50%;
+  transform: translateX(-50%);
+  width:400px;
+  height:400px;
+  z-index:900;
+  pointer-events:none;
+}
+.square{
+  position:absolute;
+  width:40px;
+  height:40px;
+  border-radius:6px;
+  opacity:0.9;
+  transform-origin:180px 180px;
+  box-shadow:0 0 10px rgba(0,0,0,0.3);
+}
+
+/* 动画关键帧 */
+@keyframes rotateOuter { from{ transform: translateX(-50%) rotate(0deg); } to{ transform: translateX(-50%) rotate(360deg); } }
+@keyframes hueShift { 0%{ filter:hue-rotate(0deg);} 100%{filter:hue-rotate(360deg);} }
+</style>
+</head>
+<body>
+
+<div id="bookTitle">加载中...</div>
+<div id="book"></div>
+<div id="error"></div>
+
+<div id="outer-ring"></div>
+<div id="square-rotation"></div>
+
+<div id="nav-circle">
+  <div class="remote">
+    <button class="btn btn-play" id="play-btn">▶</button>
+    <button class="btn btn-prev">⏮</button>
+    <button class="btn btn-next">⏭</button>
+    <button class="btn btn-font-plus">🅰+</button>
+    <button class="btn btn-font-minus">🅰-</button>
+    <button class="btn btn-speed" id="speed-btn">⏩1x</button>
+    <button class="btn btn-theme">切背景</button>
+    <button class="btn btn-home">🏠</button>
+    <button class="btn btn-light">🔄</button>
+  </div>
+</div>
+
+<audio id="chapter-audio"></audio>
+
+<script>
+// 八方形旋转
+const squareContainer=document.getElementById("square-rotation");
+const colors=["#ff4c4c","#ff9f43","#1dd1a1","#00d2d3","#576574","#f368e0","#ff6b6b","#54a0ff"];
+for(let i=0;i<8;i++){
+  const div=document.createElement("div");
+  div.className="square";
+  div.style.background=colors[i];
+  div.style.transform=`rotate(${i*45}deg) translate(160px)`;
+  squareContainer.appendChild(div);
+}
+let angle=0;
+function animateSquares(){
+  angle+=1;
+  const squares=document.querySelectorAll(".square");
+  squares.forEach((sq,i)=>{
+    sq.style.transform=`rotate(${angle+i*45}deg) translate(160px)`;
+  });
+  requestAnimationFrame(animateSquares);
+}
+animateSquares();
+
+// 音频控制
+const audio=document.getElementById("chapter-audio");
+const playBtn=document.getElementById("play-btn");
+playBtn.addEventListener("click",()=>{
+  if(!audio.src) return;
+  if(audio.paused){ audio.play(); playBtn.textContent="⏸"; }
+  else{ audio.pause(); playBtn.textContent="▶"; }
+});
+
+// 音频速度
+const speedBtn=document.getElementById("speed-btn");
+let speeds=[0.5,1,1.5,2];
+let speedIndex=1;
+audio.playbackRate=speeds[speedIndex];
+speedBtn.addEventListener("click",()=>{
+  speedIndex=(speedIndex+1)%speeds.length;
+  audio.playbackRate=speeds[speedIndex];
+  speedBtn.textContent=speeds[speedIndex]+"x";
+});
+
+// 字号调节
+const bookDiv=document.getElementById("book");
+document.querySelector(".btn-font-plus").addEventListener("click",()=>{ changeTextSize(2); });
+document.querySelector(".btn-font-minus").addEventListener("click",()=>{ changeTextSize(-2); });
+function changeTextSize(delta){
+  const style=window.getComputedStyle(bookDiv,null).getPropertyValue('font-size');
+  const current=parseFloat(style);
+  bookDiv.style.fontSize=(current+delta)+'px';
+}
+
+// 背景切换
+const backgrounds=['#fdf6e3','#fff','#e0f7fa','#fce4ec','#e8f5e9'];
+let bgIndex=0;
+document.querySelector(".btn-theme").addEventListener("click",()=>{
+  bgIndex=(bgIndex+1)%backgrounds.length;
+  document.body.style.background=backgrounds[bgIndex];
+});
+
+// 返回首页
+document.querySelector(".btn-home").addEventListener("click",()=>{ window.location.href="library.html"; });
+
+// 章节切换
+const urlParams=new URLSearchParams(window.location.search);
+let bookFolder=urlParams.get("book");
+let chapterNum=urlParams.get("chapter");
+
+function loadChapter(book,num){
+  const file=`books/${book}/${num==="cover"?"cover.html":"chapter"+num+".html"}`;
+  fetch(file)
+    .then(res=>{if(!res.ok)throw new Error("找不到文件:"+file); return res.text();})
+    .then(html=>{
+      bookDiv.innerHTML=html;
+      document.getElementById("bookTitle").textContent=`${book} - ${num==="cover"?"封面":"第 "+num+" 章"}`;
+      loadAudio(book,num);
+    })
+    .catch(err=>{document.getElementById("error").textContent="❌ "+err.message;});
+}
+function loadAudio(book,num){
+  audio.src=`books/${book}/audio/${num==="cover"?"cover":"chapter"+num}.mp3`;
+  audio.pause(); audio.currentTime=0;
+}
+
+// 上一章/下一章按钮
+document.querySelector(".btn-prev").addEventListener("click",()=>{
+  if(chapterNum==="cover") return;
+  chapterNum=parseInt(chapterNum)-1;
+  if(chapterNum<1) chapterNum="cover";
+  loadChapter(bookFolder,chapterNum);
+});
+document.querySelector(".btn-next").addEventListener("click",()=>{
+  if(chapterNum==="cover") chapterNum=1;
+  else chapterNum=parseInt(chapterNum)+1;
+  loadChapter(bookFolder,chapterNum);
+});
+
+// 初始化
+if(!bookFolder || !chapterNum){
+  document.getElementById("bookTitle").textContent="未选择书籍";
+  bookDiv.innerHTML="<p style='color:red'>❌ URL 缺少 ?book=名称 &chapter=数字</p>";
+}else{
+  loadChapter(bookFolder,chapterNum);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>《乌合之众》电子书</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+.chapter-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #0f0;
+    margin-bottom: 10px;
+    background: #111;
+    color: #0f0;
+    font-size: 1rem;
+    flex: 1;
+    scroll-behavior: smooth;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: black;
+  color: #0f0;
+  font-family: 'Share Tech Mono', monospace;
+  overflow: hidden;
+}
+
+canvas#matrix {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+#ebook-container {
+  width: 100%;
+  height: 100vh;
+  background: rgba(0,0,0,0.85);
+  border: 1px solid #0f0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  #ebook-container {
+    width: 600px;
+    height: 90vh;
+    margin: auto;
+    border-radius: 10px;
+  }
+}
+
+#ebook {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 60px;
+}
+
+.page {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.45s ease;
+  opacity: 0;
+}
+
+.page.active {
+  left: 0;
+  opacity: 1;
+}
+
+.page h1, .page h2 {
+  margin: 6px 0 18px;
+  text-align: center;
+  color: #0f0;
+}
+
+.page h1 {
+  font-size: 1.8rem;
+  text-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 20px #0f0, 0 0 40px #00ff00;
+  animation: flicker 1.6s infinite alternate;
+}
+@keyframes flicker {
+  0%,19%,21%,23%,25%,54%,56%,100% { text-shadow:0 0 5px #0f0,0 0 10px #0f0,0 0 20px #0f0,0 0 40px #00ff00; }
+  20%,22%,24%,55% { text-shadow:0 0 2px #0f0; }
+}
+
+.page p {
+  margin: 8px 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+button {
+  background:#111;
+  color:#0f0;
+  border:1px solid #0f0;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+}
+button:hover { background:#0f0; color:#000; }
+
+.big-center-btn {
+  display: block;
+  margin: 16px auto;
+  font-size: 1.1rem;
+  padding: 12px 20px;
+}
+
+.back-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #222;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  z-index: 1000;
+}
+
+.back-button:hover {
+  background: #444;
+}
+
+#nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  border-top: 1px solid #0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+  background: rgba(0,0,0,0.9);
+  box-sizing: border-box;
+}
+
+#audio-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+.chapter-content {
+    max-height: calc(100vh - 120px);
+}
+
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+
+<div id="ebook-container">
+  <div id="ebook">
+
+    <!-- Cover -->
+    <div class="page active" data-page="0">
+      <div id="cover-content">
+      <button class="back-button" onclick="window.location.href='home.html'">⬅ 返回首页</button>
+        <div class="chapter-content" style="text-align:center;">
+          <!-- 封面内容从外部加载 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TOC -->
+    <div class="page" data-page="1">
+      <h2>目录</h2>
+      <button onclick="toggleDirectory()" class="big-center-btn">📜 查看/隐藏目录</button>
+      <button id="toggle-theme" class="big-center-btn">🌈切换目光🔂</button>
+      <div id="scroll-directory" style="display:none; max-height:60vh; overflow-y:auto; border:1px solid #0f0; padding:10px; margin-top:10px;">
+        <ol>
+          <li><button onclick="goToChapter(1)">群体心理特征</button></li>
+          <li><button onclick="goToChapter(2)">群体的行为模式</button></li>
+          <li><button onclick="goToChapter(3)">群体与领袖</button></li>
+          <li><button onclick="goToChapter(4)">群体类型</button></li>
+          <li><button onclick="goToChapter(5)">社会影响</button></li>
+          <li><button onclick="goToChapter(6)">一句话总结</button></li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Chapters -->
+<div class="page" data-page="2">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>群体心理特征</h2>
+  <div class="chapter-content">
+    <p><strong>1. 个体与群体的本质差异</strong></p>
+    <p>当一个人独处时，他的思想是稳定的、理性的、有逻辑的。但当他融入群体时，奇妙的变化就发生了：</p>
+    <ul>
+      <li><strong>理智被放下：</strong>个体在群体中不再完全依赖自己的判断，而是更容易被情绪驱动。</li>
+      <li><strong>自我意识减弱：</strong>你不再是单独的“我”，而成为群体的一部分。</li>
+      <li><strong>情绪感染：</strong>你的喜怒哀乐不再完全属于你，而是被周围人的情绪“放大”或“改写”。</li>
+    </ul>
+    <p><em>冥想练习：</em>闭上眼睛，想象自己站在一群人中，你的呼吸被周围的节奏牵动，心跳随着他们同步，但你仍能感受到内心有一个独立的自己在观察这一切。</p>
+
+    <hr>
+
+    <p><strong>2. 群体心理的三个核心因素</strong></p>
+    <ol>
+      <li><strong>暗示性：</strong>群体中的人对外界暗示极度敏感。一个强烈的声音、一句口号、一种表情，都会迅速影响每个人的情绪和判断。个体独立时可能冷静分析，但在群体中，很容易顺从直观的、简单的暗示。<br>
+      <em>冥想感悟：</em>想象有人在你耳边轻声重复一句话，你感到自己不自觉地跟着情绪起伏。意识到这一点，就是你觉察暗示力量的开始。</li>
+
+      <li><strong>传染性：</strong>群体的情绪像空气一样无形，却能快速传染。一个人的愤怒可以点燃整个群体的激情。群体的欢呼、恐惧、焦虑、愤怒，都像波浪一样席卷每个人的心。<br>
+      <em>冥想练习：</em>想象自己站在一片人海里，每个人的情绪像波浪一样传来，你可以感受到冲击，但不必被卷走，保持内心的宁静。</li>
+
+      <li><strong>责任感的消失：</strong>在群体中，个体的行为责任感减弱。群体给予了“隐身感”，让你觉得自己的行为可以被掩盖。因此，人们往往做出平时不会做的事情——冲动、激烈，甚至是暴力。<br>
+      <em>冥想练习：</em>体会这种匿名感的力量，同时提醒自己：我可以感受群体的力量，但不必屈从，我依然是独立的。</li>
+    </ol>
+
+    <hr>
+
+    <p><strong>3. 个体心理被群体改造的机制</strong></p>
+    <ul>
+      <li><strong>理性消融：</strong>群体心理不依赖逻辑推理，而依赖感性、直观和情绪。</li>
+      <li><strong>易受暗示：</strong>简单重复的口号、象征、符号，比理性分析更容易被群体接受。</li>
+      <li><strong>感情扩张：</strong>个体的情绪被群体放大，激情更易激发，恐惧更易蔓延。</li>
+      <li><strong>意志融合：</strong>个体意志被群体吸纳，个人边界模糊，形成群体统一行为。</li>
+    </ul>
+    <p><em>冥想练习：</em>想象你的思想像水一样溶入群体，你感受到力量，但仍有一颗小小的水珠属于自己，这就是保持独立意识的开始。</p>
+
+    <hr>
+
+    <p><strong>4. 根源总结（内心感悟版）</strong></p>
+    <p>群体心理的根源在于人类天生的社交性与从众心理。在群体中，个体的理性减弱，情绪放大，责任感降低。暗示、传染、认同、匿名感共同作用，使群体形成一种独特的“心理生命”。</p>
+    <p>了解这一点，就是理解人类社会行为的基础，也是保护自我理性的重要第一步。</p>
+    <p><em>冥想收尾：</em>深呼吸三次，感受心中独立的“我”，同时感受群体的力量。你既能感受群体的脉动，又能保持理性和清醒，这是洞察人性和社会的第一步。</p>
+
+    <p style="text-align:center;"><button onclick="showPage(0)">⬅ 返回首页</button></p>
+  </div>
+</div>
+
+
+   <div class="page" data-page="3">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>群体的行为模式</h2>
+  <div class="chapter-content">
+    <p>思维简单化，喜欢极端。</p>
+    <p>情绪化，容易被煽动和改变。</p>
+    <p>崇拜权威，厌恶复杂推理。</p>
+
+    <hr>
+
+    <p><strong>二、暗示与传染</strong></p>
+    <p>群体的力量很大程度上来源于暗示与情绪传染。这里没有逻辑推理，只有情绪的流动。理解它，不仅是认知，更是练习自我觉察与掌控情绪的机会。</p>
+
+    <p><strong>1. 暗示性</strong></p>
+    <ul>
+      <li><strong>现象：</strong>在群体中，人们容易被外界简单、直接的刺激影响。</li>
+      <li><strong>表现：</strong>一句口号、一幅标语、一种表情，就能改变群体成员的情绪与行为。</li>
+      <li><strong>本质：</strong>这不是思考的结果，而是心理本能的反应。</li>
+    </ul>
+    <p><em>冥想练习：</em>闭上眼睛，想象周围的人不断重复一句简单的话。感受自己的心跳微微加快，你的情绪随之波动。</p>
+    <p><em>情绪管理技巧：</em>识别、命名、呼吸、选择，保持内心独立。</p>
+
+    <p><strong>2. 传染性</strong></p>
+    <ul>
+      <li><strong>现象：</strong>情绪像空气一样，在群体中自由流动。</li>
+      <li><strong>表现：</strong>一个人的恐惧可以让数百人紧张，一人的愤怒可以点燃整片人海。</li>
+      <li><strong>本质：</strong>群体像一面镜子，每个人的情绪都被放大，形成共振。</li>
+    </ul>
+    <p><em>冥想练习：</em>想象自己置身于人群中，人们的情绪像波浪涌来，你感受到它的力量。</p>
+    <p><em>情绪管理技巧：</em>观察而不参与、内心屏障、自我安抚，保持理性。</p>
+
+    <p><strong>3. 群体语言与象征</strong></p>
+    <ul>
+      <li><strong>现象：</strong>语言、符号、口号比理性更能影响群体。</li>
+      <li><strong>表现：</strong>简单、重复、富有象征意义的表达，像磁石一样吸引情绪。</li>
+      <li><strong>本质：</strong>理性思考在群体中变得迟钝，而象征与情绪成为主导。</li>
+    </ul>
+    <p><em>冥想练习：</em>想象听到一句口号，它在你脑中回荡。感受到它激发的激情，但深呼吸后，你明白这只是心理反应。</p>
+    <p><em>情绪管理技巧：</em>觉察刺激来源、暂停反应、选择回应，保持主动权。</p>
+
+    <p><strong>4. 面对群体情绪的实用方法</strong></p>
+    <ul>
+      <li>保持自我意识：在群体中时刻提醒自己，你是独立个体。</li>
+      <li>分辨情绪与理性：认清群体情绪是感染，而不是你的必然行为。</li>
+      <li>呼吸与身体觉察：深呼吸、感受身体重心，让紧张或兴奋的情绪得到释放。</li>
+      <li>语言内化：在心中重复“我感受情绪，但不必被控制”，强化自我界限。</li>
+      <li>后行动分析：事后反思自己情绪反应，增强未来面对群体心理的能力。</li>
+    </ul>
+
+    <p><em>总结冥想练习：</em>闭眼三分钟，想象周围群体的情绪像波浪涌来，你感受冲击力，却在内心保持灯塔般清晰。呼吸、觉察、选择，让你既理解群体心理，又能掌控自己的情绪。</p>
+
+    <p style="text-align:center;"><button onclick="showPage(0)">⬅ 返回首页</button></p>
+  </div>
+</div>
+
+    <div class="page" data-page="4">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>群体与领袖</h2>
+  <div class="chapter-content">
+    <p>群体缺乏独立思考，容易被领袖操纵。</p>
+    <p>领袖常用口号、重复、暗示来影响大众。</p>
+
+    <hr>
+
+    <p><strong>四、群体的特征</strong></p>
+    <p>群体就像一片有生命的海洋，它表面平静时看似有序，但水下暗流汹涌。群体心理的特征，是个体无法独立观察时最直观的体现。</p>
+
+    <p><strong>1. 思维简单而极端</strong></p>
+    <p>本质：群体不喜欢复杂、抽象的思维，它接受的信息必须简单、直观、可感知。</p>
+    <p>行为表现：复杂的问题在群体中被极端化，非黑即白、非全盘接受即全盘否定。</p>
+    <p>心理机制：群体心理不依赖逻辑分析，而依赖直觉和情绪。个体在群体中，理性被弱化，简单而强烈的感受占据主导。</p>
+    <p><em>冥想练习：</em>闭眼，想象你置身于人群中，你听到一句简单的口号，几千人的情绪瞬间被点燃。你感受情绪涌动，但在内心保持观察者的视角，明白情绪的冲击与理性的独立是两回事。</p>
+
+    <p><strong>2. 情绪化与易变</strong></p>
+    <p>本质：群体的情绪像风暴，来得快，去得也快。</p>
+    <p>行为表现：热情可以在瞬间升腾，也可以在几分钟内消散。群体情绪常常呈现极端波动。</p>
+    <p>心理机制：群体中的个体容易被他人的情绪感染，情绪在个体之间传染和放大，形成共振。</p>
+    <p><em>冥想练习：</em>想象站在广场中央，人群情绪如潮水般涌来，有时高涨，有时低落。感受其波动，但意识到自己内心可以像礁石一样稳固，不被瞬间情绪吞没。</p>
+
+    <p><strong>3. 崇拜权威</strong></p>
+    <p>本质：群体倾向于寻求强者、领袖或象征性的权威来指引方向。</p>
+    <p>行为表现：群体容易追随领袖、偶像、象征物，缺乏独立判断。</p>
+    <p>心理机制：群体成员对权威的信任源自心理安全感和从众心理，个体在群体中往往愿意放弃部分自由以换取安全和认同。</p>
+    <p><em>冥想练习：</em>闭眼想象一个象征性的人物站在人群中心，群体围绕他旋转。你感受到群体的凝聚力与压迫感，但你的内心仍保留独立意识。你意识到可以观察权威的力量，而不必完全服从。</p>
+
+    <p><strong>4. 易受暗示与传染</strong></p>
+    <p>本质：群体成员对外界暗示和情绪感染极为敏感。</p>
+    <p>行为表现：一条新闻、一句口号、一个眼神，可能引起成千上万人的共振。</p>
+    <p>心理机制：个体心理在群体中被弱化，直觉和情绪占主导，暗示和情绪传染比逻辑和理性更有力量。</p>
+    <p><em>冥想练习：</em>想象周围人不断重复一个词，你的情绪随之波动。深呼吸，体会这种心理暗示，但同时提醒自己：这只是心理反应，我仍然独立。</p>
+
+    <p><strong>5. 保守与不善分析</strong></p>
+    <p>本质：群体倾向保守，不喜欢抽象思考和复杂分析。</p>
+    <p>行为表现：群体容易坚持传统信念、惯例和习惯，不轻易改变态度。</p>
+    <p>心理机制：个体在群体中依赖简化的信念系统，避免承担复杂判断的心理负担。</p>
+    <p><em>冥想练习：</em>想象自己面对一个群体的固有信念，你可以看到它的坚固与稳定，同时在心中保持独立思考，理解它的力量，但不被束缚。</p>
+
+    <p><strong>6. 情绪的共振与爆发</strong></p>
+    <p>本质：群体的行为是一种集体情绪的物理化表现。</p>
+    <p>行为表现：小小的刺激在群体中被放大，可能引发狂欢、愤怒、恐惧或暴力。</p>
+    <p>心理机制：每个个体的情绪被群体吸纳和增强，形成集体心理“共鸣”。</p>
+    <p><em>冥想练习：</em>感受群体的情绪像波浪一样涌来，你只是观察者，感受其力量，却不被卷走。内心像深海一样平静，既理解群体，也保持独立。</p>
+
+    <p><strong>总结</strong></p>
+    <p>群体的心理特征总结为：</p>
+    <ul>
+      <li>思维简单而极端</li>
+      <li>情绪化与易变</li>
+      <li>崇拜权威</li>
+      <li>易受暗示与情绪传染</li>
+      <li>保守、不善分析</li>
+      <li>情绪共振与行为放大</li>
+    </ul>
+    <p><em>冥想收尾：</em>深呼吸三次，感受群体的力量和脉动。你既能感受其冲击，也能保持内心的独立与清醒。理解群体心理，就是理解人性，也是保护自我理性的第一步。</p>
+
+    <p style="text-align:center;"><button onclick="showPage(0)">⬅ 返回首页</button></p>
+  </div>
+</div>
+
+    <div class="page" data-page="5">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>领袖与舆论</h2>
+  <div class="chapter-content">
+    <p>群体缺乏独立判断，往往依赖领袖来确定方向。领袖不仅是群体的象征，更是情绪和意志的引导者。他们掌握了群体心理的密码，能影响、激发甚至操控成千上万人的情绪。</p>
+
+    <h3>1. 领袖的核心特质</h3>
+    <p><strong>坚定与自信：</strong>群体倾向追随坚信自己的人。强烈的信念像磁场，吸引人们的注意与情绪。</p>
+    <p><strong>情绪感染力：</strong>领袖的激情、愤怒、悲伤，都能像火焰一样迅速蔓延，点燃群体的情绪。</p>
+    <p><strong>简洁有力的语言：</strong>简单的口号、象征性的行动、不断重复的词句，比长篇逻辑更能触动群体。</p>
+    <p><em>冥想练习：</em>闭上眼睛，想象一个领袖站在广场中央，人群围绕他旋转。你感受他散发出的力量与信念，但内心保持平静，意识到自己是观察者，不必完全跟随。</p>
+
+    <h3>2. 舆论与信息操控</h3>
+    <p>群体容易被重复、符号化、情绪化的信息引导。</p>
+    <p>恐惧、热情、信仰，是最直接的操控工具。</p>
+    <p>群体缺乏理性分析能力，对信息的反应主要是感性的。</p>
+    <p><em>冥想练习：</em>想象周围不断重复的信息像波浪拍打你的心灵。感受情绪的涌动，但保持呼吸节奏，提醒自己：你可以感受，但不必行动，理性仍在心中。</p>
+
+    <h3>3. 领袖与群体互动</h3>
+    <p>领袖通过情绪感染、符号化行为和持续暗示，将个体心理融入群体。</p>
+    <p>群体在领袖引导下，行为和情绪高度同步。</p>
+    <p>个体易失独立，但也可以通过觉察保持理性。</p>
+    <p><em>冥想练习：</em>闭眼体会人群随领袖情绪起伏的节奏，你是观察者，感受冲击，却不被卷走。理性像灯塔一样照亮内心，你可以选择保持独立。</p>
+
+    <h3>4. 冥想总结</h3>
+    <p>领袖是群体心理的放大器和引导者。他们用信念、情绪和简单符号操控群体，而不是逻辑推理。</p>
+    <p>觉察这一点，你就能在群体中保持清醒，感受力量，同时不被操纵。</p>
+    <p><em>闭眼练习收尾：</em>深呼吸三次，感受领袖的能量像波浪涌来，你内心的独立意识如灯塔般明亮。你既能理解群体的动力，也能保持自我理性与清醒。</p>
+  </div>
+</div>
+
+    <div class="page" data-page="5">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>领袖与舆论</h2>
+  <div class="chapter-content">
+    <p>群体缺乏独立判断，往往依赖领袖来确定方向。领袖不仅是群体的象征，更是情绪和意志的引导者。他们掌握了群体心理的密码，能影响、激发甚至操控成千上万人的情绪。</p>
+
+    <h3>1. 领袖的核心特质</h3>
+    <p><strong>坚定与自信：</strong>群体倾向追随坚信自己的人。强烈的信念像磁场，吸引人们的注意与情绪。</p>
+    <p><strong>情绪感染力：</strong>领袖的激情、愤怒、悲伤，都能像火焰一样迅速蔓延，点燃群体的情绪。</p>
+    <p><strong>简洁有力的语言：</strong>简单的口号、象征性的行动、不断重复的词句，比长篇逻辑更能触动群体。</p>
+    <p><em>冥想练习：</em>闭上眼睛，想象一个领袖站在广场中央，人群围绕他旋转。你感受他散发出的力量与信念，但内心保持平静，意识到自己是观察者，不必完全跟随。</p>
+
+    <h3>2. 舆论与信息操控</h3>
+    <p>群体容易被重复、符号化、情绪化的信息引导。</p>
+    <p>恐惧、热情、信仰，是最直接的操控工具。</p>
+    <p>群体缺乏理性分析能力，对信息的反应主要是感性的。</p>
+    <p><em>冥想练习：</em>想象周围不断重复的信息像波浪拍打你的心灵。感受情绪的涌动，但保持呼吸节奏，提醒自己：你可以感受，但不必行动，理性仍在心中。</p>
+
+    <h3>3. 领袖与群体互动</h3>
+    <p>领袖通过情绪感染、符号化行为和持续暗示，将个体心理融入群体。</p>
+    <p>群体在领袖引导下，行为和情绪高度同步。</p>
+    <p>个体易失独立，但也可以通过觉察保持理性。</p>
+    <p><em>冥想练习：</em>闭眼体会人群随领袖情绪起伏的节奏，你是观察者，感受冲击，却不被卷走。理性像灯塔一样照亮内心，你可以选择保持独立。</p>
+
+    <h3>4. 冥想总结</h3>
+    <p>领袖是群体心理的放大器和引导者。他们用信念、情绪和简单符号操控群体，而不是逻辑推理。</p>
+    <p>觉察这一点，你就能在群体中保持清醒，感受力量，同时不被操纵。</p>
+    <p><em>闭眼练习收尾：</em>深呼吸三次，感受领袖的能量像波浪涌来，你内心的独立意识如灯塔般明亮。你既能理解群体的动力，也能保持自我理性与清醒。</p>
+  </div>
+</div>
+
+
+    <div class="page" data-page="6">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>群体类型</h2>
+  <div class="chapter-content">
+    <p>群体并非单一形态，每一种群体都有独特的心理结构和行为方式。理解群体类型，不仅能洞察社会和人性，也能帮助你在复杂的环境中保持内心的独立与清醒。</p>
+
+    <h3>异质群体（临时群体）</h3>
+    <p><strong>心理特征：</strong>成员来自不同背景、信仰和价值观，因某种事件或目的短时间聚集。内部缺乏统一信念和秩序，心理差异大。情绪极易受外界刺激影响，恐惧、愤怒或狂热可迅速扩散。</p>
+    <p><strong>行为模式：</strong>冲动、不可预测，容易出现极端行为。行动缺乏组织，像风暴般猛烈却短暂。情绪感染力强，个体容易被群体牵引而失去理性。</p>
+    <p><em>冥想练习：</em>闭上眼睛，想象自己置身在一片临时聚集的人群中。每个人的情绪如海浪般涌来，撞击你的感官。感受这股能量的冲击，但保持内心深处的宁静，你只是观察者，理性如深海礁石般稳固，不被卷走。</p>
+
+    <h3>同质群体（稳定群体）</h3>
+    <p><strong>心理特征：</strong>成员背景、信仰和价值观高度一致，长期聚集形成稳定组织。群体内部纪律严格，情绪容易统一。容易被领袖、象征或共同信念引导，形成高度凝聚力。</p>
+    <p><strong>行为模式：</strong>行动有组织、目标明确，即便情绪高涨，也呈现结构化行为。稳定性高，但个体在情绪驱动下仍可能失去独立判断。团体力量强大，凝聚力让群体具有深远影响。</p>
+    <p><em>冥想练习：</em>想象自己进入一个高度组织化的群体，感受秩序、纪律和统一意志的力量。你理解群体的凝聚力，同时在内心保持独立思考，不被完全吸收。</p>
+
+    <h3>内心觉察与冥想</h3>
+    <p>感受异质群体的冲击：体验短时间聚集的人群情绪如波涛般涌动，瞬息万变。</p>
+    <p>感受同质群体的力量：体验稳定组织的纪律和统一意志，感受凝聚力的压迫感与感染力。</p>
+    <p>保持独立意识：无论群体如何涌动，你都可以通过观察和觉察，保持理性与自我。</p>
+    <p><em>闭眼练习收尾：</em>深吸三次气，感受群体的脉动在周围流动。你既能感受群体的力量，也保持内心的清晰。意识到：理解群体心理，即是理解人性，同时守护自我理性与独立。</p>
+  </div>
+</div>
+
+
+    <div class="page" data-page="7">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>社会影响</h2>
+  <div class="chapter-content">
+    <p>群体不仅存在于某个广场、某个集会，它无处不在地塑造着社会、历史和文明的进程。理解群体对社会的影响，意味着理解社会的脉动，也意味着理解历史背后的心理力量。</p>
+
+    <h3>群体的创造性力量</h3>
+    <p>群体能将个体力量汇聚，使单独个体无法完成的壮举变为可能。宗教运动、民族团结、社会改革、科技革命——都是群体心理力量的体现。当群体情绪正向且有目标，个人的创造力被放大，社会因之前进。</p>
+    <p><em>冥想练习：</em>闭上眼睛，想象一群人在共同目标下行动，他们的热情像火焰般汇聚成光。你感受这股力量，它既温暖又巨大，但你依然保持内心的平静，你能观察，而不被情绪完全吞没。</p>
+
+    <h3>群体的破坏性力量</h3>
+    <p>当群体心理失控，情绪主导而非理性，社会就容易出现暴力、骚乱、战争。群体的冲动可以摧毁城市、破坏秩序，个体理性在其中被弱化或消失。小小的刺激、一个暗示、一句口号，可能瞬间点燃整个社会的情绪。</p>
+    <p><em>冥想练习：</em>想象暴乱或冲突场景，群体情绪如狂风暴雨席卷一切。你感受到它的力量，但保持心中灯塔般的理性意识：观察而不卷入，感受而不迷失。</p>
+
+    <h3>群体影响社会稳定与变革</h3>
+    <p>稳定作用：同质群体的纪律、凝聚力和秩序感，可以维持社会结构与制度。变革作用：异质群体的冲动与多样性，有时能撼动旧秩序，引发社会变革。群体对社会的影响不是单向的，它既能保护秩序，也能推动历史，甚至同时兼具创造与破坏。</p>
+    <p><em>冥想练习：</em>想象历史长河中，群体的情绪像潮水推动社会前行。感受它的力量、波动和节奏，同时保持内心的独立。你可以理解群体如何塑造社会，却不被其完全左右。</p>
+
+    <h3>内心觉察与冥想总结</h3>
+    <p>觉察力量：群体的力量巨大且不可忽视，它塑造社会的同时，也影响个体心理。保持清醒：理解群体心理运作机制，能够让你在社会洪流中保持理性和独立。平衡感受：感受群体能量，既看到它的正向推动力，也看到潜在破坏性。</p>
+    <p><em>闭眼练习收尾：</em>深吸三次气，感受群体的脉动贯穿社会的每一个角落。你既能理解它推动社会的力量，也能保持自我意识如灯塔般明亮。感受历史、感受力量，同时守护理性与清醒。</p>
+  </div>
+</div>
+    <div class="page" data-page="8">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>一句话总结</h2>
+  <div class="chapter-content">
+    <p>《乌合之众》揭示了人在群体中容易失去理性、被情绪和领袖操纵，群体既能推动文明，也可能带来混乱。理解群体心理，既是洞察人性，也是保护自我理性与独立的关键。</p>
+
+    <h3>核心要点回顾</h3>
+    <ul>
+      <li>个体在群体中容易失去理性、责任感下降。</li>
+      <li>暗示性与情绪传染让群体行为高度一致。</li>
+      <li>群体思维简单化、情绪化、易受象征和口号影响。</li>
+      <li>领袖通过情绪、信念和符号影响群体行为。</li>
+      <li>群体既能创造伟大事业，也能带来破坏性力量。</li>
+    </ul>
+
+    <h3>冥想收尾</h3>
+    <p>闭上眼睛，深呼吸三次，感受群体的脉动与力量，同时感受内心独立的“我”。你既能理解群体心理的冲击，也能保持理性清醒，成为观察者而非被动参与者。</p>
+  </div>
+</div>
+
+
+  </div>
+
+  <!-- Nav -->
+  <div id="nav">
+  <button onclick="prevChapter()">上一页</button>
+  <div id="audio-controls">
+    <button id="play-btn" onclick="toggleAudio()">▶️ 播放</button>
+    <button onclick="changeTextSize(2)">🔎+</button>
+    <button onclick="changeTextSize(-2)">🔎-</button>
+    <label for="speed" style="color:#0f0;">速度:</label>
+    <select id="speed" onchange="changeSpeed()" style="background:#111; color:#0f0; border:1px solid #0f0; padding:3px; border-radius:5px;">
+      <option value="0.75">0.75x</option>
+      <option value="1" selected>1x</option>
+      <option value="1.25">1.25x</option>
+      <option value="1.5">1.5x</option>
+      <option value="2">2x</option>
+    </select>
+  </div>
+  <button onclick="nextChapter()">下一页</button>
+</div>
+
+<audio id="chapter-audio"></audio>
+
+<script>
+// ------------------
+// Theme切换
+// ------------------
+const themes = [
+  { bg: "rgba(0,0,0,0.85)", text: "#0f0", border: "#0f0" },
+  { bg: "#fff", text: "#000", border: "#000" },
+  { bg: "#001f3f", text: "#fff", border: "#fff" },
+  { bg: "#fff8dc", text: "#5a3e1b", border: "#5a3e1b" }
+];
+let currentTheme = 0;
+document.getElementById("toggle-theme").addEventListener("click", () => {
+    currentTheme = (currentTheme + 1) % themes.length;
+    const theme = themes[currentTheme];
+    const container = document.getElementById("ebook-container");
+    const pages = document.querySelectorAll(".page, .chapter-content");
+    container.style.background = theme.bg;
+    pages.forEach(p => {
+        p.style.background = theme.bg;
+        p.style.color = theme.text;
+        if(p.classList.contains('chapter-content')) p.style.borderColor = theme.border;
+    });
+});
+
+// ------------------
+// 目录切换
+// ------------------
+function toggleDirectory() {
+  const dir = document.getElementById('scroll-directory');
+  dir.style.display = (dir.style.display === 'block') ? 'none' : 'block';
+}
+
+// ------------------
+// 页面切换
+// ------------------
+let pages = [];
+let currentPage = 0;
+document.addEventListener('DOMContentLoaded', () => {
+  pages = Array.from(document.querySelectorAll('.page'));
+  loadCover();
+});
+
+function showPage(n) {
+  if (n<0||n>=pages.length) return;
+  pages.forEach(p=>p.classList.remove('active'));
+  pages[n].classList.add('active');
+  currentPage = n;
+}
+function nextChapter(){ if(currentPage<pages.length-1) showPage(currentPage+1); }
+function prevChapter(){ if(currentPage>0) showPage(currentPage-1); }
+function goToChapter(n){ showPage(1+n); }
+
+// ------------------
+// 字号改变
+// ------------------
+let currentFontSize = 16;
+function changeTextSize(delta){
+  currentFontSize = Math.max(12,currentFontSize+delta);
+  document.documentElement.style.fontSize = currentFontSize + "px";
+}
+
+// ------------------
+// 音频控制
+// ------------------
+const audio = document.getElementById('chapter-audio');
+const playBtn = document.getElementById('play-btn');
+
+const audioList = [
+  'src2/audio/cover.mp3',
+  'src2/audio/chapter1.mp3',
+  'src2/audio/chapter2.mp3',
+  'src2/audio/chapter3.mp3',
+  'src2/audio/chapter4.mp3',
+  'src2/audio/chapter5.mp3',
+  'src2/audio/chapter6.mp3'
+];
+
+let currentIndex = 0;
+let isPlaying = false;
+
+// 播放/暂停按钮
+function toggleAudio() {
+  if (!isPlaying) {
+    playAudio(currentIndex);
+  } else {
+    audio.pause();
+    isPlaying = false;
+    playBtn.textContent = '▶️ 播放';
+  }
+}
+
+// 播放指定音频
+function playAudio(index) {
+  if (index >= audioList.length) {
+    // 如果超出范围，循环回到第一个音频
+    currentIndex = 0;
+    index = 0;
+  }
+
+  audio.src = audioList[index];
+  audio.load();
+  audio.play().then(() => {
+    isPlaying = true;
+    playBtn.textContent = '⏸ 暂停';
+  }).catch(err => {
+    console.error('播放失败:', err);
+  });
+
+  // 音频播放结束，自动播放下一首
+  audio.onended = () => {
+    currentIndex++;
+    // 循环播放
+    if (currentIndex >= audioList.length) currentIndex = 0;
+    playAudio(currentIndex);
+  }
+}
+
+
+// 改变播放速度
+function changeSpeed() {
+  const speed = parseFloat(document.getElementById('speed').value);
+  audio.playbackRate = speed;
+}
+
+// ------------------
+// 封面加载
+// ------------------
+function loadCover(){
+  fetch("src2/cover.html").then(r=>r.text()).then(html=>{
+    document.querySelector("#cover-content .chapter-content").innerHTML = html;
+  });
+}
+
+// ------------------
+// 矩阵背景
+// ------------------
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+function resizeCanvas(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
+const fontSize = 14;
+let columns = Math.floor(innerWidth/fontSize);
+let drops = Array(columns).fill(1);
+
+function drawMatrix(){
+  ctx.fillStyle = "rgba(0,0,0,0.06)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#0f0";
+  ctx.font = fontSize + "px monospace";
+  for(let i=0;i<drops.length;i++){
+    const text=letters.charAt(Math.floor(Math.random()*letters.length));
+    ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+    if(drops[i]*fontSize>canvas.height && Math.random()>0.975) drops[i]=0;
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix,33);
+
+</script>
+</body>
+</html>

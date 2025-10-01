@@ -1,0 +1,169 @@
+/* Home page exclusive styles */
+
+/* Gradient background animation */
+body {
+  margin: 0;
+  font-family: system-ui, Arial, sans-serif;
+  background: linear-gradient(-45deg, #141e30, #243b55, #1a2a6c, #b21f1f, #fdbb2d);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  color: #fff;
+}
+
+/* Navigation */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+}
+
+.navbar .logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #41D1FF;
+  text-decoration: none;
+}
+
+/* Navigation links */
+.nav-links a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #fff;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: #41D1FF;
+}
+
+.logout {
+  color: #ff8080 !important;
+}
+
+/* Hero section */
+.hero {
+  height: calc(100vh - 70px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  background: linear-gradient(90deg, #41D1FF, #FFEA83, #BD34FE);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 15px;
+  animation: fadeInDown 2s ease;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: #e0e0e0;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #41D1FF, #BD34FE);
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+/* Settings 按钮整体 */
+.settings {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;        /* bigger button */
+  height: 80px;
+  border: none;
+  border-radius: 50%;
+  background: #ffa502;
+  cursor: pointer;
+  transition: 0.3s;
+  padding: 0;         /* remove extra padding */
+}
+
+.settings:hover {
+  background: #e67e22;
+  transform: rotate(90deg);
+}
+
+/* Settings 图标随按钮大小 */
+.settings-icon {
+  width: 40px;    /* bigger icon inside */
+  height: 40px;
+}
+
+/* Animations */
+@keyframes gradientBG {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+@keyframes fadeInDown {
+  from {opacity: 0; transform: translateY(-40px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+/* --- Logo Styles --- */
+.logo {
+  height: 60px;      /* control logo size */
+  width: auto;       /* keeps aspect ratio */
+  display: block;    /* removes inline gap */
+}
+
+/* --- Navbar Example --- */
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background: #222;     /* dark background */
+}
+
+.navbar a {
+  text-decoration: none;
+  color: white;
+  margin-left: 15px;
+  font-size: 18px;
+}
+
+/* --- Responsive: smaller logo & icon on mobile --- */
+@media (max-width: 600px) {
+  .logo {
+    height: 40px;
+  }
+  .navbar a {
+    font-size: 16px;
+  }
+  .settings-icon {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+.btn-icon {
+  width: 22px;       /* icon size */
+  height: 22px;
+  margin-right: 8px; /* space between icon and text */
+  vertical-align: middle;
+}

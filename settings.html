@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📖 Settings</title>
+<link rel="icon" href="book.png" type="image/png">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(120deg, #74ebd5, #ACB6E5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+.profile-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 15px;
+  width: 370px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+input, select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+button {
+  margin-top: 20px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  background: #4CAF50;
+  color: #fff;
+  cursor: pointer;
+}
+button:hover {
+  background: #45a049;
+}
+.plan {
+  margin-top: 15px;
+}
+.notice {
+  text-align: center;
+  font-size: 14px;
+  color: red;
+  margin-top: 10px;
+}
+.profile-pic {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+  position: relative;
+}
+.profile-pic img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #4CAF50;
+}
+.upload-btn {
+  position: absolute;
+  bottom: 0;
+  right: 30%;
+  background: #4CAF50;
+  color: #fff;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+}
+.logout-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+.logout-icon {
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.logout-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+</style>
+</head>
+<body>
+<div class="profile-box">
+  <h2 id="title">Premium Profile Settings</h2>
+
+  <!-- Profile picture -->
+  <div class="profile-pic">
+    <img id="previewPic" src="" alt="Profile Picture">
+    <label for="profilePic" class="upload-btn">📷</label>
+    <input type="file" id="profilePic" accept="image/*" style="display:none">
+  </div>
+
+  <form id="profileForm">
+    <label id="labelName">Name</label>
+    <input type="text" id="name" required>
+
+    <label id="labelEmail">Email</label>
+    <input type="email" id="email" required>
+
+    <label id="labelPassword">Password</label>
+    <input type="password" id="password" required>
+
+    <label id="labelAge">Age</label>
+    <input type="number" id="age" required>
+
+    <label id="labelGender">Gender</label>
+    <select id="gender" required>
+      <option value="male">♂ Male</option>
+      <option value="female">♀ Female</option>
+      <option value="other">⚧ Other</option>
+    </select>
+
+    <label id="labelPhone">Phone</label>
+    <input type="tel" id="phone" required>
+
+    <!-- Premium Plan -->
+    <div class="plan">
+      <label><input type="radio" name="plan" value="premium" checked> 💎 Premium Only</label>
+    </div>
+    <div class="notice">⚠️ Only Premium users can create new accounts here</div>
+
+    <button type="submit">开通VIP会员</button>
+  </form>
+
+  <!-- Logout button -->
+  <div class="logout-container">
+    <img src="assetss/logout.png" alt="Logout" class="logout-icon" onclick="logout()">
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+// ====== Firebase 初始化 ======
+const firebaseConfig = {
+  apiKey: "AIzaSyBCIVYd8e5vBeGRz-H12Nj9hd5dyqnZCDI",
+  authDomain: "guardiangate-7xkgi.firebaseapp.com",
+  projectId: "guardiangate-7xkgi",
+  storageBucket: "guardiangate-7xkgi.firebasestorage.app",
+  messagingSenderId: "133766737758",
+  appId: "1:133766737758:web:38de135254fef4664769cf"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+// ====== 登录状态检查 ======
+auth.onAuthStateChanged((user) => {
+  if (!user) {
+    window.location.replace("index.html");
+  }
+});
+
+// ====== Logout ======
+async function logout() {
+  try {
+    await auth.signOut();
+    sessionStorage.clear();
+    localStorage.clear();
+    window.location.replace("index.html"); // 防止返回
+  } catch (err) {
+    alert("❌ 退出失败: " + err.message);
+  }
+}
+
+// ====== 防止后退进入 ======
+history.pushState(null, null, window.location.href);
+window.onpopstate = function () {
+  auth.signOut().then(() => {
+    window.location.replace("index.html");
+  });
+};
+
+// ====== 多语言支持 ======
+const translations = {
+  en: {title:"Premium Profile Settings", name:"Name", email:"Email", password:"Password", age:"Age", gender:"Gender", phone:"Phone"},
+  es: {title:"Configuración Premium", name:"Nombre", email:"Correo electrónico", password:"Contraseña", age:"Edad", gender:"Género", phone:"Teléfono"},
+  zh: {title:"普通会员", name:"姓名", email:"电子邮件", password:"密码", age:"年龄", gender:"性别", phone:"电话"}
+};
+const userLang = navigator.language.slice(0,2);
+const lang = translations[userLang] ? userLang : "en";
+document.getElementById("title").textContent = translations[lang].title;
+document.getElementById("labelName").textContent = translations[lang].name;
+document.getElementById("labelEmail").textContent = translations[lang].email;
+document.getElementById("labelPassword").textContent = translations[lang].password;
+document.getElementById("labelAge").textContent = translations[lang].age;
+document.getElementById("labelGender").textContent = translations[lang].gender;
+document.getElementById("labelPhone").textContent = translations[lang].phone;
+
+// ====== Profile picture logic ======
+const previewPic = document.getElementById("previewPic");
+const profilePicInput = document.getElementById("profilePic");
+
+function generateAvatar(name) {
+  const initials = name ? name.charAt(0).toUpperCase() : "U";
+  const bgColors = ["#4CAF50", "#FF9800", "#2196F3", "#9C27B0", "#E91E63"];
+  const bg = bgColors[Math.floor(Math.random() * bgColors.length)];
+  const canvas = document.createElement("canvas");
+  canvas.width = 100; canvas.height = 100;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#fff";
+  ctx.font = "50px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(initials, canvas.width/2, canvas.height/2);
+  return canvas.toDataURL();
+}
+
+// 页面加载时恢复数据
+window.onload = () => {
+  const saved = JSON.parse(localStorage.getItem("profileData"));
+  if (saved) {
+    document.getElementById("name").value = saved.name || "";
+    document.getElementById("email").value = saved.email || "";
+    document.getElementById("password").value = saved.password || "";
+    document.getElementById("age").value = saved.age || "";
+    document.getElementById("gender").value = saved.gender || "";
+    document.getElementById("phone").value = saved.phone || "";
+    previewPic.src = saved.pic || generateAvatar(saved.name);
+  } else {
+    previewPic.src = generateAvatar("User");
+  }
+};
+
+// 上传头像并保存到 localStorage
+profilePicInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      previewPic.src = event.target.result;
+      const saved = JSON.parse(localStorage.getItem("profileData")) || {};
+      saved.pic = event.target.result;
+      localStorage.setItem("profileData", JSON.stringify(saved));
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// ====== Form submit (Premium Only) ======
+document.getElementById("profileForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const age = document.getElementById("age").value;
+  const gender = document.getElementById("gender").value;
+  const phone = document.getElementById("phone").value;
+  const plan = "premium";
+  const pic = previewPic.src || generateAvatar(name);
+
+  const confirmText =
+    "请确认您的 VIP 用户信息:\n\n" +
+    "👤 姓名: " + name + "\n" +
+    "📧 邮箱: " + email + "\n" +
+    "🔑 密码: " + "*".repeat(password.length) + "\n" +
+    "🎂 年龄: " + age + "\n" +
+    "⚧ 性别: " + gender + "\n" +
+    "📱 手机: " + phone + "\n" +
+    "💎 会员类型: " + plan.toUpperCase() + "\n\n" +
+    "是否确认创建此 VIP 用户？";
+
+  if (confirm(confirmText)) {
+    const profileData = {name, email, password, age, gender, phone, plan, pic};
+    localStorage.setItem("profileData", JSON.stringify(profileData));
+    alert("✅ Premium account created successfully!");
+  }
+});
+</script>
+</body>
+</html>

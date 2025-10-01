@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hmoobtsaab's漆书</title>
+
+  <!-- 禁止缓存，避免退出后点返回还能进入 -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <!-- Global styles -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Home page styles -->
+  <link rel="stylesheet" href="home-style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="home.html">
+      <img src="assetss/logo.png" alt="Awvtsaab's漆书" class="logo">
+    </a>
+    <div class="nav-links">
+      <a href="home.html" class="nav-btn">首页</a>
+      <a href="library.html" class="nav-btn">正开发中</a>
+      <a href="books.html" class="nav-btn">完整书版</a>
+      <a href="family.html" class="nav-btn">家族之书</a>
+      <a href="forum.html" class="nav-btn">在线论坛</a>
+      <a href="about.html" class="nav-btn">关于</a>
+      <!-- Settings button -->
+      <button class="settings" onclick="goSettings()">
+        <img src="assetss/settings.png" alt="Settings" class="settings-icon">
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <h1>真像比现实更现实</h1>
+    <p>欢迎来到Awvtsaab's 知识图书馆</p>
+    <a href="library.html" class="btn">
+      <img src="assetss/book.png" alt="进入书库" class="btn-icon"> 进入书库
+    </a>
+
+  </header>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script>
+    // ===== Firebase 配置 =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyBCIVYd8e5vBeGRz-H12Nj9hd5dyqnZCDI",
+      authDomain: "guardiangate-7xkgi.firebaseapp.com",
+      projectId: "guardiangate-7xkgi",
+      storageBucket: "guardiangate-7xkgi.firebasestorage.app",
+      messagingSenderId: "133766737758",
+      appId: "1:133766737758:web:38de135254fef4664769cf"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // 检查是否已登录
+    auth.onAuthStateChanged((user) => {
+      if (!user) {
+        // 没有用户时强制跳转回登录页
+        window.location.href = "index.html";
+      }
+    });
+
+    // 跳转到设置页
+    function goSettings() {
+      window.location.href = "settings.html";
+    }
+  </script>
+
+  <style>
+    /* 导航整体 */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    /* logo */
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    /* 链接容器 */
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* 美丽按钮 */
+    .nav-btn {
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 500;
+      transition: 0.3s;
+      white-space: nowrap;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.35);
+      transform: scale(1.05);
+    }
+
+    /* 📱 手机优化 */
+    @media (max-width: 600px) {
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav-links {
+        margin-top: 10px;
+        gap: 6px;
+      }
+
+      .nav-btn {
+        font-size: 14px;
+        padding: 8px 12px;
+      }
+    }
+
+    /* Settings 按钮 */
+    .settings {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      background: #ffa502;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .settings:hover {
+      background: #e67e22;
+      transform: rotate(90deg);
+    }
+
+    .settings-icon {
+      width: 18px;
+      height: 18px;
+    }
+  </style>
+</body>
+</html>

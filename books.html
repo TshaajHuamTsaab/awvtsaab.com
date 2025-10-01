@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>21世纪21堂课电子书</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+/* -------------------------
+   章节内容
+   ------------------------- */
+.chapter-content {
+    max-height: 60vh;  /* 手机可见区域 */
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #0f0;
+    margin-bottom: 10px;
+    background: #111;
+    color: #0f0;
+    font-size: 1rem;
+    flex: 1;
+    scroll-behavior: smooth;
+}
+
+/* -------------------------
+   Base / layout
+   ------------------------- */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: black;
+  color: #0f0;
+  font-family: 'Share Tech Mono', monospace;
+  overflow: hidden;
+}
+
+/* Matrix canvas */
+canvas#matrix {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+/* ebook container */
+#ebook-container {
+  width: 100%;
+  height: 100vh;
+  background: rgba(0,0,0,0.85);
+  border: 1px solid #0f0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* desktop center box */
+@media (min-width: 768px) {
+  #ebook-container {
+    width: 600px;
+    height: 90vh;
+    margin: auto;
+    border-radius: 10px;
+  }
+}
+
+#ebook {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 60px; /* 留出底部导航高度 */
+}
+
+/* -------------------------
+   Pages
+   ------------------------- */
+.page {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.45s ease;
+  opacity: 0;
+}
+
+.page.active {
+  left: 0;
+  opacity: 1;
+}
+
+.page h1, .page h2 {
+  margin: 6px 0 18px;
+  text-align: center;
+  color: #0f0;
+}
+.page h1 {
+  font-size: 1.8rem;
+  text-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 20px #0f0, 0 0 40px #00ff00;
+  animation: flicker 1.6s infinite alternate;
+}
+@keyframes flicker {
+  0%,19%,21%,23%,25%,54%,56%,100% { text-shadow:0 0 5px #0f0,0 0 10px #0f0,0 0 20px #0f0,0 0 40px #00ff00; }
+  20%,22%,24%,55% { text-shadow:0 0 2px #0f0; }
+}
+
+.page p {
+  margin: 8px 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+/* -------------------------
+   按钮
+   ------------------------- */
+button {
+  background:#111;
+  color:#0f0;
+  border:1px solid #0f0;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+}
+button:hover { background:#0f0; color:#000; }
+
+.big-center-btn {
+  display: block;
+  margin: 16px auto;
+  font-size: 1.1rem;
+  padding: 12px 20px;
+}
+
+/* -------------------------
+   返回按钮
+   ------------------------- */
+.backBtn {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #111;
+  color: #0f0;
+  border: 1px solid #0f0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.backBtn:hover { background:#0f0; color:#000; }
+
+/* -------------------------
+   底部导航 / 播放按钮
+   ------------------------- */
+#nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  border-top: 1px solid #0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+  background: rgba(0,0,0,0.9);
+  box-sizing: border-box;
+}
+
+/* 中间控件 */
+#audio-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+/* -------------------------
+   全局字体继承
+   ------------------------- */
+#ebook-container, #ebook, .page, .chapter-content {
+  font-size: inherit;
+}
+
+.back-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #222;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  z-index: 1000;
+}
+
+.back-button:hover {
+  background: #444;
+}
+
+</style>
+
+
+</style>
+</head>
+
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div id="ebook-container">
+  <div id="ebook">
+
+    <!-- Cover -->
+    <div class="page active" data-page="0">
+      <div id="cover-content">
+        <button class="backBtn" onclick="goBack()">⬅ 返回简介</button>
+        <div class="chapter-content" style="text-align:center;">
+          <h1>21世纪的21堂课</h1>
+          <p>作者: 尤瓦尔·赫拉利</p>
+          <p>这是一本探索现代社会重大挑战的书。</p>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- TOC -->
+    <div class="page" data-page="1">
+      <h2>目录</h2>
+      <button onclick="toggleDirectory()" class="big-center-btn">📜 查看/隐藏目录</button>
+      <button id="toggle-theme" class="big-center-btn">🌈切换目光🔂</button>
+      <button class="backBtn" onclick="goBack()">⬅ 返回上一页</button>
+      <div id="scroll-directory" style="display:none; max-height:60vh; overflow-y:auto; border:1px solid #0f0; padding:10px; margin-top:10px;">
+        <ol>
+          <li><button onclick="goToChapter(1)">人工智能与工作</button></li>
+          <li><button onclick="goToChapter(2)">生物科技与未来身体</button></li>
+          <li><button onclick="goToChapter(3)">数据与隐私</button></li>
+          <li><button onclick="goToChapter(4)">网络安全与政治操控</button></li>
+          <li><button onclick="goToChapter(5)">恐怖主义与安全</button></li>
+          <li><button onclick="goToChapter(6)">民主与民族主义</button></li>
+          <li><button onclick="goToChapter(7)">教育与技能培养</button></li>
+          <li><button onclick="goToChapter(8)">自由与算法决定</button></li>
+          <li><button onclick="goToChapter(9)">世界秩序</button></li>
+          <li><button onclick="goToChapter(10)">意义与宗教</button></li>
+          <li><button onclick="goToChapter(11)">幸福与心理健康</button></li>
+          <li><button onclick="goToChapter(12)">教育的重要性</button></li>
+          <li><button onclick="goToChapter(13)">意识与自我认知</button></li>
+          <li><button onclick="goToChapter(14)">故事与价值观</button></li>
+          <li><button onclick="goToChapter(15)">环境与气候变化</button></li>
+          <li><button onclick="goToChapter(16)">核武器与战争</button></li>
+          <li><button onclick="goToChapter(17)">移民与人口流动</button></li>
+          <li><button onclick="goToChapter(18)">全球合作与治理</button></li>
+          <li><button onclick="goToChapter(19)">人工智能与不平等</button></li>
+          <li><button onclick="goToChapter(20)">人类未来的伦理</button></li>
+          <li><button onclick="goToChapter(21)">面对不确定性</button></li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Chapters -->
+<div class="page" data-page="2">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>人工智能与工作</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="3">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>生物科技与未来身体</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="4">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>数据与隐私</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="5">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>网络安全与政治操控</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="6">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>恐怖主义与安全</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="7">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>民主与民族主义</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="8">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>教育与技能培养</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="9">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>自由与算法决定</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="10">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>世界秩序</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="11">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>意义与宗教</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="12">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>幸福与心理健康</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="13">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>教育的重要性</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="14">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>意识与自我认知</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="15">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>故事与价值观</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="16">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>环境与气候变化</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="17">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>核武器与战争</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="18">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>移民与人口流动</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="19">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>全球合作与治理</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="20">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>人工智能与不平等</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="21">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>人类未来的伦理</h2>
+  <div class="chapter-content"></div>
+</div>
+
+<div class="page" data-page="22">
+  <button class="back-button" onclick="showPage(1)">← 返回目录</button>
+  <h2>面对不确定性</h2>
+  <div class="chapter-content"></div>
+</div>
+
+
+  <!-- Nav -->
+<div id="nav" style="display:flex; align-items:center; justify-content:space-between; padding:10px;">
+  <!-- Prev -->
+  <button onclick="prevChapter()">上一页</button>
+
+  <!-- Audio + text controls (centered) -->
+  <div id="audio-controls" style="display:flex; gap:10px; align-items:center; justify-content:center; flex:1;">
+    <button id="play-btn" onclick="cycleAudio()">▶️ 播放</button>
+    <button onclick="changeTextSize(2)">🔎+</button>
+    <button onclick="changeTextSize(-2)">🔎-</button>
+
+    <label for="speed" style="color:#0f0;">速度:</label>
+    <select id="speed" onchange="changeSpeed()" style="background:#111; color:#0f0; border:1px solid #0f0; padding:3px; border-radius:5px;">
+      <option value="0.75">0.75x</option>
+      <option value="1" selected>1x</option>
+      <option value="1.25">1.25x</option>
+      <option value="1.5">1.5x</option>
+      <option value="2">2x</option>
+    </select>
+  </div>
+
+  <!-- Next -->
+  <button onclick="nextChapter()">下一页</button>
+</div>
+
+<!-- Audio element (kept separate, not breaking layout) -->
+<audio id="chapter-audio"></audio>
+<script>
+  const themes = [
+    { bg: "rgba(0,0,0,0.85)", text: "#0f0", border: "#0f0" }, // 黑底绿字
+    { bg: "#fff", text: "#000", border: "#000" },               // 白底黑字
+    { bg: "#001f3f", text: "#fff", border: "#fff" },            // 深蓝底白字
+    { bg: "#fff8dc", text: "#5a3e1b", border: "#5a3e1b" }      // 浅黄底深棕字
+];
+
+let currentTheme = 0;
+
+document.getElementById("toggle-theme").addEventListener("click", () => {
+    currentTheme = (currentTheme + 1) % themes.length;
+    const theme = themes[currentTheme];
+
+    const container = document.getElementById("ebook-container");
+    const pages = document.querySelectorAll(".page, .chapter-content");
+
+    container.style.background = theme.bg;
+    pages.forEach(p => {
+        p.style.background = theme.bg;
+        p.style.color = theme.text;
+        if(p.classList.contains('chapter-content')) {
+            p.style.borderColor = theme.border;
+        }
+    });
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const audio = document.getElementById("chapter-audio");
+    const playBtn = document.getElementById("play-btn");
+    let clickState = 0; // 0 = 初始, 1 = 播放中, 2 = 暂停
+
+    // 初始化音频
+    function loadAudio(filePath) {
+        audio.src = filePath;
+        audio.currentTime = 0;
+        audio.pause();
+        playBtn.textContent = "▶️ 播放";
+        clickState = 0;
+    }
+
+    // 播放/暂停切换
+    playBtn.addEventListener("click", () => {
+        if (!audio.src) return;
+        if (clickState === 0) {
+            audio.play();
+            playBtn.textContent = "⏸ 暂停";
+            clickState = 1;
+        } else if (clickState === 1) {
+            audio.pause();
+            playBtn.textContent = "▶️ 继续";
+            clickState = 2;
+        } else if (clickState === 2) {
+            audio.play();
+            playBtn.textContent = "⏸ 暂停";
+            clickState = 1;
+        }
+    });
+
+    // 默认加载封面音频
+    loadAudio("assets/audio/cover.mp3");
+});
+
+/* ------------------------- */
+/* Cover & Chapter Loading    */
+/* ------------------------- */
+const audio = document.getElementById("chapter-audio");
+const playBtn = document.getElementById("play-btn");
+let clickState = 0; // 0=play, 1=pause, 2=resume
+
+function loadCover() {
+  const coverDiv = document.getElementById("cover-content");
+  fetch("assets/cover.html")
+    .then(res => res.text())
+    .then(html => { coverDiv.innerHTML = html; })
+    .catch(() => { coverDiv.innerHTML = "<h2>封面加载失败</h2>"; });
+
+  // Load cover audio
+  loadCoverAudio();
+}
+
+function loadCoverAudio() {
+  audio.src = "assets/audio/cover.mp3";
+  audio.currentTime = 0;
+  audio.pause();
+  playBtn.textContent = "▶️ 播放";
+  clickState = 0;
+}
+
+/* ------------------------- */
+/* Text Resize                */
+/* ------------------------- */
+let currentFontSize = 16;
+function changeTextSize(delta) {
+  currentFontSize = Math.max(12, currentFontSize + delta);
+  document.documentElement.style.fontSize = currentFontSize + "px";
+}
+
+/* ------------------------- */
+/* Audio Logic                */
+/* ------------------------- */
+function cycleAudio() {
+  if (!audio.src) return;
+  if (clickState === 0) {
+    audio.play(); playBtn.textContent="⏸ 暂停"; clickState=1;
+  } else if (clickState === 1) {
+    audio.pause(); playBtn.textContent="▶️ 继续"; clickState=2;
+  } else if (clickState === 2) {
+    audio.play(); playBtn.textContent="⏸ 暂停"; clickState=1;
+  }
+}
+
+function loadChapterAudio(chapterNumber) {
+  audio.src = `assets/audio/audio${chapterNumber}.mp3`;
+  audio.currentTime = 0;
+  audio.pause();
+  playBtn.textContent = "▶️ 播放";
+  clickState = 0;
+}
+
+function changeSpeed() {
+  audio.playbackRate = parseFloat(document.getElementById("speed").value);
+}
+
+function changeVolume(delta) {
+  audio.volume = Math.min(1, Math.max(0, audio.volume + delta));
+}
+
+/* ------------------------- */
+/* Page & Navigation Logic    */
+/* ------------------------- */
+let pages = [];
+let currentPage = 0;
+
+document.addEventListener('DOMContentLoaded', () => {
+  pages = Array.from(document.querySelectorAll('.page'));
+  updateBackButtons();
+  loadCover();
+});
+
+function showPage(n) {
+  if (n < 0 || n >= pages.length) return;
+  pages.forEach(p => p.classList.remove('active'));
+  pages[n].classList.add('active');
+  currentPage = n;
+  updateBackButtons();
+}
+
+function nextChapter() {
+  if (currentPage < pages.length - 1) showPage(currentPage + 1);
+}
+function prevChapter() {
+  if (currentPage > 0) showPage(currentPage - 1);
+}
+
+function toggleDirectory() {
+  const dir = document.getElementById('scroll-directory');
+  if (!dir) return;
+  dir.style.display = (dir.style.display === 'block') ? 'none' : 'block';
+}
+
+function goToChapter(chapterNumber) {
+  const pageNum = 2 + (chapterNumber - 1);
+  const page = pages[pageNum];
+  if (!page) return;
+
+  const contentDiv = page.querySelector('.chapter-content');
+  const title = page.querySelector('h2')?.innerText || `第${chapterNumber}章`;
+
+  fetch(`assets/file/chapter${chapterNumber}.html`)
+    .then(res => res.text())
+    .then(html => {
+      contentDiv.innerHTML = `<strong>${title}</strong><br>` + html;
+      contentDiv.scrollTop = 0;
+    })
+    .catch(()=>{contentDiv.innerHTML = `<strong>${title}</strong><br>章节内容加载失败`;} );
+
+  // Load audio for this chapter
+  loadChapterAudio(chapterNumber);
+
+  showPage(pageNum);
+}
+
+function goBack() {
+  if (currentPage > 0) showPage(currentPage - 1);
+  else if(history.length > 1) history.back();
+}
+
+function updateBackButtons() {
+  document.querySelectorAll('.backBtn').forEach(btn => {
+    btn.style.display = (currentPage > 0 || history.length > 1) ? 'block' : 'none';
+  });
+}
+
+/* ------------------------- */
+/* Matrix Background          */
+/* ------------------------- */
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas() {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', () => {
+  resizeCanvas();
+  columns = Math.floor(innerWidth / fontSize);
+  drops = Array(columns).fill(1);
+});
+
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
+const fontSize = 14;
+let columns = Math.floor(innerWidth / fontSize);
+let drops = Array(columns).fill(1);
+
+function drawMatrix() {
+  ctx.fillStyle = "rgba(0,0,0,0.06)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#0f0";
+  ctx.font = fontSize + "px monospace";
+
+  for(let i = 0; i < drops.length; i++){
+    const text = letters.charAt(Math.floor(Math.random() * letters.length));
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix, 33);
+</script>
+</body>
+</html>

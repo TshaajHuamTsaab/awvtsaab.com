@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>阅读器（安全版）</title>
+<style>
+  body { font-family: sans-serif; margin: 20px; background: #111; color: #0f0; }
+  h1 { text-align: center; }
+  .page { display: none; margin-bottom: 20px; }
+  .page.active { display: block; }
+  #nav { margin-top: 20px; text-align: center; }
+  button { 
+    margin: 5px; padding: 8px 12px; 
+    background: #111; color: #0f0; border: 1px solid #0f0; border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover { background: #0f0; color: #111; }
+  #error { color: red; text-align: center; margin-top: 10px; }
+</style>
+</head>
+<body>
+  <button onclick="goBack()">⬅ 返回目录</button>
+  <h1 id="bookTitle">加载中...</h1>
+  <div id="book"></div>
+  <div id="error"></div>
+
+  <div id="nav">
+    <button onclick="prevPage()">⬅ 上一页</button>
+    <button onclick="nextPage()">下一页 ➡</button>
+    <button onclick="toggleAudio()">🔊 播放/暂停</button>
+    <button onclick="goBack()">📖 返回目录</button>
+  </div>
+
+<script>
+let currentPage = 0;
+let pages = [];
+let audio = null;
+
+const urlParams = new URLSearchParams(window.location.search);
+const chapterNum = urlParams.get("chapter");
+
+// 返回目录
+function goBack() {
+  window.location.href = "library.html";
+}
+
+// 加载章节文字
+function loadChapter(num) {
+  const file = `assets/chapter${num}.txt`;
+
+  fetch(file)
+    .then(res => {
+      if (!res.ok) throw new Error("找不到文件: " + file);
+      return res.text();
+    })
+    .then(text => {
+      const chapters = text.split("==="); // 可以用 === 分页
+      const bookDiv = document.getElementById("book");
+      bookDiv.innerHTML = "";
+
+      chapters.forEach((chapter, i) => {
+        const page = document.createElement("div");
+        page.className = "page";
+        if (i === 0) page.classList.add("active");
+        page.innerHTML = `<pre>${chapter.trim()}</pre>`;
+        bookDiv.appendChild(page);
+      });
+
+      pages = document.querySelectorAll(".page");
+      currentPage = 0;
+      document.getElementById("bookTitle").textContent = "正在阅读：第 " + num + " 章";
+
+      // 自动加载对应音频
+      loadAudio(num);
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("error").textContent = "❌ " + err.message;
+    });
+}
+
+// 翻页
+function showPage(n){
+  pages.forEach(p => p.classList.remove("active"));
+  if (pages[n]) {
+    pages[n].classList.add("active");
+    currentPage = n;
+  }
+}
+function nextPage(){ if(currentPage < pages.length-1) showPage(currentPage+1); }
+function prevPage(){ if(currentPage > 0) showPage(currentPage-1); }
+
+// 音频播放
+function loadAudio(num) {
+  const audioFile = `src/chapter${num}.mp3`; // 从 src 文件夹加载
+  audio = new Audio(audioFile);
+  audio.onerror = () => {
+    document.getElementById("error").textContent = "❌ 无法加载音频: " + audioFile;
+  };
+}
+
+function toggleAudio() {
+  if (!audio) return;
+  if (audio.paused) audio.play();
+  else audio.pause();
+}
+
+// 默认加载
+if (!chapterNum) {
+  document.getElementById("bookTitle").textContent = "未选择章节";
+  document.getElementById("book").innerHTML = "<p style='color:red'>❌ URL 缺少 ?chapter=数字 参数，请从目录页点击章节</p>";
+} else {
+  loadChapter(chapterNum);
+}
+</script>
+
+</body>
+</html>

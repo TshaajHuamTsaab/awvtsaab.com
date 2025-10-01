@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Awvtsaab's漆书 Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    .rainbow-header {
+      text-align: center;
+      margin-bottom: 12px;
+      /* optional: give a little backdrop glow to match hacker theme */
+      filter: drop-shadow(0 0 12px rgba(0,255,128,0.06));
+    }
+
+    /* 大字样式 */
+    .rainbow-header h1 {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 32px;             /* 根据需要调整大小 */
+      letter-spacing: 1px;
+      font-weight: 700;
+
+      /* 关键：用线性渐变并裁剪到文字上 */
+      background: linear-gradient(90deg,
+        #ff3b3b,
+        #ff903b,
+        #ffd93b,
+        #7fff3b,
+        #3bffdf,
+        #3b8bff,
+        #8b3bff,
+        #ff3bcf,
+        #ff3b3b
+      );
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+
+      /* 平滑移动渐变 */
+      animation: rainbowShift 6s linear infinite, neonFlicker 3s infinite;
+
+      /* optional subtle glow behind text for contrast on dark bg */
+      text-shadow:
+        0 0 6px rgba(255,255,255,0.03),
+        0 0 12px rgba(0,255,128,0.08),
+        0 0 24px rgba(0,255,128,0.06);
+    }
+
+    /* 渐变移动动画（左右流动） */
+    @keyframes rainbowShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* 轻微闪烁/呼吸效果，增强黑科技感 */
+    @keyframes neonFlicker {
+      0%, 100% { opacity: 1; transform: translateY(0); }
+      45% { opacity: 0.95; transform: translateY(-1px); }
+      50% { opacity: 1; transform: translateY(0); }
+      80% { opacity: 0.98; transform: translateY(-0.5px); }
+    }
+
+    /* 小屏幕缩小文字 */
+    @media (max-width: 420px) {
+      .rainbow-header h1 { font-size: 22px; }
+    }
+    * {margin:0;padding:0;box-sizing:border-box;font-family:'Share Tech Mono', monospace;}
+    body {
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background:black;
+      color:white;
+      overflow:hidden;
+    }
+
+    canvas#matrix {
+      position:fixed;
+      top:0;left:0;
+      width:100%;height:100%;
+      z-index:-1;
+    }
+
+    .container {
+      background:rgba(0,0,0,0.85);
+      padding:30px;
+      border-radius:12px;
+      box-shadow:0 0 20px rgba(0,255,100,0.5);
+      text-align:center;
+      width:280px;
+    }
+
+    .logo {margin-bottom:15px;}
+    .logo img {width:70px;}
+
+    h2 {margin-bottom:15px;color:#0f0;}
+
+    input, select {
+      width:100%;
+      padding:10px;
+      margin:8px 0;
+      border:none;
+      border-radius:6px;
+      outline:none;
+      background:#111;
+      color:#0f0;
+    }
+    input::placeholder {color:#555;}
+
+    .btn {
+      width:100%;
+      padding:10px;
+      margin:8px 0;
+      font-size:14px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight:bold;
+      text-transform:uppercase;
+    }
+
+    .btn-login {
+      background:#111;
+      color:white;
+      border:1px solid white;
+      box-shadow:0 0 10px white;
+      transition:0.3s;
+    }
+    .btn-login:hover {background:white;color:black;box-shadow:0 0 20px white;}
+
+    .btn-create {
+      background:#111;
+      color:red;
+      border:1px solid red;
+      box-shadow:0 0 10px red;
+      transition:0.3s;
+    }
+    .btn-create:hover {background:red;color:white;box-shadow:0 0 20px red;}
+
+    #createForm {display:none;margin-top:20px;}
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+
+  <div class="container">
+    <div class="logo">
+      <img src="https://i.postimg.cc/DwzYYTWD/logo.webp" alt="Logo">
+    </div>
+      
+    <!-- 登录区域 -->
+    <div id="loginSection">
+      <div class="rainbow-header">
+        <h1>Awvtsaab's 漆书</h1>
+      </div>
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button class="btn btn-login" onclick="login()">登录</button>
+      <button class="btn btn-create" onclick="promptCreate()">创建新用户</button>
+    </div>
+
+    <!-- 创建用户表单 -->
+    <div id="createForm">
+      <h2>确保隐私安全，随便即可！</h2>
+      <input type="text" id="signupName" placeholder="姓名">
+      <input type="email" id="signupEmail" placeholder="邮箱">
+      <input type="password" id="signupPassword" placeholder="密码">
+      <input type="number" id="signupAge" placeholder="年龄">
+      <select id="signupGender">
+        <option value="" disabled selected>请选择性别</option>
+        <option value="male">男</option>
+        <option value="female">女</option>
+        <option value="other">其他</option>
+      </select>
+      <input type="tel" id="signupPhone" placeholder="手机号码">
+      <button class="btn btn-create" onclick="confirmSignup()">确认</button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // ✅ Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBCIVYd8e5vBeGRz-H12Nj9hd5dyqnZCDI",
+      authDomain: "guardiangate-7xkgi.firebaseapp.com",
+      projectId: "guardiangate-7xkgi",
+      storageBucket: "guardiangate-7xkgi.firebasestorage.app",
+      messagingSenderId: "133766737758",
+      appId: "1:133766737758:web:38de135254fef4664769cf"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // 🔹 点击创建新用户按钮时
+    function promptCreate() {
+      if (confirm("⚡ 你确定要创建一个新用户吗？")) {
+        document.getElementById("loginSection").style.display = "none"; // 隐藏登录
+        document.getElementById("createForm").style.display = "block"; // 显示注册
+      }
+    }
+
+    // 🔹 二次确认提交
+    function confirmSignup() {
+      const name = document.getElementById("signupName").value;
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+      const age = document.getElementById("signupAge").value;
+      const gender = document.getElementById("signupGender").value;
+      const phone = document.getElementById("signupPhone").value;
+
+      if (!name || !email || !password || !age || !gender || !phone) {
+        alert("⚠️ 保护您的隐私安全，随便填写即可🔐💡");
+        return;
+      }
+
+      const confirmText =
+        "请确认以下信息:\n\n" +
+        "👤 姓名: " + name + "\n" +
+        "📧 邮箱: " + email + "\n" +
+        "🔑 密码: " + "*".repeat(password.length) + "\n" +
+        "🎂 年龄: " + age + "\n" +
+        "⚧ 性别: " + gender + "\n" +
+        "📱 手机: " + phone + "\n\n" +
+        "是否确认创建新用户？";
+
+      if (confirm(confirmText)) {
+        signup(name, email, password, age, gender, phone);
+      }
+    }
+
+    // 🔹 Firebase 创建账号
+    async function signup(name, email, password, age, gender, phone) {
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        await db.collection("users").doc(user.uid).set({
+          name, email, age, gender, phone,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert("✅ 新用户创建成功！");
+        window.location.href = "home.html"; // 跳转主页
+      } catch (error) {
+        alert("❌ " + error.message);
+      }
+    }
+
+    // 🔹 Firebase 登录
+    async function login() {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        alert("✅ 登录成功！");
+        window.location.href = "home.html";
+      } catch (error) {
+        alert("❌ " + error.message);
+      }
+    }
+
+    // 🔹 矩阵黑客背景
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#0f0";
+      ctx.font = fontSize + "px monospace";
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+    setInterval(draw, 33);
+  </script>
+</body>
+</html>

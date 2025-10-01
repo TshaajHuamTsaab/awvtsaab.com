@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>玻璃遥控阅读器</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #fdf6e3;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    transition: background 0.3s;
+  }
+
+  #book {
+    padding: 20px;
+    font-size: 18px;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto 200px auto; /* 给下面遥控器留空间 */
+  }
+
+  /* 圆盘控制器容器 */
+  #controller {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+
+  /* 隐藏时 */
+  #controller.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) scale(0.8);
+  }
+
+  /* 中心按钮 */
+  #controller .center-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: none;
+    font-size: 20px;
+    background: #ffd93d;
+    color: #000;
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(0,0,0,0.3);
+  }
+
+  /* 方向按钮位置 */
+  .btn {
+    position: absolute;
+    border-radius: 50%;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 6px rgba(0,0,0,0.3);
+  }
+
+  .btn:hover {
+    transform: scale(1.1);
+  }
+
+  /* 上下左右 */
+  .top { top: 20px; left: 50%; transform: translateX(-50%); }
+  .bottom { bottom: 20px; left: 50%; transform: translateX(-50%); }
+  .left { left: 20px; top: 50%; transform: translateY(-50%); }
+  .right { right: 20px; top: 50%; transform: translateY(-50%); }
+
+  /* 四角 */
+  .top-left { top: 40px; left: 40px; }
+  .top-right { top: 40px; right: 40px; }
+  .bottom-left { bottom: 40px; left: 40px; }
+  .bottom-right { bottom: 40px; right: 40px; }
+
+  /* 隐藏按钮 */
+  #toggle-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    border: none;
+    border-radius: 50%;
+    padding: 6px;
+    font-size: 14px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div id="book">
+  <h2>示例章节</h2>
+  <p>这是一本测试书籍的第一段文字。</p>
+  <p>这里有第二段，带更多的说明。</p>
+  <p>第三段：可以测试按钮功能是否正常。</p>
+</div>
+
+<!-- 音频 -->
+<audio id="chapter-audio" src="books/book3/audio/cover.mp3"></audio>
+
+<!-- 遥控器 -->
+<div id="controller">
+  <button id="toggle-btn">✖</button>
+  <button class="center-btn" onclick="toggleAudio()">▶️/⏸</button>
+  <button class="btn top" onclick="prevChapter()">⬆</button>
+  <button class="btn bottom" onclick="nextChapter()">⬇</button>
+  <button class="btn left" onclick="changeTextSize(-2)">🔎-</button>
+  <button class="btn right" onclick="changeTextSize(2)">🔎+</button>
+  <button class="btn top-left" onclick="cycleSpeed()">⏩</button>
+  <button class="btn top-right" onclick="changeBackground()">🌈</button>
+  <button class="btn bottom-left" onclick="goBack()">📖</button>
+  <button class="btn bottom-right" onclick="alert('⭐ 收藏功能待开发')">⭐</button>
+</div>
+
+<script>
+let audio = document.getElementById("chapter-audio");
+
+// 播放/暂停
+function toggleAudio() {
+  if (audio.paused) audio.play();
+  else audio.pause();
+}
+
+// 章节切换
+function prevChapter() {
+  alert("上一章功能已触发 (替换成 loadChapter)");
+}
+function nextChapter() {
+  alert("下一章功能已触发 (替换成 loadChapter)");
+}
+
+// 字号调整
+function changeTextSize(delta) {
+  const bookDiv = document.getElementById("book");
+  const style = window.getComputedStyle(bookDiv, null).getPropertyValue('font-size');
+  const currentSize = parseFloat(style);
+  bookDiv.style.fontSize = (currentSize + delta) + "px";
+}
+
+// 播放速度循环
+const speeds = [0.5, 1, 1.5, 2];
+let speedIndex = 1;
+function cycleSpeed() {
+  speedIndex = (speedIndex + 1) % speeds.length;
+  audio.playbackRate = speeds[speedIndex];
+  alert("播放速度: " + speeds[speedIndex] + "x");
+}
+
+// 背景切换
+const backgrounds = ["#fdf6e3","#fff","#e0f7fa","#fce4ec","#e8f5e9"];
+let bgIndex = 0;
+function changeBackground() {
+  bgIndex = (bgIndex + 1) % backgrounds.length;
+  document.body.style.background = backgrounds[bgIndex];
+}
+
+// 返回首页
+function goBack() {
+  alert("返回首页 (替换成 window.location.href='library.html')");
+}
+
+// 隐藏控制器
+document.getElementById("toggle-btn").onclick = () => {
+  document.getElementById("controller").classList.toggle("hidden");
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的个人简介</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .profile-card {
+      background: rgba(0,0,0,0.5);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      max-width: 500px;
+      backdrop-filter: blur(8px);
+    }
+
+    .profile-card img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      margin-bottom: 15px;
+      object-fit: cover;
+    }
+
+    h1 {
+      margin: 10px 0;
+      font-size: 26px;
+    }
+
+    p {
+      line-height: 1.6;
+    }
+
+    .contact {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .contact a {
+      color: #ffd369;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .contact a:hover {
+      text-decoration: underline;
+    }
+
+    /* 返回按钮样式 */
+    .back-btn {
+      margin-top: 25px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 25px;
+      background: #ffd369;
+      color: #333;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .back-btn:hover {
+      background: #ffb347;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+    <!-- 返回首页按钮 -->
+ <button class="back-btn" onclick="location.href='home.html'">首页</button>
+  <div class="profile-card">
+    <!-- 在这里换成你自己的照片 -->
+    <img src="https://i.postimg.cc/9XZf2Jdc/1-2.png" alt="我的照片">
+    <h1>你好，我是初学程序员</h1>
+    <p>
+      我已经完成了 <strong>5-20个小项目</strong>，包括稳定的登录页面、字母背景和美丽的界面。<br>
+      未来我希望开发更多 <strong>App、电子书平台、社交软件和资产保护软件</strong>，并以最快的速度跟上时代。
+    </p>
+    <p>
+      我会使用 <strong>英语、汉语、缅语、Hmoob语</strong> 开发与交流。<br>
+      我的梦想是创造出媲美微软的优秀软件。
+    </p>
+    <div class="contact">
+      📧 邮箱: <a href="gmail@gmail.com">tubkoobhmoovtsaab@email.com</a><br>
+      📞 电话: +95-9682992601<br>
+      📍 地区:Kayin省 缅甸 / 妙瓦底
+      
+    </div>
+  </div>
+</body>
+</html>
