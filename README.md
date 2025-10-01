@@ -38,7 +38,3 @@ This project allows you to read and listen to books in a clean, mobile-friendly 
 └── /images/ # Book cover images
 ├── book1.jpg
 └── ...
-
----
-
-Do you want me to also **generate those screenshots for you** (your circular remote controller + reading page UI) so you can just upload them into your `images/` folder?
