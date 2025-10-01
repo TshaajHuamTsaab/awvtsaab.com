@@ -370,18 +370,24 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowRight") changeChapter(1);
 });
 
-// ====== 触屏滑动切换章节 (修复版) ======
+// ====== 触屏滑动切换章节 (只响应左右滑动) ======
 let touchStartX = 0;
+let touchStartY = 0;
 
 document.addEventListener("touchstart", (e) => {
   touchStartX = e.changedTouches[0].clientX;
+  touchStartY = e.changedTouches[0].clientY;
 }, { passive: true });
 
 document.addEventListener("touchend", (e) => {
   const touchEndX = e.changedTouches[0].clientX;
-  const diffX = touchEndX - touchStartX;
+  const touchEndY = e.changedTouches[0].clientY;
 
-  if (Math.abs(diffX) > 50) { // 设置滑动阈值
+  const diffX = touchEndX - touchStartX;
+  const diffY = touchEndY - touchStartY;
+
+  // 只在左右滑动比上下滑动更明显时触发
+  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
     if (diffX > 0) {
       changeChapter(-1); // 右滑 → 上一章
     } else {
@@ -413,3 +419,4 @@ document.querySelector(".btn-theme").addEventListener("click", () => {
 
 </body>
 </html>
+
