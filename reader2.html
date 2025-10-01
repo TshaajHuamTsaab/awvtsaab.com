@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>通用阅读器完整版</title>
+<title>正播放中</title>
 <style>
 body {
   font-family: "Segoe UI", Arial, sans-serif;
@@ -167,6 +167,36 @@ body {
 @keyframes rotateOuter { from{ transform: translateX(-50%) rotate(0deg); } to{ transform: translateX(-50%) rotate(360deg); } }
 @keyframes hueShift { 0%{ filter:hue-rotate(0deg);} 100%{filter:hue-rotate(360deg);} }
 </style>
+<style>
+/* 保持之前的隐藏规则 */
+.remote.hidden .btn:not(#play-btn) {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+/* 播放按钮在隐藏模式下变大并加动画 */
+.remote.hidden #play-btn {
+  width: 160px;
+  height: 160px;
+  font-size: 48px;
+  box-shadow: 0 0 35px rgba(39,192,28,0.95);
+  animation: pulsePlay 1.5s infinite ease-in-out;
+  transition: all 0.4s ease;
+}
+
+/* 动画效果：呼吸放大缩小 */
+@keyframes pulsePlay {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.15); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* 可选：按钮边框隐藏 */
+.remote.no-border .btn {
+  border: none;
+}
+</style>
 </head>
 <body>
 
@@ -246,8 +276,6 @@ function changeTextSize(delta){
 }
 
 // 背景切换
-const backgrounds=['#fdf6e3','#fff','#e0f7fa','#fce4ec','#e8f5e9'];
-let bgIndex=0;
 document.querySelector(".btn-theme").addEventListener("click",()=>{
   bgIndex=(bgIndex+1)%backgrounds.length;
   document.body.style.background=backgrounds[bgIndex];
@@ -298,5 +326,90 @@ if(!bookFolder || !chapterNum){
   loadChapter(bookFolder,chapterNum);
 }
 </script>
+<style>
+/* 新增隐藏按钮类 - 只隐藏除了播放按钮的其他按钮 */
+.remote.hidden .btn:not(#play-btn) {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+/* 可选：按钮边框隐藏 */
+.remote.no-border .btn {
+  border: none;
+}
+</style>
+<script>
+// ====== 控制按钮显示/隐藏 ======
+const remote = document.querySelector(".remote");
+
+// 点击空白处时只隐藏/显示“除播放按钮外的其他按钮”
+document.body.addEventListener("click", (e) => {
+  if (e.target.closest(".btn")) return; // 点击按钮本身不触发
+  remote.classList.toggle("hidden");
+});
+
+// 🔄按钮：切换边框 & 隐藏非播放按钮
+document.querySelector(".btn-light").addEventListener("click", () => {
+  remote.classList.toggle("no-border");
+  remote.classList.toggle("hidden");
+});
+
+// ====== 章节切换逻辑 ======
+function changeChapter(delta) {
+  if (chapterNum === "cover" && delta < 0) return;
+  if (chapterNum === "cover") chapterNum = 1;
+  else chapterNum = parseInt(chapterNum) + delta;
+  if (chapterNum < 1) chapterNum = "cover";
+  loadChapter(bookFolder, chapterNum);
+}
+
+// 键盘左右切换章节
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft") changeChapter(-1);
+  if (e.key === "ArrowRight") changeChapter(1);
+});
+
+// ====== 触屏滑动切换章节 (修复版) ======
+let touchStartX = 0;
+
+document.addEventListener("touchstart", (e) => {
+  touchStartX = e.changedTouches[0].clientX;
+}, { passive: true });
+
+document.addEventListener("touchend", (e) => {
+  const touchEndX = e.changedTouches[0].clientX;
+  const diffX = touchEndX - touchStartX;
+
+  if (Math.abs(diffX) > 50) { // 设置滑动阈值
+    if (diffX > 0) {
+      changeChapter(-1); // 右滑 → 上一章
+    } else {
+      changeChapter(1);  // 左滑 → 下一章
+    }
+  }
+}, { passive: true });
+
+// ====== 背景切换 + 自动文字颜色 ======
+const backgrounds = [
+  { bg: '#fdf6e3', color: '#222' },   // 米黄底，深字
+  { bg: '#ffffff', color: '#222' },   // 白底，深字
+  { bg: '#222222', color: '#fdf6e3' },// 黑灰底，浅字
+  { bg: '#e0f7fa', color: '#003' },   // 青色底，深字
+  { bg: '#fce4ec', color: '#4a148c' },// 粉底，紫字
+  { bg: '#e8f5e9', color: '#1b5e20' } // 绿底，深绿字
+];
+let bgIndex = 0;
+
+document.querySelector(".btn-theme").addEventListener("click", () => {
+  bgIndex = (bgIndex + 1) % backgrounds.length;
+  const theme = backgrounds[bgIndex];
+  document.body.style.background = theme.bg;
+  document.body.style.color = theme.color;
+  document.getElementById("bookTitle").style.color = theme.color;
+  document.getElementById("book").style.color = theme.color;
+});
+</script>
+
 </body>
 </html>
