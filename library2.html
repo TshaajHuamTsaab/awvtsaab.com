@@ -2,188 +2,279 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>书库</title>
+
+  <!-- Modern icon & font support -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
   <style>
-    body { background:#111; color:#0f0; font-family: monospace; margin:0; padding:0; }
-    nav { background:#000; padding:10px; text-align:center; }
-    nav a { color:#0f0; text-decoration:none; margin:0 15px; }
-    nav a:hover { text-decoration:underline; }
-    h1 { text-align:center; margin:20px 0; }
+    body {
+      background: #0a0a0a;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent; /* remove tap highlight */
+    }
+
+    nav {
+      background: #000;
+      padding: 10px 0;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid #0f0;
+    }
+
+    nav a {
+      color: #0f0;
+      text-decoration: none;
+      margin: 0 18px;
+      font-size: 1.1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    nav a:hover {
+      color: #7fff00;
+      text-shadow: 0 0 5px #0f0;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.8rem;
+    }
+
+    /* Responsive grid for book cards */
     #book-list {
-        display:grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
-        gap:15px;
-        padding:10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 15px;
+      padding: 12px;
     }
+
     .book-card {
-        background-color:#111;
-        color:#0f0;
-        border:1px solid #0f0;
-        border-radius:12px;
-        overflow:hidden;
-        cursor:pointer;
-        text-align:center;
-        transition: transform 0.3s, box-shadow 0.3s;
+      background-color: #111;
+      color: #0f0;
+      border: 1px solid #0f0;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.25s, box-shadow 0.25s;
     }
-    .book-card:hover {
-        transform: scale(1.05);
-        box-shadow:0 5px 15px rgba(0,255,0,0.5);
+
+    .book-card:active {
+      transform: scale(0.98);
+      box-shadow: 0 0 10px #0f0;
     }
+
     .book-card img {
-        width:100%;
-        height:220px;
-        object-fit:cover;
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-bottom: 1px solid #0f0;
     }
-    .book-info { padding:8px; }
-    .book-info h3 { font-size:1.1rem; margin-bottom:4px; }
-    .book-info p { font-size:0.9rem; opacity:0.85; margin:0; }
+
+    .book-info {
+      padding: 8px;
+    }
+
+    .book-info h3 {
+      font-size: 1rem;
+      margin: 6px 0;
+    }
+
+    .book-info p {
+      font-size: 0.85rem;
+      opacity: 0.85;
+      margin: 0;
+    }
+
+    /* Bottom tab bar (mobile app style) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0;
+      border-top: 1px solid #0f0;
+      z-index: 100;
+    }
+
+    .bottom-nav a {
+      color: #0f0;
+      text-align: center;
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+
+    .bottom-nav a i {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 3px;
+    }
+
+    .bottom-nav a.active {
+      color: #7fff00;
+    }
   </style>
 </head>
+
 <body>
 
-<nav>
-  <a href="home.html">首页</a>
-  <a href="books.html">完整书版</a>
-  <a href="about.html">关于</a>
-</nav>
+  <!-- Top Navigation -->
+  <nav>
+    <a href="home.html"><i class="fa-solid fa-house"></i> 首页</a>
+    <a href="books.html"><i class="fa-solid fa-book"></i> 完整书版</a>
+    <a href="about.html"><i class="fa-solid fa-circle-info"></i> 关于</a>
+  </nav>
 
-<h1>📚 我的书库</h1>
+  <h1>📚 我的书库</h1>
 
-<div id="book-list">
-
-  <div class="book-card" onclick="location.href='wagner.html?book=book1'">
-      <img src="https://i.postimg.cc/Bvy1YpFR/Yevgeny-Prigozhin.jpg" alt="叶夫根尼·普里戈任（Yevgeny Prigozhin）">
+  <!-- Book Grid -->
+  <div id="book-list">
+    <div class="book-card" onclick="openLibrary('wagner.html?book=book1')">
+      <img src="https://i.postimg.cc/Bvy1YpFR/Yevgeny-Prigozhin.jpg" alt="叶夫根尼·普里戈任">
       <div class="book-info">
-          <h3>趋吉避凶-叔敖</h3>
-          <p>叶夫根尼·普里戈任（Yevgeny Prigozhin）</p>
+        <h3>趋吉避凶-叔敖</h3>
+        <p>叶夫根尼·普里戈任</p>
       </div>
-  </div>
+    </div>
 
-  <!-- 1 -->
-  <div class="book-card" onclick="location.href='books.html?book=book1'">
-      <img src="https://i.postimg.cc/MHRfxz7B/getImage.webp" alt="21世纪21堂课">
-      <div class="book-info">
-          <h3>21世纪21堂课</h3>
-          <p>尤瓦尔·赫拉利</p>
-      </div>
-  </div>
-
-  <div class="book-card" onclick="location.href='book2.html?book=book2'">
+    <a class="book-card" href="reader2.html?book=book2&chapter=cover">
       <img src="https://i.postimg.cc/qMN7SM1m/image.jpg" alt="乌合之众">
       <div class="book-info">
-          <h3>乌合之众</h3>
-          <p>古斯塔夫·勒庞</p>
+        <h3>乌合之众</h3>
+        <p>古斯塔夫·勒庞</p>
       </div>
+    </a>
+
+      <!-- 2 -->
+    <a class="book-card" href="reader2.html?book=book2&chapter=cover">
+        <img src="https://i.postimg.cc/qMN7SM1m/image.jpg" alt="低调影人">
+        <div class="book-info">
+            <h3>低调是一种“深藏不露”的力量。</h3>
+            <p>叔敖</p>
+        </div>
+    </a>
+
+    <!-- 3 -->
+    <a class="book-card" href="reader2.html?book=book3&chapter=cover">
+        <img src="https://i.postimg.cc/Fzp8mYh5/image.jpg" alt="人性的弱点">
+        <div class="book-info">
+          <h3>人性的弱点</h3>
+          <p>戴尔·卡耐基</p>
+        </div>
+    </a>
+
+    <!-- 4 -->
+    <a class="book-card" href="reader2.html?book=book4&chapter=cover">
+      <img src="https://i.postimg.cc/k5KscCrG/image.jpg" alt="习惯的力量">
+      <div class="book-info">
+        <h3>习惯的力量</h3>
+        <p>查尔斯·杜希格</p>
+      </div>
+    </a>
+
+    <!-- 5 -->
+    <a class="book-card" href="reader2.html?book=book5&chapter=cover">
+      <img src="https://i.postimg.cc/y8cm6FHD/image.jpg" alt="自私的基因">
+      <div class="book-info">
+        <h3>自私的基因</h3>
+        <p>理查德·道金斯</p>
+      </div>
+    </a>
+
+    <!-- 6 -->
+    <a class="book-card" href="reader2.html?book=book6&chapter=cover">
+      <img src="https://i.postimg.cc/RhgzG866/image.jpg" alt="社会性动物">
+      <div class="book-info">
+        <h3>社会性动物</h3>
+        <p>大卫·迈尔斯</p>
+      </div>
+    </a>
+
+    <!-- 7 -->
+    <a class="book-card" href="reader2.html?book=book7&chapter=cover">
+      <img src="https://i.postimg.cc/ydn5zRV2/image.jpg" alt="人类简史">
+      <div class="book-info">
+        <h3>人类简史</h3>
+        <p>尤瓦尔·赫拉利</p>
+      </div>
+    </a>
+
+    <!-- 8 -->
+    <a class="book-card" href="reader2.html?book=book8&chapter=cover">
+      <img src="https://i.postimg.cc/3rBLV3kD/image.jpg" alt="自卑与超越">
+      <div class="book-info">
+        <h3>自卑与超越</h3>
+        <p>阿尔弗雷德·阿德勒</p>
+      </div>
+    </a>
+
+    <!-- 9 -->
+    <a class="book-card" href="reader2.html?book=book9&chapter=cover">
+      <img src="https://i.postimg.cc/pT1ZZJVV/image.jpg" alt="利维坦">
+      <div class="book-info">
+        <h3>利维坦</h3>
+        <p>托马斯·霍布斯</p>
+      </div>
+    </a>
+
+    <!-- 10 -->
+    <a class="book-card" href="reader2.html?book=book10&chapter=cover">
+      <img src="https://i.postimg.cc/k52F5tFk/image.png" alt="君主论">
+      <div class="book-info">
+        <h3>君主论</h3>
+        <p>马基雅维利</p>
+      </div>
+    </a>
+
+    <!-- 11 -->
+    <a class="book-card" href="reader2.html?book=book11&chapter=cover">
+      <img src="https://i.postimg.cc/Dw9mqJKV/image.jpg" alt="罪与罚">
+      <div class="book-info">
+        <h3>罪与罚</h3>
+        <p>陀思妥耶夫斯基</p>
+      </div>
+    </a>
+
+    <!-- 12 -->
+    <a class="book-card" href="reader2.html?book=book12&chapter=cover">
+      <img src="https://i.postimg.cc/x8p1qqP4/image.jpg" alt="存在与虚无">
+      <div class="book-info">
+        <h3>存在与虚无</h3>
+        <p>让-保罗·萨特</p>
+      </div>
+    </a>
+
+  </div>
+  
   </div>
 
-  <!-- 2 -->
-  <a class="book-card" href="reader2.html?book=book2&chapter=cover">
-      <img src="https://i.postimg.cc/qMN7SM1m/image.jpg" alt="低调影人">
-      <div class="book-info">
-          <h3>低调是一种“深藏不露”的力量。</h3>
-          <p>叔敖</p>
-      </div>
-  </a>
+  <!-- Bottom Mobile Navigation -->
+  <div class="bottom-nav">
+    <a href="home.html"><i class="fa-solid fa-house"></i><span>首页</span></a>
+    <a href="books.html" class="active"><i class="fa-solid fa-book-open"></i><span>书库</span></a>
+    <a href="library.html"><i class="fa-solid fa-bookmark"></i><span>收藏</span></a>
+    <a href="profile.html"><i class="fa-solid fa-user"></i><span>我</span></a>
+    <a href="menu.html"><i class="fa-solid fa-bars"></i><span>菜单</span></a>
+  </div>
 
-  <!-- 3 -->
-  <a class="book-card" href="reader2.html?book=book3&chapter=cover">
-      <img src="https://i.postimg.cc/Fzp8mYh5/image.jpg" alt="人性的弱点">
-      <div class="book-info">
-        <h3>人性的弱点</h3>
-        <p>戴尔·卡耐基</p>
-      </div>
-  </a>
-
-  <!-- 4 -->
-  <a class="book-card" href="reader2.html?book=book4&chapter=cover">
-    <img src="https://i.postimg.cc/k5KscCrG/image.jpg" alt="习惯的力量">
-    <div class="book-info">
-      <h3>习惯的力量</h3>
-      <p>查尔斯·杜希格</p>
-    </div>
-  </a>
-
-  <!-- 5 -->
-  <a class="book-card" href="reader2.html?book=book5&chapter=cover">
-    <img src="https://i.postimg.cc/y8cm6FHD/image.jpg" alt="自私的基因">
-    <div class="book-info">
-      <h3>自私的基因</h3>
-      <p>理查德·道金斯</p>
-    </div>
-  </a>
-
-  <!-- 6 -->
-  <a class="book-card" href="reader2.html?book=book6&chapter=cover">
-    <img src="https://i.postimg.cc/RhgzG866/image.jpg" alt="社会性动物">
-    <div class="book-info">
-      <h3>社会性动物</h3>
-      <p>大卫·迈尔斯</p>
-    </div>
-  </a>
-
-  <!-- 7 -->
-  <a class="book-card" href="reader2.html?book=book7&chapter=cover">
-    <img src="https://i.postimg.cc/ydn5zRV2/image.jpg" alt="人类简史">
-    <div class="book-info">
-      <h3>人类简史</h3>
-      <p>尤瓦尔·赫拉利</p>
-    </div>
-  </a>
-
-  <!-- 8 -->
-  <a class="book-card" href="reader2.html?book=book8&chapter=cover">
-    <img src="https://i.postimg.cc/3rBLV3kD/image.jpg" alt="自卑与超越">
-    <div class="book-info">
-      <h3>自卑与超越</h3>
-      <p>阿尔弗雷德·阿德勒</p>
-    </div>
-  </a>
-
-  <!-- 9 -->
-  <a class="book-card" href="reader2.html?book=book9&chapter=cover">
-    <img src="https://i.postimg.cc/pT1ZZJVV/image.jpg" alt="利维坦">
-    <div class="book-info">
-      <h3>利维坦</h3>
-      <p>托马斯·霍布斯</p>
-    </div>
-  </a>
-
-  <!-- 10 -->
-  <a class="book-card" href="reader2.html?book=book10&chapter=cover">
-    <img src="https://i.postimg.cc/k52F5tFk/image.png" alt="君主论">
-    <div class="book-info">
-      <h3>君主论</h3>
-      <p>马基雅维利</p>
-    </div>
-  </a>
-
-  <!-- 11 -->
-  <a class="book-card" href="reader2.html?book=book11&chapter=cover">
-    <img src="https://i.postimg.cc/Dw9mqJKV/image.jpg" alt="罪与罚">
-    <div class="book-info">
-      <h3>罪与罚</h3>
-      <p>陀思妥耶夫斯基</p>
-    </div>
-  </a>
-
-  <!-- 12 -->
-  <a class="book-card" href="reader2.html?book=book12&chapter=cover">
-    <img src="https://i.postimg.cc/x8p1qqP4/image.jpg" alt="存在与虚无">
-    <div class="book-info">
-      <h3>存在与虚无</h3>
-      <p>让-保罗·萨特</p>
-    </div>
-  </a>
-
-</div>
-
-<script>
-function openLibrary(filePath){
-    // 点击书籍卡片跳转到 audiobook.html 并传递 JSON 文件路径
-    window.location.href = `audiobook.html?file=${filePath}`;
-}
-</script>
+  <script>
+    function openLibrary(filePath) {
+      // Redirect to audiobook / reader with book data
+      window.location.href = `audiobook.html?file=${filePath}`;
+    }
+  </script>
 
 </body>
 </html>
