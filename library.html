@@ -7,62 +7,141 @@
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  <!-- Main CSS -->
   <link rel="stylesheet" href="css/library.css">
 </head>
 
 <body>
 
+  <!-- App Logo -->
+  <div class="app-logo">
+    <img src="https://i.postimg.cc/3x3QzSGq/cropped-favicon-180x180.png" alt="App Logo">
+  </div>
+
+  <!-- Page Title -->
+  <h1>📚 我的书库</h1>
+
   <!-- Book Grid -->
   <div id="book-list">
+    <!-- Book 1 -->
     <div class="book-card" onclick="openLibrary('wagner.html?book=book1')">
-      <img src="https://i.postimg.cc/x1jWMsn3/images.jpg" alt="Book 1">
+      <img src="https://i.postimg.cc/x1jWMsn3/images.jpg" alt="趋吉避凶-叔敖">
+      <div class="book-info">
+        <h3>趋吉避凶-叔敖</h3>
+        <p>叶夫根尼·普里戈任</p>
+      </div>
     </div>
 
+    <!-- Book 2 -->
     <div class="book-card" onclick="openLibrary('books.html?book=book1')">
-      <img src="https://i.postimg.cc/vTQ1GFwy/6.jpg" alt="Book 2">
+      <img src="https://i.postimg.cc/vTQ1GFwy/6.jpg" alt="21世纪21堂课">
+      <div class="book-info">
+        <p>Yuval Noah Harari</p>
+      </div>
     </div>
 
+    <!-- Book 3 -->
     <a class="book-card" href="reader2.html?book=book2&chapter=cover">
-      <img src="https://i.postimg.cc/tT5TPWr9/1.jpg" alt="Book 3">
+      <img src="https://i.postimg.cc/qMN7SM1m/image.jpg" alt="乌合之众">
+      <div class="book-info">
+        <p>古斯塔夫·勒庞</p>
+      </div>
     </a>
 
+    <!-- Book 4 -->
     <a class="book-card" href="reader2.html?book=book2&chapter=cover">
-      <img src="https://i.postimg.cc/qMN7SM1m/image.jpg" alt="Book 4">
+      <img src="https://i.postimg.cc/tT5TPWr9/1.jpg" alt="低调影人">
+      <div class="book-info">
+        <p>叔敖</p>
+      </div>
     </a>
 
+    <!-- Book 5 -->
     <a class="book-card" href="reader2.html?book=book3&chapter=cover">
-      <img src="https://i.postimg.cc/d3pK4r6P/5.jpg" alt="Book 5">
+      <img src="https://i.postimg.cc/d3pK4r6P/5.jpg" alt="人性的弱点">
+      <div class="book-info">
+        <p>戴尔·卡耐基</p>
+      </div>
     </a>
 
+    <!-- Book 6 -->
     <a class="book-card" href="reader2.html?book=book4&chapter=cover">
-      <img src="https://i.postimg.cc/k5KscCrG/image.jpg" alt="Book 6">
+      <img src="https://i.postimg.cc/k5KscCrG/image.jpg" alt="习惯的力量">
+      <div class="book-info">
+        <p>查尔斯·杜希格</p>
+      </div>
     </a>
 
+    <!-- Book 7 -->
     <a class="book-card" href="reader2.html?book=book5&chapter=cover">
-      <img src="https://i.postimg.cc/y8cm6FHD/image.jpg" alt="Book 7">
+      <img src="https://i.postimg.cc/y8cm6FHD/image.jpg" alt="自私的基因">
+      <div class="book-info">
+        <p>理查德·道金斯</p>
+      </div>
     </a>
 
+    <!-- Book 8 -->
     <a class="book-card" href="reader2.html?book=book6&chapter=cover">
-      <img src="https://i.postimg.cc/RhgzG866/image.jpg" alt="Book 8">
+      <img src="https://i.postimg.cc/RhgzG866/image.jpg" alt="社会性动物">
+      <div class="book-info">
+        <p>大卫·迈尔斯</p>
+      </div>
     </a>
 
+    <!-- Book 9 -->
     <a class="book-card" href="reader2.html?book=book7&chapter=cover">
-      <img src="https://i.postimg.cc/ydn5zRV2/image.jpg" alt="Book 9">
+      <img src="https://i.postimg.cc/ydn5zRV2/image.jpg" alt="人类简史">
+      <div class="book-info">
+        <p>尤瓦尔·赫拉利</p>
+      </div>
     </a>
 
+    <!-- Book 10 -->
     <a class="book-card" href="reader2.html?book=book8&chapter=cover">
-      <img src="https://i.postimg.cc/3rBLV3kD/image.jpg" alt="Book 10">
+      <img src="https://i.postimg.cc/3rBLV3kD/image.jpg" alt="自卑与超越">
+      <div class="book-info">
+        <p>阿尔弗雷德·阿德勒</p>
+      </div>
+    </a>
+
+    <!-- Book 11 -->
+    <a class="book-card" href="reader2.html?book=book9&chapter=cover">
+      <img src="https://i.postimg.cc/pT1ZZJVV/image.jpg" alt="利维坦">
+      <div class="book-info">
+        <p>托马斯·霍布斯</p>
+      </div>
+    </a>
+
+    <!-- Book 12 -->
+    <a class="book-card" href="reader2.html?book=book10&chapter=cover">
+      <img src="https://i.postimg.cc/k52F5tFk/image.png" alt="君主论">
+      <div class="book-info">
+        <p>马基雅维利</p>
+      </div>
     </a>
   </div>
 
   <!-- Bottom Mobile Navigation -->
   <div class="bottom-nav">
-    <a href="home.html"><i class="fa-solid fa-house"></i><span>首页</span></a>
-    <a href="books.html" class="active"><i class="fa-solid fa-book-open"></i><span>书库</span></a>
-    <a href="library.html"><i class="fa-solid fa-bookmark"></i><span>收藏</span></a>
-    <a href="profile.html"><i class="fa-solid fa-user"></i><span>我</span></a>
-    <a href="menu.html"><i class="fa-solid fa-bars"></i><span>菜单</span></a>
+    <a href="home.html">
+      <i class="fa-solid fa-house"></i>
+      <span>首页</span>
+    </a>
+    <a href="books.html" class="active">
+      <i class="fa-solid fa-book-open"></i>
+      <span>书库</span>
+    </a>
+    <a href="library.html">
+      <i class="fa-solid fa-bookmark"></i>
+      <span>收藏</span>
+    </a>
+    <a href="profile.html">
+      <i class="fa-solid fa-user"></i>
+      <span>我</span>
+    </a>
+    <a href="menu.html">
+      <i class="fa-solid fa-bars"></i>
+      <span>菜单</span>
+    </a>
   </div>
 
   <script>
