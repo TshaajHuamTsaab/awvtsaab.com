@@ -1,0 +1,62 @@
+/* Navbar */
+.navbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 10px 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-btn, .settings {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #f3f4f6;
+  color: #1f2937;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.nav-btn i, .settings i {
+  font-size: 16px;
+}
+
+.nav-btn:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.settings {
+  background: #2563eb;
+  color: white;
+}
+
+.settings:hover {
+  background: #1d4ed8;
+}
+
+/* Responsive for small screens */
+@media (max-width: 768px) {
+  .nav-links {
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 10px;
+  }
+}

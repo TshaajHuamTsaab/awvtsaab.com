@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Awvtsaab's漆书 Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="icon" type="image/png" href="image/logo/logo.png">
+  <!-- 禁止缓存，避免退出后点返回还能进入 -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+
+  <div class="container">
+    <div class="logo">
+      <img src="https://i.postimg.cc/DwzYYTWD/logo.webp" alt="Logo">
+    </div>
+      
+    <!-- 登录区域 -->
+    <div id="loginSection">
+      <div class="rainbow-header">
+        <h1>Awvtsaab's 漆书</h1>
+      </div>
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button class="btn btn-login" onclick="login()">登录</button>
+      <button class="btn btn-create" onclick="promptCreate()">创建新用户</button>
+      <div id="loginMessage" class="message"></div>
+    </div>
+
+    <!-- 创建用户表单 -->
+    <div id="createForm" style="display: none;">
+      <h2>确保隐私安全，随便即可！</h2>
+      <input type="text" id="signupName" placeholder="姓名">
+      <input type="email" id="signupEmail" placeholder="邮箱">
+      <input type="password" id="signupPassword" placeholder="密码">
+      <input type="number" id="signupAge" placeholder="年龄">
+      <select id="signupGender">
+        <option value="" disabled selected>请选择性别</option>
+        <option value="male">男</option>
+        <option value="female">女</option>
+        <option value="other">其他</option>
+      </select>
+      <input type="tel" id="signupPhone" placeholder="手机号码">
+      <button class="btn btn-create" onclick="confirmSignup()">确认</button>
+      <button class="btn btn-secondary" onclick="backToLogin()">返回登录</button>
+      <div id="signupMessage" class="message"></div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script src="/static/js/index.js"></script>
+</body>
+</html>

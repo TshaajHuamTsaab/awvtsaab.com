@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Awvtsaab's 漆书</title>
+
+  <!-- Font Awesome CDN for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Optional: Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+  <!-- Your login.css -->
+  <link rel="stylesheet" href="static/css/login.css">
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="static/assets/logo.png" alt="Logo">
+    </div>
+
+    <!-- Login Section -->
+    <div id="loginSection">
+      <h1 id="loginTitle">Login</h1>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button class="btn-login" onclick="login()">
+        <i class="fas fa-sign-in-alt"></i> <span id="loginBtnText">Login</span>
+      </button>
+      <button class="btn-create" onclick="showSignup()">
+        <i class="fas fa-user-plus"></i> <span id="signupBtnText">Create Account</span>
+      </button>
+
+      <div style="margin-top:10px;">
+        <label for="langSelect"><i class="fas fa-globe"></i></label>
+        <select id="langSelect" onchange="changeLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="zh">中文</option>
+          <option value="mm">မြန်မာ</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Signup Section -->
+    <div id="signupSection" style="display:none;">
+      <h1 id="signupTitle">Create Account</h1>
+      <input type="text" id="signupName" placeholder="Name">
+      <input type="email" id="signupEmail" placeholder="Email">
+      <input type="password" id="signupPassword" placeholder="Password">
+      <input type="number" id="signupAge" placeholder="Age">
+      <select id="signupGender">
+        <option value="" disabled selected>Select Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+      <input type="tel" id="signupPhone" placeholder="Phone">
+      <button class="btn-login" onclick="signup()">
+        <i class="fas fa-check"></i> <span id="confirmBtnText">Confirm</span>
+      </button>
+      <button class="btn-create" onclick="showLogin()">
+        <i class="fas fa-arrow-left"></i> <span id="backBtnText">Back to Login</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Your login.js -->
+  <script src="static/js/login.js"></script>
+
+  <script>
+    // ================= Language Support =================
+    const translations = {
+      en: {
+        loginTitle: "Login",
+        loginBtnText: "Login",
+        signupBtnText: "Create Account",
+        signupTitle: "Create Account",
+        confirmBtnText: "Confirm",
+        backBtnText: "Back to Login",
+      },
+      zh: {
+        loginTitle: "登录",
+        loginBtnText: "登录",
+        signupBtnText: "创建账户",
+        signupTitle: "创建账户",
+        confirmBtnText: "确认",
+        backBtnText: "返回登录",
+      },
+      mm: {
+        loginTitle: "လော့ဂ်အင်",
+        loginBtnText: "လော့ဂ်အင်",
+        signupBtnText: "အကောင့်ဖန်တီးရန်",
+        signupTitle: "အကောင့်ဖန်တီးရန်",
+        confirmBtnText: "အတည်ပြုရန်",
+        backBtnText: "Login သို့ပြန်ရန်",
+      }
+    };
+
+    function changeLanguage(lang) {
+      const t = translations[lang];
+      if (!t) return;
+      document.getElementById("loginTitle").textContent = t.loginTitle;
+      document.getElementById("loginBtnText").textContent = t.loginBtnText;
+      document.getElementById("signupBtnText").textContent = t.signupBtnText;
+      document.getElementById("signupTitle").textContent = t.signupTitle;
+      document.getElementById("confirmBtnText").textContent = t.confirmBtnText;
+      document.getElementById("backBtnText").textContent = t.backBtnText;
+    }
+
+    // Optional: default language
+    changeLanguage("en");
+  </script>
+</body>
+</html>

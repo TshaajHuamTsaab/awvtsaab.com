@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>完整语言书库</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="css/books.css">
+
+</head>
+
+<body>
+
+  <!-- App Logo -->
+  <div class="app-logo">
+    <img src="https://i.postimg.cc/3x3QzSGq/cropped-favicon-180x180.png" alt="App Logo">
+  </div>
+
+  <!-- Page Title -->
+  <h1>完整语言书库</h1>
+
+  <!-- Search and Stats -->
+  <div class="search-container">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search-input" placeholder="搜索书名或作者...">
+    </div>
+  </div>
+  
+  <div class="stats">
+    共 <span id="book-count">15</span> 本书
+  </div>
+
+  <!-- Book Grid -->
+  <div id="book-list">
+    <!-- Books will be dynamically inserted here -->
+  </div>
+</body>
+<script src="js/books.js"></script>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>收藏夹</title>
+
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<link rel="stylesheet" href="css/library.css">
+
+<style>
+  body {
+    background: #000;
+    color: #fff;
+    font-family: "Segoe UI", Arial, sans-serif;
+    padding-bottom: 80px;
+  }
+
+  .app-logo img {
+    display: block;
+    margin: 20px auto;
+    width: 100px;
+    height: 100px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #00ff00;
+    margin-bottom: 15px;
+  }
+
+  .book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    padding: 10px;
+  }
+
+  .book-card {
+    position: relative;
+    background: #111;
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    color: #fff;
+    box-shadow: 0 0 10px #00ff00aa;
+    transition: transform 0.2s ease;
+  }
+  .book-card:hover {
+    transform: scale(1.05);
+  }
+
+  .book-card img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    height: 200px;
+  }
+
+  .book-info {
+    padding: 10px;
+    text-align: center;
+  }
+
+  .book-info h3 {
+    font-size: 16px;
+    margin: 5px 0;
+  }
+
+  .book-info p {
+    font-size: 14px;
+    color: #ccc;
+  }
+
+  .favorite-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #ff3b3b;
+    font-size: 22px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .favorite-btn:hover {
+    transform: scale(1.2);
+    color: #ff0000;
+  }
+
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #111;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0;
+    border-top: 1px solid #00ff00;
+  }
+
+  .bottom-nav a {
+    color: #ccc;
+    text-decoration: none;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .bottom-nav a i {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 3px;
+  }
+
+  .bottom-nav a.active {
+    color: #00ff00;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #00ff00;
+    color: #000;
+    padding: 8px 15px;
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-weight: bold;
+  }
+  .toast.show {
+    opacity: 1;
+  }
+</style>
+</head>
+<body>
+
+<div class="app-logo">
+  <img src="https://i.postimg.cc/3x3QzSGq/cropped-favicon-180x180.png" alt="App Logo">
+</div>
+
+<h1>⭐ 我的收藏夹</h1>
+<div id="favorites-books" class="book-grid"></div>
+
+<div class="bottom-nav">
+  <a href="home.html"><i class="fa-solid fa-house"></i><span>首页</span></a>
+  <a href="library.html"><i class="fa-solid fa-book-open"></i><span>书库</span></a>
+  <a href="favorites.html" class="active"><i class="fa-solid fa-bookmark"></i><span>收藏</span></a>
+  <a href="profile.html"><i class="fa-solid fa-user"></i><span>我</span></a>
+</div>
+
+<script>
+function showToast(msg){
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(()=> toast.classList.add("show"), 10);
+  setTimeout(()=>{ toast.classList.remove("show"); setTimeout(()=> toast.remove(),300); }, 2000);
+}
+
+// 渲染收藏书籍
+function renderFavorite(book){
+  const container = document.getElementById("favorites-books");
+  const card = document.createElement("a");
+  card.className = "book-card";
+  card.href = book.link;
+  card.target = "_blank";
+
+  const img = document.createElement("img");
+  img.src = book.cover;
+  img.alt = book.title;
+
+  const info = document.createElement("div");
+  info.className = "book-info";
+
+  const title = document.createElement("h3");
+  title.textContent = book.title;
+
+  const author = document.createElement("p");
+  author.textContent = book.author;
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.className = "favorite-btn";
+  cancelBtn.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+  cancelBtn.title = "取消收藏";
+  cancelBtn.onclick = (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    let favorites = JSON.parse(localStorage.getItem("favorites")||"[]");
+    favorites = favorites.filter(f=>f.link!==book.link);
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    card.remove();
+    showToast(`❌ 已取消收藏：${book.title}`);
+  };
+
+  info.appendChild(title);
+  info.appendChild(author);
+  card.appendChild(img);
+  card.appendChild(cancelBtn);
+  card.appendChild(info);
+  container.appendChild(card);
+}
+
+function loadFavorites(){
+  const favorites = JSON.parse(localStorage.getItem("favorites")||"[]");
+  const container = document.getElementById("favorites-books");
+  if(favorites.length===0){
+    container.innerHTML="<p style='color:#00ff00; text-align:center;'>暂无收藏内容</p>";
+    return;
+  }
+  favorites.forEach(book=>renderFavorite(book));
+}
+
+loadFavorites();
+</script>
+</body>
+</html>

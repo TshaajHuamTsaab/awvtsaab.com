@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hmoobtsaab's 漆书 - 欢迎</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #8a2be2;
+      --primary-dark: #6a1cb3;
+      --secondary: #ff6b6b;
+      --accent: #00d2d3;
+      --success: #1dd1a1;
+      --warning: #ff9f43;
+      --danger: #ff6b6b;
+      --dark: #1a1a2e;
+      --darker: #0f0f1a;
+      --light: #f7f7f7;
+      --gray: #576574;
+      --book-primary: #00ff99;
+      --book-glow: rgba(0, 255, 153, 0.7);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .language-selector {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .lang-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--light);
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+
+    .lang-btn:hover, .lang-btn.active {
+      background: var(--book-primary);
+      color: var(--dark);
+      transform: translateY(-2px);
+    }
+
+    .container {
+      text-align: center;
+      padding: 20px;
+      max-width: 500px;
+      width: 90%;
+    }
+
+    .logo {
+      margin-bottom: 30px;
+    }
+
+    .logo-icon {
+      font-size: 80px;
+      color: var(--book-primary);
+      margin-bottom: 15px;
+      text-shadow: 0 0 20px var(--book-glow);
+    }
+
+    .logo-text {
+      font-size: 36px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--book-primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .logo-subtitle {
+      font-size: 16px;
+      color: var(--gray);
+      margin-bottom: 40px;
+    }
+
+    .welcome-text {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 30px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease;
+    }
+
+    .welcome-text.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .countdown {
+      font-size: 120px;
+      font-weight: 900;
+      color: var(--book-primary);
+      text-shadow: 0 0 30px var(--book-glow);
+      margin: 30px 0;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.5s ease;
+    }
+
+    .countdown.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .redirect-text {
+      font-size: 18px;
+      color: var(--gray);
+      margin-top: 30px;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .redirect-text.show {
+      opacity: 1;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 50px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease 0.5s;
+    }
+
+    .features.show {
+      opacity: 1;
+        transform: translateY(0);
+    }
+
+    .feature-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-icon {
+      font-size: 30px;
+      color: var(--book-primary);
+      margin-bottom: 15px;
+    }
+
+    .feature-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .feature-desc {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      text-align: center;
+      color: var(--gray);
+      font-size: 14px;
+      width: 100%;
+    }
+
+    /* 动画效果 */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in-up {
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .features {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      
+      .welcome-text {
+        font-size: 36px;
+      }
+      
+      .countdown {
+        font-size: 80px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo-text {
+        font-size: 28px;
+      }
+      
+      .welcome-text {
+        font-size: 28px;
+      }
+      
+      .countdown {
+        font-size: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 语言选择器 -->
+  <div class="language-selector">
+    <button class="lang-btn active" data-lang="zh">中文</button>
+    <button class="lang-btn" data-lang="en">English</button>
+    <button class="lang-btn" data-lang="my">မြန်မာ</button>
+  </div>
+
+  <!-- 主要内容 -->
+  <div class="container">
+    <div class="logo">
+      <div class="logo-icon">
+        <i class="fas fa-book-open"></i>
+      </div>
+      <div class="logo-text">Hmoobtsaab's 漆书</div>
+      <div class="logo-subtitle" id="subtitle">您的个人数字图书馆</div>
+    </div>
+
+    <div class="welcome-text" id="welcome-text">欢迎来到漆书</div>
+    
+    <div class="countdown" id="countdown">5</div>
+    
+    <div class="redirect-text" id="redirect-text">即将跳转到登录页面...</div>
+
+    <div class="features" id="features">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-infinity"></i>
+        </div>
+        <div class="feature-title">无限阅读</div>
+        <div class="feature-desc">畅读海量书籍，随时随地享受阅读乐趣</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-download"></i>
+        </div>
+        <div class="feature-title">离线下载</div>
+        <div class="feature-desc">下载书籍到本地，无网络也能阅读</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-crown"></i>
+        </div>
+        <div class="feature-title">会员特权</div>
+        <div class="feature-desc">尊享会员专属内容和无广告体验</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>© 2023 Hmoobtsaab's 漆书 - 让阅读成为一种生活方式</p>
+  </div>
+
+  <audio id="countdown-sound" preload="auto">
+    <source src="assets/sounds/countdown.mp3" type="audio/mpeg">
+  </audio>
+
+  <audio id="transition-sound" preload="auto">
+    <source src="assets/sounds/transition.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // 多语言文本
+    const translations = {
+      zh: {
+        subtitle: "您的个人数字图书馆",
+        welcome: "欢迎来到漆书",
+        redirect: "即将跳转到登录页面...",
+        feature1: "无限阅读",
+        feature1desc: "畅读海量书籍，随时随地享受阅读乐趣",
+        feature2: "离线下载", 
+        feature2desc: "下载书籍到本地，无网络也能阅读",
+        feature3: "会员特权",
+        feature3desc: "尊享会员专属内容和无广告体验",
+        footer: "© 2023 Hmoobtsaab's 漆书 - 让阅读成为一种生活方式"
+      },
+      en: {
+        subtitle: "Your Personal Digital Library",
+        welcome: "Welcome to Hmoobtsaab's Book",
+        redirect: "Redirecting to login page...",
+        feature1: "Unlimited Reading",
+        feature1desc: "Read vast collections of books anytime, anywhere",
+        feature2: "Offline Download",
+        feature2desc: "Download books for offline reading without internet",
+        feature3: "Premium Benefits", 
+        feature3desc: "Enjoy exclusive content and ad-free experience",
+        footer: "© 2023 Hmoobtsaab's Book - Make reading a lifestyle"
+      },
+      my: {
+        subtitle: "သင့်ရဲ့ဒစ်ဂျစ်တယ်စာကြည့်တိုက်",
+        welcome: "Hmoobtsaab's Book မှကြိုဆိုပါတယ်",
+        redirect: "လော့ဂ်အင်စာမျက်နှာသို့ခေါ်ဆောင်သွားမည်...",
+        feature1: "အကန့်အသတ်မရှိဖတ်ရှုခြင်း",
+        feature1desc: "မည်သည့်နေရာ၊ မည်သည့်အချိန်မဆိုစာအုပ်စာပေများစွာဖတ်ရှုပါ",
+        feature2: "အော့ဖ်လိုင်းဒေါင်းလုဒ်",
+        feature2desc: "အင်တာနက်မလိုဘဲအော့ဖ်လိုင်းဖတ်ရှုရန်စာအုပ်များဒေါင်းလုဒ်လုပ်ပါ",
+        feature3: "ပရီမီယံအခွင့်အရေးများ",
+        feature3desc: "သီးသန့်အကြောင်းအရာများနှင့်ကြော်ငြာမပါသောအတွေ့အကြုံကိုခံစားပါ",
+        footer: "© 2023 Hmoobtsaab's Book - စာဖတ်ခြင်းကိုဘဝနေထိုင်မှုပုံစံတစ်ခုအဖြစ်ပြုလုပ်ပါ"
+      }
+    };
+
+    // DOM 元素
+    const langButtons = document.querySelectorAll('.lang-btn');
+    const subtitle = document.getElementById('subtitle');
+    const welcomeText = document.getElementById('welcome-text');
+    const countdownElement = document.getElementById('countdown');
+    const redirectText = document.getElementById('redirect-text');
+    const features = document.getElementById('features');
+    const countdownSound = document.getElementById('countdown-sound');
+    const transitionSound = document.getElementById('transition-sound');
+    const footer = document.querySelector('.footer p');
+
+    // 当前语言
+    let currentLang = 'zh';
+    let countdown = 5;
+
+    // 初始化页面
+    function initPage() {
+      // 显示欢迎文字
+      setTimeout(() => {
+        welcomeText.classList.add('show');
+      }, 500);
+
+      // 显示倒计时
+      setTimeout(() => {
+        countdownElement.classList.add('show');
+        startCountdown();
+      }, 1500);
+
+      // 显示重定向文字
+      setTimeout(() => {
+        redirectText.classList.add('show');
+      }, 2000);
+
+      // 显示特性卡片
+      setTimeout(() => {
+        features.classList.add('show');
+      }, 2500);
+    }
+
+    // 开始倒计时
+    function startCountdown() {
+      // 播放倒计时声音
+      try {
+        countdownSound.play();
+      } catch (e) {
+        console.log('音频播放失败:', e);
+      }
+
+      const countdownInterval = setInterval(() => {
+        countdown--;
+        countdownElement.textContent = countdown;
+        
+        // 添加脉冲动画
+        countdownElement.classList.remove('pulse');
+        void countdownElement.offsetWidth; // 触发重绘
+        countdownElement.classList.add('pulse');
+
+        if (countdown <= 0) {
+          clearInterval(countdownInterval);
+          // 播放转场声音
+          try {
+            transitionSound.play();
+          } catch (e) {
+            console.log('转场音频播放失败:', e);
+          }
+          // 跳转到登录页面
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000);
+        }
+      }, 1000);
+    }
+
+    // 切换语言
+    function switchLanguage(lang) {
+      currentLang = lang;
+      const text = translations[lang];
+      
+      // 更新界面文本
+      subtitle.textContent = text.subtitle;
+      welcomeText.textContent = text.welcome;
+      redirectText.textContent = text.redirect;
+      footer.textContent = text.footer;
+      
+      // 更新特性卡片
+      const featureTitles = document.querySelectorAll('.feature-title');
+      const featureDescs = document.querySelectorAll('.feature-desc');
+      
+      featureTitles[0].textContent = text.feature1;
+      featureTitles[1].textContent = text.feature2;
+      featureTitles[2].textContent = text.feature3;
+      
+      featureDescs[0].textContent = text.feature1desc;
+      featureDescs[1].textContent = text.feature2desc;
+      featureDescs[2].textContent = text.feature3desc;
+      
+      // 更新活动按钮状态
+      langButtons.forEach(btn => {
+        if (btn.dataset.lang === lang) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    // 事件监听
+    langButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchLanguage(btn.dataset.lang);
+      });
+    });
+
+    // 初始化页面
+    document.addEventListener('DOMContentLoaded', () => {
+      initPage();
+      
+      // 检查是否有保存的语言设置
+      const savedLang = localStorage.getItem('preferredLanguage');
+      if (savedLang) {
+        switchLanguage(savedLang);
+      }
+    });
+  </script>
+</body>
+</html>

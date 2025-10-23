@@ -1,0 +1,207 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#loginSection, #createForm {
+  background: rgba(10, 10, 10, 0.9);
+  padding: 40px;
+  border-radius: 15px;
+  border: 1px solid #00ff41;
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(10px);
+  
+  max-height: 80vh;     /* ✅ 限制最大高度 */
+  overflow-y: auto;     /* ✅ 内容太多时表单自己可以滚动 */
+}
+
+#loginSection, #createForm {
+  margin-bottom: 20px;
+}
+
+#matrix {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.logo {
+  margin-bottom: 30px;
+}
+
+.logo img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid #00ff41;
+  box-shadow: 0 0 20px #00ff41;
+}
+
+.rainbow-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.rainbow-header h1 {
+  font-size: 2.5em;
+  background: linear-gradient(45deg, #ff0000, #ff8000, #ffff00, #00ff00, #00ffff, #0000ff, #8000ff, #ff00ff);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: rainbow 3s ease-in-out infinite;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes rainbow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+#loginSection, #createForm {
+  background: rgba(10, 10, 10, 0.9);
+  padding: 40px;
+  border-radius: 15px;
+  border: 1px solid #00ff41;
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(10px);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #00ff41;
+  font-size: 1.8em;
+  text-shadow: 0 0 10px #00ff41;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #00ff41;
+  border-radius: 5px;
+  color: #00ff41;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #00ffff;
+  box-shadow: 0 0 10px #00ffff;
+  background: rgba(0, 20, 20, 0.8);
+}
+
+input::placeholder {
+  color: #00802b;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-login {
+  background: linear-gradient(45deg, #00ff41, #00cc33);
+  color: #000;
+}
+
+.btn-login:hover {
+  background: linear-gradient(45deg, #00cc33, #00ff41);
+  box-shadow: 0 0 15px #00ff41;
+  transform: translateY(-2px);
+}
+
+.btn-create {
+  background: linear-gradient(45deg, #0080ff, #0044cc);
+  color: #fff;
+}
+
+.btn-create:hover {
+  background: linear-gradient(45deg, #0044cc, #0080ff);
+  box-shadow: 0 0 15px #0080ff;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: linear-gradient(45deg, #666, #333);
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(45deg, #333, #666);
+  box-shadow: 0 0 15px #666;
+  transform: translateY(-2px);
+}
+
+.message {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.message.success {
+  background: rgba(0, 255, 65, 0.2);
+  border: 1px solid #00ff41;
+  color: #00ff41;
+}
+
+.message.error {
+  background: rgba(255, 0, 0, 0.2);
+  border: 1px solid #ff0000;
+  color: #ff0000;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+  
+  #loginSection, #createForm {
+    padding: 20px;
+  }
+  
+  .rainbow-header h1 {
+    font-size: 2em;
+  }
+  
+  h2 {
+    font-size: 1.5em;
+  }
+}

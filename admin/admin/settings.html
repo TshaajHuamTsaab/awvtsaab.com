@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>设置 - Hmoobtsaab's 漆书</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #8a2be2;
+      --primary-dark: #6a1cb3;
+      --secondary: #ff6b6b;
+      --accent: #00d2d3;
+      --success: #1dd1a1;
+      --warning: #ff9f43;
+      --danger: #ff6b6b;
+      --dark: #1a1a2e;
+      --darker: #0f0f1a;
+      --light: #f7f7f7;
+      --gray: #576574;
+      --gold: #ffd700;
+      --silver: #c0c0c0;
+      --bronze: #cd7f32;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+      color: var(--light);
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    .header {
+      background: rgba(26, 26, 46, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    #back-btn {
+      background: none;
+      border: none;
+      color: var(--light);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header h1 {
+      margin-left: 20px;
+      font-size: 22px;
+      font-weight: 600;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title i {
+      font-size: 20px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .user-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .user-details {
+      flex: 1;
+    }
+
+    .user-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .user-id {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 5px;
+    }
+
+    .user-status {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--success);
+      color: white;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    .membership-section {
+      background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 210, 211, 0.2));
+      border: 1px solid rgba(138, 43, 226, 0.3);
+    }
+
+    .membership-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .membership-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .upgrade-btn {
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .upgrade-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+    }
+
+    .membership-plans {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .plan-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .plan-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .plan-card.popular {
+      border: 2px solid var(--gold);
+      position: relative;
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--gold);
+      color: var(--dark);
+      padding: 3px 15px;
+      border-radius: 15px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .plan-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .plan-price {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .plan-price.mmk {
+      color: var(--success);
+    }
+
+    .plan-features {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 15px;
+    }
+
+    .plan-features li {
+      margin-bottom: 8px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .plan-features li i {
+      color: var(--success);
+      font-size: 12px;
+    }
+
+    .select-plan {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s;
+    }
+
+    .select-plan:hover {
+      background: var(--primary-dark);
+    }
+
+    .payment-methods {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .payment-method {
+      flex: 1;
+      min-width: 120px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .payment-method:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .payment-method.active {
+      border: 2px solid var(--accent);
+    }
+
+    .payment-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .payment-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    button {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--light);
+      padding: 12px 15px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    button.danger {
+      color: var(--danger);
+      border-color: rgba(255, 107, 107, 0.3);
+    }
+
+    button.danger:hover {
+      background: rgba(255, 107, 107, 0.1);
+    }
+
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .popup-box {
+      background: var(--dark);
+      border-radius: 15px;
+      padding: 25px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .popup-box h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: var(--accent);
+    }
+
+    .popup-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .popup-actions button {
+      flex: 1;
+      text-align: center;
+      justify-content: center;
+      margin-bottom: 0;
+    }
+
+    .cancel-btn {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .confirm-btn {
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      color: white;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .corner-btn {
+      position: fixed;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      z-index: 99;
+      transition: all 0.3s;
+    }
+
+    .corner-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .top-right {
+      top: 80px;
+      right: 20px;
+    }
+
+    .bottom-right {
+      bottom: 80px;
+      right: 20px;
+    }
+
+    .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--danger);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .service-popup {
+      position: fixed;
+      bottom: 140px;
+      right: 20px;
+      background: var(--dark);
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 98;
+      display: none;
+    }
+
+    .service-popup a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--light);
+      text-decoration: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .service-popup a:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .tg-icon {
+      color: #0088cc;
+    }
+
+    .ms-icon {
+      color: #006aff;
+    }
+
+    .scrollable {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--gray);
+      font-size: 14px;
+      margin-top: 30px;
+    }
+
+    .qr-code {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .qr-code img {
+      max-width: 200px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .membership-benefits {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .benefit-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .benefit-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+
+    .benefit-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .benefit-desc {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    @media (max-width: 768px) {
+      .membership-plans {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .membership-benefits {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <button id="back-btn"><i class="fa-solid fa-arrow-left"></i> <span>返回</span></button>
+    <h1>设置</h1>
+  </header>
+
+  <!-- 主体 -->
+  <main>
+    <!-- 用户信息 -->
+    <div class="section">
+      <div class="user-info">
+        <div class="user-avatar">
+          <i class="fa-solid fa-user"></i>
+        </div>
+        <div class="user-details">
+          <div class="user-name">Hmoobtsaab</div>
+          <div class="user-id">用户ID: APP-988231</div>
+          <div class="user-status">Free</div>
+        </div>
+      </div>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">∞</div>
+          <div class="stat-label">无限简介</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">15</div>
+          <div class="stat-label">下载简介</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">8</div>
+          <div class="stat-label">完整书籍</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 会员升级 -->
+    <div class="section membership-section">
+      <div class="membership-header">
+        <div class="membership-title">升级会员</div>
+        <button class="upgrade-btn">立即升级</button>
+      </div>
+      
+      <div class="membership-plans">
+        <div class="plan-card">
+          <div class="plan-name">3个月</div>
+          <div class="plan-price mmk">6,8880 MMK</div>
+          <ul class="plan-features">
+            <li><i class="fa-solid fa-check"></i> 无限阅读</li>
+            <li><i class="fa-solid fa-check"></i> 无广告</li>
+            <li><i class="fa-solid fa-check"></i> 离线下载</li>
+          </ul>
+          <button class="select-plan">选择</button>
+        </div>
+        
+        <div class="plan-card popular">
+          <div class="popular-badge">最受欢迎</div>
+          <div class="plan-name">6个月</div>
+          <div class="plan-price mmk">89,990 MMK</div>
+          <ul class="plan-features">
+            <li><i class="fa-solid fa-check"></i> 无限阅读</li>
+            <li><i class="fa-solid fa-check"></i> 无广告</li>
+            <li><i class="fa-solid fa-check"></i> 离线下载</li>
+            <li><i class="fa-solid fa-check"></i> 优先支持</li>
+          </ul>
+          <button class="select-plan">选择</button>
+        </div>
+        
+        <div class="plan-card">
+          <div class="plan-name">永恒会员</div>
+          <div class="plan-price mmk">888,888 MMK</div>
+          <ul class="plan-features">
+            <li><i class="fa-solid fa-check"></i> 无限阅读</li>
+            <li><i class="fa-solid fa-check"></i> 无广告</li>
+            <li><i class="fa-solid fa-check"></i> 离线下载</li>
+            <li><i class="fa-solid fa-check"></i> 优先支持</li>
+            <li><i class="fa-solid fa-check"></i> 专属内容</li>
+          </ul>
+          <button class="select-plan">选择</button>
+        </div>
+      </div>
+      
+      <div class="payment-methods">
+        <div class="payment-method active">
+          <div class="payment-icon"><i class="fa-solid fa-qrcode"></i></div>
+          <div class="payment-name">二维码支付</div>
+        </div>
+        <div class="payment-method">
+          <div class="payment-icon"><i class="fa-solid fa-credit-card"></i></div>
+          <div class="payment-name">信用卡</div>
+        </div>
+        <div class="payment-method">
+          <div class="payment-icon"><i class="fa-brands fa-paypal"></i></div>
+          <div class="payment-name">PayPal</div>
+        </div>
+      </div>
+      
+      <div class="qr-code">
+        <p>扫描二维码完成支付</p>
+        <div style="background: white; padding: 15px; display: inline-block; border-radius: 10px;">
+          <!-- 这里可以放置真实的二维码图片 -->
+          <div style="width: 150px; height: 150px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #333;">
+            QR Code
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 会员特权 -->
+    <div class="section">
+      <div class="section-title">
+        <i class="fa-solid fa-crown"></i>
+        <span>会员特权</span>
+      </div>
+      
+      <div class="membership-benefits">
+        <div class="benefit-card">
+          <div class="benefit-icon"><i class="fa-solid fa-book-open"></i></div>
+          <div class="benefit-title">无限阅读</div>
+          <div class="benefit-desc">访问所有书籍和内容</div>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon"><i class="fa-solid fa-download"></i></div>
+          <div class="benefit-title">离线下载</div>
+          <div class="benefit-desc">随时随地阅读</div>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon"><i class="fa-solid fa-ad"></i></div>
+          <div class="benefit-title">无广告</div>
+          <div class="benefit-desc">纯净阅读体验</div>
+        </div>
+        <div class="benefit-card">
+          <div class="benefit-icon"><i class="fa-solid fa-headset"></i></div>
+          <div class="benefit-title">优先支持</div>
+          <div class="benefit-desc">24/7 客服支持</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 账户与购买 -->
+    <div class="section">
+      <div class="section-title">
+        <i class="fa-solid fa-user"></i>
+        <span>账户与购买</span>
+      </div>
+      <button><i class="fa-solid fa-user"></i> <span>账号设置</span></button>
+      <button><i class="fa-solid fa-ticket"></i> <span>兑换优惠券代码</span></button>
+      <button><i class="fa-solid fa-rotate-left"></i> <span>恢复购买</span></button>
+    </div>
+
+    <!-- 邀请与主题 -->
+    <div class="section">
+      <div class="section-title">
+        <i class="fa-solid fa-gift"></i>
+        <span>邀请与主题</span>
+      </div>
+      <button><i class="fa-solid fa-gift"></i> <span>邀请获取免费1个月</span></button>
+      <button><i class="fa-solid fa-palette"></i> <span>主题</span></button>
+      <button><i class="fa-solid fa-bell"></i> <span>通知</span></button>
+      <button><i class="fa-solid fa-tv"></i> <span>设备</span></button>
+    </div>
+
+    <!-- 辅助与联系我们 -->
+    <div class="section">
+      <div class="section-title">
+        <i class="fa-solid fa-wheelchair"></i>
+        <span>辅助与支持</span>
+      </div>
+      <button><i class="fa-solid fa-wheelchair"></i> <span>辅助</span></button>
+      <button><i class="fa-solid fa-phone"></i> <span>联系我们</span></button>
+      <button><i class="fa-solid fa-circle-info"></i> <span>关于</span></button>
+    </div>
+
+    <!-- 分享与反馈 -->
+    <div class="section">
+      <div class="section-title">
+        <i class="fa-solid fa-star"></i>
+        <span>分享与反馈</span>
+      </div>
+      <button><i class="fa-solid fa-star"></i> <span>评价与评论</span></button>
+      <button><i class="fa-solid fa-comment"></i> <span>反馈</span></button>
+      <button><i class="fa-brands fa-telegram"></i> <span>与好友分享</span></button>
+    </div>
+
+    <!-- 条款与退出 -->
+    <div class="section">
+      <div class="section-title">
+        <i class="fa-solid fa-file-contract"></i>
+        <span>条款与退出</span>
+      </div>
+      <button><i class="fa-solid fa-file-contract"></i> <span>条款与条件</span></button>
+      <button><i class="fa-solid fa-user-secret"></i> <span>隐私政策</span></button>
+
+      <!-- 退出按钮 -->
+      <button id="logout-btn" class="danger">
+        <i class="fa-solid fa-right-from-bracket"></i> <span>退出</span>
+      </button>
+
+    </div>
+  </main>
+
+  <!-- 退出弹窗 -->
+  <div id="logout-popup" class="popup-overlay hidden">
+    <div class="popup-box">
+      <h2>确定要退出吗？</h2>
+      <div class="popup-actions">
+        <button id="cancel-logout" class="cancel-btn">取消</button>
+        <button id="confirm-logout" class="confirm-btn">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 通知按钮 -->
+  <div class="corner-btn top-right" id="notif-btn">
+    <i class="fa-solid fa-bell"></i>
+    <span class="badge" id="notif-badge">3</span>
+  </div>
+
+  <!-- 客服按钮 -->
+  <div class="corner-btn bottom-right" id="service-btn">
+    <i class="fa-solid fa-headset"></i>
+  </div>
+
+  <!-- 客服弹窗 -->
+  <div class="service-popup" id="service-popup">
+    <a href="#" target="_blank"><i class="fa-brands fa-telegram tg-icon"></i> Telegram</a>
+    <a href="#" target="_blank"><i class="fa-brands fa-facebook-messenger ms-icon"></i> Messenger</a>
+  </div>
+
+  <!-- 通知弹窗 -->
+  <div class="popup-overlay hidden" id="notif-popup">
+    <div class="popup-box scrollable">
+      <h3>📢 通知</h3>
+      <div id="notif-content">
+        <p>🆕 欢迎使用 Hmoobtsaab's 漆书</p>
+        <p>📅 系统将在明天凌晨 2:00 维护</p>
+        <p>🎉 恭喜你获得高级会员体验</p>
+        <p>💰 新用户专享：首月会员5折优惠</p>
+        <p>📚 新增50本开发中书籍</p>
+      </div>
+      <div class="popup-actions">
+        <button id="close-notif" class="confirm-btn">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>Hmoobtsaab's 漆书</p>
+    <p>Version 1.0.0</p>
+  </footer>
+  <script>
+    // DOM 元素
+    const backBtn = document.getElementById('back-btn');
+    const logoutPopup = document.getElementById('logout-popup');
+    const cancelLogout = document.getElementById('cancel-logout');
+    const confirmLogout = document.getElementById('confirm-logout');
+    const notifBtn = document.getElementById('notif-btn');
+    const notifPopup = document.getElementById('notif-popup');
+    const closeNotif = document.getElementById('close-notif');
+    const serviceBtn = document.getElementById('service-btn');
+    const servicePopup = document.getElementById('service-popup');
+    const planCards = document.querySelectorAll('.plan-card');
+    const paymentMethods = document.querySelectorAll('.payment-method');
+    const upgradeBtn = document.querySelector('.upgrade-btn');
+    
+    // 返回按钮事件
+    backBtn.addEventListener('click', () => {
+      window.history.back();
+    });
+    
+    const logoutBtn = document.getElementById('logout-btn');
+
+logoutBtn.addEventListener('click', async () => {
+  try {
+    // 调用后端接口清除会话
+    await fetch('/logout', { method: 'POST', credentials: 'include' });
+    // 跳转回登录页
+    window.location.href = 'index.html';
+  } catch (err) {
+    console.error('Logout failed', err);
+  }
+});
+    
+    // 通知按钮事件
+    notifBtn.addEventListener('click', () => {
+      notifPopup.classList.remove('hidden');
+      // 清除通知徽章
+      document.getElementById('notif-badge').style.display = 'none';
+    });
+    
+    closeNotif.addEventListener('click', () => {
+      notifPopup.classList.add('hidden');
+    });
+    
+    // 客服按钮事件
+    serviceBtn.addEventListener('click', () => {
+      servicePopup.style.display = servicePopup.style.display === 'block' ? 'none' : 'block';
+    });
+    
+    // 点击页面其他地方关闭客服弹窗
+    document.addEventListener('click', (e) => {
+      if (!serviceBtn.contains(e.target) && !servicePopup.contains(e.target)) {
+        servicePopup.style.display = 'none';
+      }
+    });
+    
+    // 会员计划选择
+    planCards.forEach(card => {
+      card.addEventListener('click', () => {
+        planCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        
+        const planName = card.querySelector('.plan-name').textContent;
+        const planPrice = card.querySelector('.plan-price').textContent;
+        
+        alert(`您选择了 ${planName} 套餐，价格：${planPrice}`);
+      });
+    });
+    
+    // 支付方式选择
+    paymentMethods.forEach(method => {
+      method.addEventListener('click', () => {
+        paymentMethods.forEach(m => m.classList.remove('active'));
+        method.classList.add('active');
+      });
+    });
+    
+    // 升级按钮事件
+    upgradeBtn.addEventListener('click', () => {
+      alert('跳转到会员升级页面');
+      // 这里可以添加实际跳转逻辑
+    });
+    
+    // 选择套餐按钮事件
+    document.querySelectorAll('.select-plan').forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = e.target.closest('.plan-card');
+        const planName = card.querySelector('.plan-name').textContent;
+        const planPrice = card.querySelector('.plan-price').textContent;
+        
+        alert(`您选择了 ${planName} 套餐，价格：${planPrice}，请完成支付`);
+      });
+    });
+  </script>
+<script src="../data/app.js"></script>
+<script src="data/server.js"></script>
+<script src="../static/js/settings.js"></script>
+</body>
+</html>

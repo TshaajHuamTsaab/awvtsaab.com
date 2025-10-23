@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>叶夫根尼·普里戈任（Yevgeny Prigozhin）</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: black;
+  color: #0f0;
+  font-family: 'Share Tech Mono', monospace;
+  overflow: hidden;
+}
+
+canvas#matrix {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+#ebook-container {
+  width: 100%;
+  height: 100vh;
+  background: rgba(0,0,0,0.85);
+  border: 1px solid #0f0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  #ebook-container {
+    width: 700px;
+    height: 90vh;
+    margin: auto;
+    border-radius: 10px;
+  }
+}
+
+#ebook { flex: 1; position: relative; overflow: hidden; padding: 20px; }
+
+.page { width: 100%; height: 100%; overflow-y: auto; display: flex; flex-direction: column; }
+.page h1 { font-size: 1.8rem; text-align: center; color: #0f0; text-shadow: 0 0 5px #0f0,0 0 10px #0f0,0 0 20px #0f0,0 0 40px #00ff00; animation: flicker 1.6s infinite alternate; margin-top: 40px; }
+@keyframes flicker { 0%,19%,21%,23%,25%,54%,56%,100% { text-shadow:0 0 5px #0f0,0 0 10px #0f0,0 0 20px #0f0,0 0 40px #00ff00; } 20%,22%,24%,55% { text-shadow:0 0 2px #0f0; } }
+
+.page .chapter-content { margin-top: 20px; flex: 1; overflow-y: auto; border: 1px solid #0f0; padding: 10px; background: #111; color: #0f0; font-size: 1rem; line-height: 1.6; text-align: justify; }
+
+button { background:#111; color:#0f0; border:1px solid #0f0; padding:6px 10px; border-radius:6px; cursor:pointer; }
+button:hover { background:#0f0; color:#000; }
+
+.backBtn { position: absolute; top: 12px; left: 12px; }
+#controls { margin-top: 10px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* 固定底部按钮栏（手机友好） */
+.fixed-btn-bar{
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 10000;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid #0f0;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+}
+
+/* 单个按钮样式 */
+.fixed-btn-bar button{
+  min-width: 44px;
+  height: 44px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid #0f0;
+  background: #111;
+  color: #0f0;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* 按钮 hover 与触控反馈 */
+.fixed-btn-bar button:hover,
+.fixed-btn-bar button:active {
+  background: #0f0;
+  color: #000;
+}
+
+/* 更大屏（桌面）时把按钮栏限制宽度居中 */
+@media (min-width: 768px){
+  .fixed-btn-bar{
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 700px;
+  }
+  .fixed-btn-bar button{ font-size: 15px; }
+}
+
+/* 可选：更明显的主题变量（JS 会改动这些 CSS 变量） */
+:root{
+  --theme-bg: rgba(0,0,0,0.85);
+  --theme-text: #0f0;
+  --theme-border: #0f0;
+}
+#ebook-container{ background: var(--theme-bg); }
+.chapter-content{ color: var(--theme-text); border-color: var(--theme-border); }
+
+/* 手机触摸优化：扩大点击区域 */
+.fixed-btn-bar button{ touch-action: manipulation; -webkit-tap-highlight-color: rgba(255,255,255,0.05); }
+
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div id="ebook-container">
+  <div id="ebook">
+    <div class="page active">
+      <button class="backBtn" onclick="history.back()">⬅ 返回</button>
+      <h1>叶夫根尼·普里戈任（Yevgeny Prigozhin）</h1>
+      <div class="chapter-content" id="chapter-content">
+        <p>大家好，我叫叔敖。今天我要讲一个关于勇气、野心、智慧与危险的故事，一个现代人必须听懂的故事。它不仅关乎战争，也关乎做人做事的智慧——因为有些事你做了，会让你赢得世界；有些事你做了，可能连明天都看不到。</p>
+
+        <h2>一、年少时期：环境塑造野心</h2>
+        <p>叶夫根尼·普里戈任（Yevgeny Prigozhin）出生于1961年6月1日，地点是俄罗斯列宁格勒（现圣彼得堡）的普通家庭。父母都是工薪阶层，成长环境不宽裕，正值苏联晚期，社会秩序严苛又充满不确定性。</p>
+        <p>小时候，他就不是轻易服从的人。环境艰苦、社会混乱，他学会用聪明和勇气争取生存机会。</p>
+        <p>教训：没有人会主动帮你，你必须自己争取。</p>
+        <p>性格种子：果敢、机敏、善于利用机会。</p>
+        <p>年轻人要明白：环境塑造性格，但性格也决定选择。你能适应环境，但不要被环境绑架你的判断力。</p>
+
+        <h2>二、成长与学习：智慧与人际的磨炼</h2>
+        <p>普里戈任少年到青年时期，不只靠勇气，更靠智慧与观察力。他在社会和职场中快速学习：</p>
+        <ul>
+          <li>人际关系：懂得和关键人物建立关系，包括有权势的人、军方、政客。关系网就是机会和保护。</li>
+          <li>商业与技术：利用商业手段积累财富，为未来军事和政治行动提供资金。学会用资源换影响力，用钱和信息获取优势。</li>
+        </ul>
+        <p>年轻人要记住：能力重要，但关系与资源管理同样关键。聪明的人不会只靠蛮力，而是用智慧把自己放在有利位置。</p>
+
+        <h2>三、崛起为瓦格纳集团领袖：野心与傲慢交织</h2>
+        <p>凭借聪明和果敢，普里戈任建立了瓦格纳集团（Wagner Group），一支私人军事公司。他的任务复杂多样：</p>
+        <ul>
+          <li>战场行动：执行俄罗斯在乌克兰、非洲、叙利亚等地的敏感任务。</li>
+          <li>政治与经济任务：支持国家利益，同时用战争和资源积累财富。</li>
+        </ul>
+        <p>真实小故事：在乌克兰东部的一次行动中，他亲自指挥小队伏击一支装备精良的敌军车队。士兵回忆，他在寒风中走到前线，用地图和望远镜指导战术，那一天他展现出果敢与亲力亲为。但几天后，过于自负，险些让小队陷入包围。优点与缺点并存，教人深思。</p>
+        <p>优点：果敢、聪明、战略眼光、执行力强。缺点：傲慢、自负，低估政治风险。</p>
+        <p>年轻人要学：勇敢和智慧能让你快速崛起，但傲慢和自负会让你失去一切。</p>
+
+        <h2>四、现代新战场策略：隐蔽、灵活、数字化</h2>
+        <p>今天的战争，已经不是单纯拼人数或坦克。瓦格纳集团使用：</p>
+        <ul>
+          <li>非正规部队策略：快速、隐蔽、可调度，高风险任务小而精。</li>
+          <li>资源驱动战术：通过雇佣兵、装备采购和后勤保障获得优势。</li>
+          <li>信息与心理战：网络舆论和心理手段削弱敌方士气。</li>
+        </ul>
+        <p>年轻人要明白：现代战争不仅靠勇气，也靠智慧、策略和科技应用。能力再强，如果不懂新规则，也可能失去先机甚至生命。</p>
+
+        <h2>五、人性与代价：暗示与警示</h2>
+        <ul>
+          <li>2022年2月24日：俄罗斯全面入侵乌克兰，普里戈任的瓦格纳集团参与战场行动。</li>
+          <li>2023年6月：与俄罗斯国防部关系紧张，发起短暂兵变威胁莫斯科。</li>
+          <li>2023年8月23日：私人飞机坠毁身亡，被广泛认为是政治暗杀。</li>
+        </ul>
+        <p>从中学到：能力与勇气可以让你崛起，但政治智慧、风险判断和自我保护同样重要。缺乏这些，可能连明天都看不到。</p>
+
+        <h2>六、古代灭族比喻与现代警示</h2>
+        <p>在古代，如果有人像普里戈任一样，既有权力又挑战高层，傲慢自负，可能不仅个人丧命，还会被灭族——父母、兄弟、子女都难逃。今天虽然没有灭族制度，但危险本质没变：傲慢、自负、缺乏策略的人，仍可能付出惨重代价——失去职位、自由，甚至生命。</p>
+        <p>年轻人必须加倍谨慎：</p>
+        <ul>
+          <li>清醒自知：知道自己能做什么，不能做什么。</li>
+          <li>战略思考：每一步都考虑后果和潜在风险。</li>
+          <li>保护自己与团队：聪明、勇敢的人也需要安全屏障和后援。</li>
+        </ul>
+
+        <h2>七、战争未结束：现实的教训</h2>
+        <p>即便普里戈任已不在人世，战争仍在继续：乌克兰东部冲突、非洲代理战争、网络战与信息战仍在延续。年轻人要明白：世界没有永远胜利者，每一个选择都可能改变命运。</p>
+
+        <h2>八、人性教训与年轻人启示</h2>
+        <ul>
+          <li>做人要清醒自知：知道自己能做什么、不能做什么，衡量风险和后果。</li>
+          <li>做事要趋吉避凶：勇气和野心可以成功，但缺乏智慧和策略，可能连明天都看不到。</li>
+          <li>人性弱点的代价：自负、傲慢、只靠力量的人，最终容易被暗中消灭。</li>
+          <li>成功不是单靠胆量：能力、智慧、战略、关系、风险管理缺一不可。</li>
+        </ul>
+
+        <h2>九、总结：年轻人必须懂的道理</h2>
+        <ul>
+          <li>能力、勇气、智慧三者结合：只勇敢不聪明撞死墙，只聪明不敢做事一事无成。</li>
+          <li>清醒自知：了解底线、风险与局限，才能安全前行。</li>
+          <li>人际与资源管理：没有网络和资源，再聪明也难独立成功。</li>
+          <li>避免傲慢与自负：尊重力量对比与现实，轻视可能致命。</li>
+          <li>短期利益 vs 长期后果：今天赢了不代表明天安全。</li>
+        </ul>
+        <p>普里戈任的故事，是现代权力、战争与人性交织的教科书。年轻人，你可以做事，可以追求野心，但要懂得何时退、何时进，保护自己和团队，保持清醒——这是趋吉避凶的智慧。</p>
+      </div>
+
+      <!-- 固定按钮栏（放到 <body> 里，通常放在页面底部） -->
+<div id="fixed-btn-bar" class="fixed-btn-bar" aria-hidden="false">
+  <button id="play-btn" aria-label="播放/暂停" title="播放/暂停">▶️</button>
+  <button id="speed-btn" aria-label="播放速度" title="切换播放速度">1x</button>
+  <button id="theme-btn" aria-label="切换主题" title="🌈切换目光🔂">🌈切换目光🔂</button>
+  <button id="zoom-in" aria-label="放大文字" title="放大文字">🔎+</button>
+  <button id="zoom-out" aria-label="缩小文字" title="缩小文字">🔎-</button>
+</div>
+
+<!-- 音频文件（放在 src/audio/ 下） -->
+<audio id="chapter-audio" src="assets/src/audio/prigozhin.mp3" preload="metadata"></audio>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // 元素
+  const audio = document.getElementById('chapter-audio');
+  const playBtn = document.getElementById('play-btn');
+  const speedBtn = document.getElementById('speed-btn');
+  const themeBtn = document.getElementById('theme-btn');
+  const zoomInBtn = document.getElementById('zoom-in');
+  const zoomOutBtn = document.getElementById('zoom-out');
+  // 章节内容选择（若不同，可改这里的选择器）
+  const content = document.getElementById('chapter-content') || document.querySelector('.chapter-content');
+
+  /* ---------------------------
+     播放 / 暂停
+     --------------------------- */
+  // 初始按钮图标
+  function setPlayUi(isPlaying){
+    playBtn.textContent = isPlaying ? '⏸' : '▶️';
+  }
+  setPlayUi(!audio.paused);
+
+  playBtn.addEventListener('click', () => {
+    if (audio.paused) {
+      audio.play().catch(()=>{ /* 如果自动播放被阻止，这里可处理 */ });
+      setPlayUi(true);
+    } else {
+      audio.pause();
+      setPlayUi(false);
+    }
+  });
+
+  // 当音频结束或暂停状态变化时更新 UI
+  audio.addEventListener('ended', () => setPlayUi(false));
+  audio.addEventListener('pause', () => setPlayUi(false));
+  audio.addEventListener('play', () => setPlayUi(true));
+
+  /* ---------------------------
+     速度切换（单按钮循环）
+     0.5x -> 1x -> 1.5x -> 2x -> back to 0.5x
+     --------------------------- */
+  const speeds = [0.5, 1, 1.5, 2];
+  let speedIndex = speeds.indexOf(1); // 默认 1x
+  audio.playbackRate = speeds[speedIndex];
+  speedBtn.textContent = speeds[speedIndex] + 'x';
+
+  speedBtn.addEventListener('click', () => {
+    speedIndex = (speedIndex + 1) % speeds.length;
+    audio.playbackRate = speeds[speedIndex];
+    speedBtn.textContent = speeds[speedIndex] + 'x';
+    // 可短暂给用户视觉提示（闪烁）
+    speedBtn.animate([{opacity:1},{opacity:0.6},{opacity:1}], {duration:240});
+  });
+
+  /* ---------------------------
+     多主题循环（更多颜色）
+     每个主题设置：container 背景、content 背景、文字颜色、边框颜色
+     --------------------------- */
+  const themes = [
+    {name:'绿', containerBg: 'rgba(0,0,0,0.85)', contentBg:'#111', text:'#0f0', border:'#0f0'},
+    {name:'白', containerBg: '#ffffff', contentBg:'#fff8f0', text:'#000', border:'#000'},
+    {name:'蓝', containerBg: '#001f3f', contentBg:'#001f3f', text:'#ffffff', border:'#ffffff'},
+    {name:'紫', containerBg: '#2e003e', contentBg:'#3f0d4a', text:'#ffeb3b', border:'#ffeb3b'},
+    {name:'暖黄', containerBg:'#fff8dc', contentBg:'#fff8dc', text:'#5a3e1b', border:'#5a3e1b'}
+  ];
+  let themeIndex = 0;
+
+  function applyTheme(t){
+    // update CSS variables or directly style elements
+    const ebook = document.getElementById('ebook-container') || document.querySelector('#ebook-container');
+    if (ebook) ebook.style.background = t.containerBg;
+    if (content){
+      content.style.background = t.contentBg;
+      content.style.color = t.text;
+      content.style.borderColor = t.border;
+    }
+    // update fixed buttons' border & text to match theme for better integration
+    document.querySelectorAll('.fixed-btn-bar button').forEach(b => {
+      b.style.borderColor = t.border;
+      b.style.color = t.text;
+      // 除非是白底，用深色按钮背景
+      b.style.background = (t.containerBg && t.containerBg.toString().includes('255')) ? '#fff' : '#111';
+      // adjust hover colors conservatively (no direct hover JS here)
+    });
+  }
+
+  // 初始应用
+  applyTheme(themes[themeIndex]);
+
+  themeBtn.addEventListener('click', () => {
+    themeIndex = (themeIndex + 1) % themes.length;
+    applyTheme(themes[themeIndex]);
+    // 小动画提示
+    themeBtn.animate([{transform:'scale(1)'},{transform:'scale(1.08)'},{transform:'scale(1)'}], {duration:220});
+  });
+
+  /* ---------------------------
+     放大 / 缩小文字
+     --------------------------- */
+  const MIN_FONT = 12;
+  const MAX_FONT = 28;
+
+  function changeFontSize(delta){
+    if (!content) return;
+    const style = window.getComputedStyle(content);
+    const currentSize = parseFloat(style.fontSize) || 16;
+    let next = Math.round((currentSize + delta) * 10) / 10; // 精度
+    next = Math.max(MIN_FONT, Math.min(MAX_FONT, next));
+    content.style.fontSize = next + 'px';
+    // 小提示动画
+    content.animate([{opacity:0.95},{opacity:1}], {duration:160});
+  }
+
+  zoomInBtn.addEventListener('click', ()=> changeFontSize(2));
+  zoomOutBtn.addEventListener('click', ()=> changeFontSize(-2));
+
+  /* ---------------------------
+     小提示：如果你想页面载入时自动播放（注意浏览器策略）
+     你可以尝试：
+     audio.play().catch(()=>{/* 浏览器阻止自动播放时无事发生 */});
+     但推荐保留为用户点击触发播放
+
+/* -------------------------
+   Matrix Background
+------------------------- */
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas() { canvas.width = innerWidth; canvas.height = innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
+const fontSize = 14;
+let columns = Math.floor(innerWidth / fontSize);
+let drops = Array(columns).fill(1);
+
+function drawMatrix() {
+  ctx.fillStyle = "rgba(0,0,0,0.06)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#0f0";
+  ctx.font = fontSize + "px monospace";
+  for(let i=0;i<drops.length;i++){
+    const text = letters.charAt(Math.floor(Math.random()*letters.length));
+    ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+    if(drops[i]*fontSize>canvas.height && Math.random()>0.975) drops[i]=0;
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix,33);
+
+/* -------------------------
+   Audio Controls
+------------------------- */
+const audio = document.getElementById("audio");
+function toggleAudio(){ audio.paused ? audio.play() : audio.pause(); }
+function changeSpeed(speed){ audio.playbackRate = speed; }
+
+/* -------------------------
+   Text Size Control
+------------------------- */
+function changeTextSize(delta){
+  const content = document.getElementById("chapter-content");
+  let style = window.getComputedStyle(content,null).getPropertyValue('font-size');
+  let size = parseFloat(style);
+  content.style.fontSize = (size+delta)+'px';
+}
+
+/* -------------------------
+   Theme Toggle
+------------------------- */
+let darkTheme = true;
+function toggleTheme(){
+  const container = document.getElementById("ebook-container");
+  const content = document.getElementById("chapter-content");
+  if(darkTheme){
+    container.style.background="rgba(255,255,255,0.9)";
+    content.style.background="#eee";
+    content.style.color="#000";
+  } else {
+    container.style.background="rgba(0,0,0,0.85)";
+    content.style.background="#111";
+    content.style.color="#0f0";
+  }
+  darkTheme = !darkTheme;
+}
+</script>
+
+</body>
+</html>

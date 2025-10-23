@@ -1,0 +1,289 @@
+/* ================= Rainbow Hacker Header ================= */
+.rainbow-header {
+  text-align: center;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 0 12px rgba(0,255,128,0.06));
+}
+
+.rainbow-header h1 {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 32px;
+  letter-spacing: 1px;
+  font-weight: 700;
+  background: linear-gradient(90deg,
+    #ff3b3b, #ff903b, #ffd93b, #7fff3b,
+    #3bffdf, #3b8bff, #8b3bff, #ff3bcf, #ff3b3b
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbowShift 6s linear infinite, neonFlicker 3s infinite;
+  text-shadow:
+    0 0 6px rgba(255,255,255,0.03),
+    0 0 12px rgba(0,255,128,0.08),
+    0 0 24px rgba(0,255,128,0.06);
+}
+
+@keyframes rainbowShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes neonFlicker {
+  0%, 100% { opacity: 1; transform: translateY(0); }
+  45% { opacity: 0.95; transform: translateY(-1px); }
+  50% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 0.98; transform: translateY(-0.5px); }
+}
+
+/* ================= Global ================= */
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Share Tech Mono', monospace; }
+body {
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:black;
+  color:white;
+  overflow:hidden;
+}
+
+canvas#matrix {
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  z-index:-1;
+}
+
+/* ================= Container ================= */
+.container {
+  background: rgba(0,0,0,0.85);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,255,100,0.5);
+  text-align: center;
+  width: 300px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.container:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 30px rgba(0,255,128,0.8);
+}
+
+.logo { margin-bottom: 15px; }
+.logo img { width: 70px; transition: transform 0.3s ease; }
+.logo img:hover { transform: scale(1.1) rotate(-3deg); }
+
+h2 {
+  margin-bottom: 15px;
+  color: #0f0;
+  text-shadow: 0 0 6px rgba(0,255,0,0.4);
+}
+
+/* ================= Inputs & Selects ================= */
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 6px;
+  outline: none;
+  background: #111;
+  color: #0f0;
+  box-shadow: inset 0 0 5px rgba(0,255,0,0.2);
+  transition: 0.3s;
+}
+input::placeholder, select option { color: #555; }
+input:focus, select:focus {
+  background: #000;
+  box-shadow: 0 0 10px #0f0;
+}
+
+/* ================= Buttons ================= */
+.btn {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+/* Login button */
+.btn-login {
+  background: #111;
+  color: white;
+  border: 1px solid white;
+  box-shadow: 0 0 10px white;
+}
+.btn-login:hover {
+  background: white;
+  color: black;
+  box-shadow: 0 0 20px white, 0 0 40px #0f0;
+  transform: translateY(-2px);
+}
+
+/* Create button */
+.btn-create {
+  background: #111;
+  color: red;
+  border: 1px solid red;
+  box-shadow: 0 0 10px red;
+}
+.btn-create:hover {
+  background: red;
+  color: white;
+  box-shadow: 0 0 20px red, 0 0 40px #ff0;
+  transform: translateY(-2px);
+}
+
+/* ================= Signup Form ================= */
+#signupSection {
+  display: none;
+  margin-top: 20px;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* ================= Animations ================= */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ================= Responsive ================= */
+@media (max-width: 420px) {
+  .rainbow-header h1 { font-size: 22px; }
+  .container { width: 90%; padding: 20px; }
+  input, select, .btn { padding: 10px; font-size: 12px; }
+}
+
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* Body */
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black;
+  color: white;
+  overflow: hidden;
+}
+
+/* Container */
+.container {
+  background: rgba(0, 0, 0, 0.9);
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 255, 100, 0.6);
+  text-align: center;
+  width: 320px;
+}
+
+/* Logo */
+.logo img {
+  width: 80px;
+  margin-bottom: 20px;
+}
+
+/* Titles */
+h1 {
+  font-size: 28px;
+  color: #0f0;
+  margin-bottom: 20px;
+  text-shadow: 0 0 6px #0f0, 0 0 12px #0f0;
+}
+
+/* Input Fields */
+input, select {
+  width: 100%;
+  padding: 14px 12px;
+  margin: 10px 0;
+  border: 2px solid #0f0; /* Thicker border */
+  border-radius: 10px;
+  background: #111;
+  color: #0f0;
+  outline: none;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+input::placeholder {
+  color: #555;
+}
+
+/* Input focus glow */
+input:focus, select:focus {
+  border-color: #3bff3b;
+  box-shadow: 0 0 10px #0f0;
+}
+
+/* Buttons */
+button {
+  width: 100%;
+  padding: 14px 0;
+  margin: 12px 0;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+/* Login button */
+.btn-login {
+  background: #111;
+  color: #0f0;
+  border: 2px solid #0f0;
+  box-shadow: 0 0 10px #0f0;
+}
+
+.btn-login:hover {
+  background: #0f0;
+  color: #000;
+  box-shadow: 0 0 20px #0f0, 0 0 30px #0f0 inset;
+}
+
+/* Create / secondary button */
+.btn-create {
+  background: #111;
+  color: #ff3b3b;
+  border: 2px solid #ff3b3b;
+  box-shadow: 0 0 10px #ff3b3b;
+}
+
+.btn-create:hover {
+  background: #ff3b3b;
+  color: #111;
+  box-shadow: 0 0 20px #ff3b3b, 0 0 30px #ff3b3b inset;
+}
+
+/* Language selector */
+select {
+  font-size: 14px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 2px solid #0f0;
+  background: #111;
+  color: #0f0;
+  margin-top: 8px;
+}
+
+select:focus {
+  border-color: #3bff3b;
+  box-shadow: 0 0 10px #0f0;
+}

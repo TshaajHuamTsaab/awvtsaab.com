@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Awvtsaab's漆书 Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="icon" type="image/png" href="image/logo/logo.png">
+  <!-- 禁止缓存，避免退出后点返回还能进入 -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <style>
+    /* 黑客风格按钮样式 */
+    .btn-hacker {
+      background: linear-gradient(45deg, #00ff00, #008800);
+      border: 1px solid #00ff00;
+      color: #00ff00;
+      text-shadow: 0 0 5px #00ff00;
+      font-family: 'Share Tech Mono', monospace;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    }
+    
+    .btn-hacker:hover {
+      background: linear-gradient(45deg, #00ff00, #00cc00);
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+      transform: translateY(-2px);
+    }
+    
+    .btn-hacker:active {
+      transform: translateY(0);
+    }
+    
+    .btn-hacker::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.4), transparent);
+      transition: left 0.5s;
+    }
+    
+    .btn-hacker:hover::before {
+      left: 100%;
+    }
+    
+    .btn-hacker::after {
+      content: '>> ';
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .btn-hacker:hover::after {
+      opacity: 1;
+    }
+    
+    /* 管理面板样式 */
+    .admin-panel {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #00ff00;
+      border-radius: 5px;
+      background: rgba(0, 255, 0, 0.05);
+    }
+    
+    .admin-title {
+      color: #00ff00;
+      font-family: 'Share Tech Mono', monospace;
+      text-align: center;
+      margin-bottom: 10px;
+      text-shadow: 0 0 5px #00ff00;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+
+  <div class="container">
+    <div class="logo">
+      <img src="https://i.postimg.cc/DwzYYTWD/logo.webp" alt="Logo">
+    </div>
+      
+    <!-- 登录区域 -->
+    <div id="loginSection">
+      <div class="rainbow-header">
+        <h1>Awvtsaab's 漆书</h1>
+      </div>
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button class="btn btn-login" onclick="login()">登录</button>
+      <button class="btn btn-create" onclick="promptCreate()">创建新用户</button>
+      <div id="loginMessage" class="message"></div>
+      
+      <!-- 用户管理面板 -->
+      <div class="admin-panel">
+        <h3 class="admin-title">SYSTEM ADMINISTRATION</h3>
+        <button class="btn btn-hacker" onclick="accessAdminPanel()">
+          <span class="hacker-text">ACCESS ADMIN PANEL</span>
+        </button>
+        <div class="admin-info">
+          <p style="color: #00ff00; font-size: 12px; text-align: center; margin-top: 10px;">
+            Warning: Authorized Personnel Only
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 创建用户表单 -->
+    <div id="createForm" style="display: none;">
+      <h2>确保隐私安全，随便即可！</h2>
+      <input type="text" id="signupName" placeholder="姓名">
+      <input type="email" id="signupEmail" placeholder="邮箱">
+      <input type="password" id="signupPassword" placeholder="密码">
+      <input type="number" id="signupAge" placeholder="年龄">
+      <select id="signupGender">
+        <option value="" disabled selected>请选择性别</option>
+        <option value="male">男</option>
+        <option value="female">女</option>
+        <option value="other">其他</option>
+      </select>
+      <input type="tel" id="signupPhone" placeholder="手机号码">
+      <button class="btn btn-create" onclick="confirmSignup()">确认</button>
+      <button class="btn btn-secondary" onclick="backToLogin()">返回登录</button>
+      <div id="signupMessage" class="message"></div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script src="../static/js/profile.js"></script>
+  
+  <script>
+    // 访问管理员面板函数
+    function accessAdminPanel() {
+      // 添加黑客风格的访问效果
+      const button = event.target;
+      const originalText = button.innerHTML;
+      
+      // 模拟终端访问效果
+      button.innerHTML = '<span style="color: #00ff00">ACCESSING SYSTEM...</span>';
+      button.disabled = true;
+      
+      // 模拟加载过程
+      setTimeout(() => {
+        button.innerHTML = '<span style="color: #00ff00">AUTHENTICATING...</span>';
+      }, 500);
+      
+      setTimeout(() => {
+        button.innerHTML = '<span style="color: #00ff00">GRANTING ACCESS...</span>';
+      }, 1000);
+      
+      setTimeout(() => {
+        button.innerHTML = '<span style="color: #00ff00">ACCESS GRANTED!</span>';
+        
+        // 重定向到管理员面板
+        setTimeout(() => {
+          window.location.href = 'admin/dashboard.html';
+        }, 500);
+        
+      }, 1500);
+    }
+    
+    // 增强的矩阵背景效果
+    document.addEventListener('DOMContentLoaded', function() {
+      const canvas = document.getElementById('matrix');
+      const ctx = canvas.getContext('2d');
+      
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*()[]{}<>";
+      const charArray = chars.split("");
+      const fontSize = 14;
+      const columns = canvas.width / fontSize;
+      const drops = [];
+      
+      for (let x = 0; x < columns; x++) {
+        drops[x] = 1;
+      }
+      
+      function draw() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = "#0F0";
+        ctx.font = fontSize + "px 'Share Tech Mono'";
+        
+        for (let i = 0; i < drops.length; i++) {
+          const text = charArray[Math.floor(Math.random() * charArray.length)];
+          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+          
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
+      }
+      
+      setInterval(draw, 33);
+      
+      // 窗口调整大小时重置canvas
+      window.addEventListener('resize', function() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+    });
+  </script>
+</body>
+</html>

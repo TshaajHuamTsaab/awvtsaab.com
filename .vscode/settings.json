@@ -1,0 +1,11 @@
+{
+    "liveServer.settings.port": 5501,
+    "git.ignoreLimitWarning": true,
+    "git.enableCommitSigning": false,
+    "git.enabled": false,
+    "git.blame.statusBarItem.enabled": false,
+    "git.decorations.enabled": false,
+    "editor.hover.enabled": false,
+    "editor.parameterHints.enabled": false,
+    "files.enableTrash": false
+}

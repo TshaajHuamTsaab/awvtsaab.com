@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>有声书播放器</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding-bottom: 60px; /* for bottom nav */
+    }
+
+    .player-container {
+      max-width: 400px;
+      margin: 30px auto;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .book-cover {
+      width: 200px;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .book-title {
+      font-size: 1.2rem;
+      margin-top: 15px;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #222;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+    }
+
+    .bottom-nav a {
+      color: #aaa;
+      text-decoration: none;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .bottom-nav a i {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .bottom-nav a.active {
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="player-container">
+    <img id="bookCover" class="book-cover" src="" alt="Book Cover">
+    <div id="bookTitle" class="book-title">加载中...</div>
+
+    <audio id="audioPlayer" controls>
+      <source id="audioSource" src="" type="audio/mpeg">
+      您的浏览器不支持音频播放。
+    </audio>
+  </div>
+
+  <!-- Bottom Mobile Navigation -->
+  <div class="bottom-nav">
+    <a href="home.html"><i class="fa-solid fa-house"></i><span>首页</span></a>
+    <a href="books.html"><i class="fa-solid fa-book-open"></i><span>书库</span></a>
+    <a href="library.html"><i class="fa-solid fa-bookmark"></i><span>收藏</span></a>
+    <a href="profile.html"><i class="fa-solid fa-user"></i><span>我</span></a>
+    <a href="menu.html"><i class="fa-solid fa-bars"></i><span>菜单</span></a>
+  </div>
+
+  <script>
+    // 获取 URL 参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const file = urlParams.get('file'); // 例如： audiobook.html?file=wagner.html
+
+    // 这里你可以根据 file 来设置不同的音频和封面
+    const bookData = {
+      "wagner.html?book=book1": {
+        title: "乌合之众",
+        cover: "https://i.postimg.cc/x1jWMsn3/images.jpg",
+        audio: "audio/book1.mp3"
+      },
+      "books.html?book=book1": {
+        title: "21世纪21堂课",
+        cover: "https://i.postimg.cc/vTQ1GFwy/6.jpg",
+        audio: "audio/book2.mp3"
+      }
+      // 你可以继续添加更多书的数据
+    };
+
+    if (bookData[file]) {
+      document.getElementById('bookCover').src = bookData[file].cover;
+      document.getElementById('bookTitle').innerText = bookData[file].title;
+      document.getElementById('audioSource').src = bookData[file].audio;
+      document.getElementById('audioPlayer').load();
+    } else {
+      document.getElementById('bookTitle').innerText = "未找到对应书籍";
+    }
+  </script>
+</body>
+</html>

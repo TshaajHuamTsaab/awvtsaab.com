@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>阅读记录</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<link rel="stylesheet" href="css/library.css">
+</head>
+<body>
+
+<div class="app-logo">
+  <img src="https://i.postimg.cc/3x3QzSGq/cropped-favicon-180x180.png" alt="App Logo">
+</div>
+
+<h1>📖 阅读记录</h1>
+<div id="history-books" class="book-grid"></div>
+
+<div class="bottom-nav">
+  <a href="home.html"><i class="fa-solid fa-house"></i><span>首页</span></a>
+  <a href="library.html"><i class="fa-solid fa-book-open"></i><span>书库</span></a>
+  <a href="favorites.html"><i class="fa-solid fa-bookmark"></i><span>收藏</span></a>
+  <a href="profile.html"><i class="fa-solid fa-user"></i><span>我</span></a>
+</div>
+<script>
+function loadHistory(){
+  const history = JSON.parse(localStorage.getItem("readingHistory") || "[]");
+  if(history.length === 0){
+    document.getElementById("history-books").innerHTML =
+      "<p style='color:#00ff00; text-align:center;'>暂无阅读记录</p>";
+    return;
+  }
+
+  // 最近阅读排前
+  history.sort((a,b)=>b.lastAccess - a.lastAccess);
+
+  const container = document.getElementById("history-books");
+  container.innerHTML = "";
+  history.forEach(h=>{
+    const card = document.createElement("div");
+    card.className="book-card";
+
+    const info = document.createElement("div");
+    info.className="book-info";
+
+    const title = document.createElement("h3"); 
+    title.textContent = h.title;
+
+    const seconds = Math.floor(h.timeSpent / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const remMinutes = minutes % 60;
+    const remSeconds = seconds % 60;
+    const timeText = `${hours}小时 ${remMinutes}分 ${remSeconds}秒`;
+
+    const timeP = document.createElement("p"); 
+    timeP.textContent = `阅读时间：${timeText}`;
+
+    info.appendChild(title);
+    info.appendChild(timeP);
+    card.appendChild(info);
+    container.appendChild(card);
+  });
+}
+
+loadHistory();
+</script>
+</body>
+</html>

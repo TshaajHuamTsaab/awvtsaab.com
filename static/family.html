@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>衷心语境</title>
+<!-- 引入CDN资源 -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/swift-icons@1.0.0/css/swift-icons.min.css" rel="stylesheet">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Noto Serif SC', serif;
+  }
+  
+  body {
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    position: relative;
+    color: #fff;
+  }
+  
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* 覆盖层 */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 0;
+  }
+  
+  /* 主内容区域 */
+  #content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  /* 标题样式 */
+  #title {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    font-weight: 700;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    background: linear-gradient(45deg, #ffd700, #ff8c00, #ff4500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-family: 'Ma Shan Zheng', cursive;
+  }
+  
+  /* 正文样式 */
+  .line {
+    margin: 15px 0;
+    font-size: 1.3rem;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+    line-height: 1.6;
+    max-width: 800px;
+  }
+  
+  /* 页码显示 */
+  #pageNumber {
+    margin-top: 20px;
+    font-size: 1rem;
+    color: #ddd;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 16px;
+    border-radius: 20px;
+  }
+  
+  /* 控制栏样式 */
+  #controls {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    z-index: 3;
+    padding: 0 20px;
+  }
+  
+  /* 高明按钮样式 */
+  .control-btn {
+    padding: 12px 20px;
+    font-weight: bold;
+    font-size: 1rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .control-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .control-btn i {
+    font-size: 1.2rem;
+  }
+  
+  #playBtn {
+    background: linear-gradient(45deg, #00c853, #64dd17);
+  }
+  
+  #stopBtn {
+    background: linear-gradient(45deg, #ff1744, #f50057);
+  }
+  
+  #stopBtn.paused {
+    background: linear-gradient(45deg, #2979ff, #2962ff);
+  }
+  
+  #increase, #decrease {
+    background: linear-gradient(45deg, #ff9100, #ff6d00);
+  }
+  
+  #changeBg {
+    background: linear-gradient(45deg, #651fff, #7c4dff);
+  }
+  
+  #logout-btn {
+    background: linear-gradient(45deg, #d50000, #ff1744);
+  }
+  
+  /* 搜索栏样式 */
+  #search-bar {
+    position: absolute;
+    top: 80px;
+    width: 100%;
+    text-align: center;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  #search-input {
+    padding: 10px 15px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    width: 150px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    color: white;
+    font-size: 1rem;
+  }
+  
+  #search-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  #search-btn {
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(45deg, #00b0ff, #0091ea);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  #search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 176, 255, 0.4);
+  }
+  
+  /* 特效画布 */
+  #stars, #snow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    #title {
+      font-size: 2rem;
+    }
+    
+    .line {
+      font-size: 1.1rem;
+    }
+    
+    #controls {
+      top: 10px;
+    }
+    
+    .control-btn {
+      padding: 10px 15px;
+      font-size: 0.9rem;
+    }
+    
+    #search-bar {
+      top: 70px;
+    }
+  }
+  
+  /* 页面切换动画 */
+  .page-transition {
+    animation: fadeIn 0.5s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- 控制栏 -->
+<div id="controls">
+  <button id="playBtn" class="control-btn"><i class="fas fa-play"></i> 播放</button>
+  <button id="stopBtn" class="control-btn"><i class="fas fa-stop"></i> 停止</button>
+  <button id="increase" class="control-btn"><i class="fas fa-search-plus"></i> 放大</button>
+  <button id="decrease" class="control-btn"><i class="fas fa-search-minus"></i> 缩小</button>
+  <button id="changeBg" class="control-btn"><i class="fas fa-palette"></i> 切换背景</button>
+  <button id="logout-btn" class="control-btn"><i class="fas fa-home"></i> 首页</button>
+</div>
+
+<!-- 页码搜索 -->
+<div id="search-bar">
+  <input type="number" id="search-input" placeholder="输入页码..." min="1"/>
+  <button id="search-btn"><i class="fas fa-arrow-right"></i> 跳转</button>
+</div>
+
+<!-- 内容区域 -->
+<div id="content">
+  <h1 id="title"></h1>
+  <div id="lines"></div>
+  <div id="pageNumber"></div>
+</div>
+
+<!-- 特效画布 -->
+<canvas id="stars"></canvas>
+<canvas id="snow"></canvas>
+<div class="overlay"></div>
+
+<script>
+// 页面数据 - 保留您原有的所有内容
+let pages = [
+  {
+    title: "格局胜过金钱",
+    lines: [
+      "贫困最可怕的，不是物质的贫乏，",
+      "而是陷入贫困的思维和认知。",
+      "",
+      "物质上穷只是穷一时，",
+      "要是思维和认知上穷，那就穷三代了。",
+      "",
+      "要知道给下一代留的不是巨额财富，",
+      "只要留 格局、眼界、思维 就够了，",
+      "因为这就是最宝贵的财富。"
+    ],
+  },
+  {
+    title: "自珍与低调——放低姿态，戒骄戒躁",
+    lines: [
+      "与其“师为人师”孤芳自赏，不如去“拜人为师”使自己成长；",
+      "这并不是自卑，而是智慧。",
+      "只有看到别人的长处，才能不断充实自己。",
+      "",
+      "向他人学习，不要随便指点、纠正别人。",
+      "骄傲的人往往自以为是，他认为别人观点一定有问题，只有他自己的才是对的。",
+      "就会在应友同事的矛盾困扰起来，就会拒绝别人的忠告和帮助。"
+    ],
+  },
+  {
+    title: "学习的重要性",
+    lines: [
+      "知识改变命运，",
+      "学习开拓眼界，",
+      "坚持每天进步一点点，",
+      "长久累积就是质的飞跃。"
+    ]
+  },
+  {
+    title: "坚持的力量",
+    lines: [
+      "生活不是一场短跑，",
+      "而是一场需要耐力的马拉松。",
+      "只有坚持到最后的人，",
+      "才能看到真正的风景。"
+    ]
+  },
+  {title:"社会处事",
+    lines:[
+      "在社会混，最值钱的不是钱，而是信用。",
+      "给人留台阶，就是给自己留后路。",
+      "圈子再大，不真诚也白搭。",
+      "碰到麻烦，先沉住气，不要乱说话。",
+      "人脉不是认识多少人，而是谁愿意帮你。"
+    ],
+    deletable:false
+  },
+  {
+    title:"为人处事",
+    lines:[
+      "会做人，比会做事更重要。",
+      "千万别贪小便宜，最后吃大亏的还是自己。",
+      "人前说一句，背后别添一句。",
+      "恩情要记心里，矛盾要放身后。",
+      "小事情能看出一个人的真面目。"
+    ],
+    deletable:false
+  },
+  {
+    title:"夫妻相处",
+    lines:[
+      "婚姻不是比谁厉害，而是一起过日子。",
+      "吵架别过夜，冷战最伤感情。",
+      "站在对方角度想想，有些火气就下去了。",
+      "夸一句，比骂十句更管用。",
+      "苦日子能一起熬，甜日子才稳得住。"
+    ],
+    deletable:false
+  },
+  {
+    title:"家庭和睦",
+    lines:[
+      "家里不是讲输赢的地方，是讲温暖的地方。",
+      "一家人多说一句谢谢，气氛就不一样。",
+      "家务不是谁的事，谁有空谁做。",
+      "进家门，先放下情绪再开口。",
+      "家里和气，走出去才有底气。"
+    ],
+    deletable:false
+  },
+  {
+    title:"教育孩子",
+    lines:[
+      "孩子学你怎么做，不听你怎么说。",
+      "先教做人，再教读书。",
+      "太顺的孩子，长大容易吃大亏。",
+      "要孩子懂付出，而不是只会要东西。",
+      "鼓励一句，顶得过打击十句。"
+    ],
+    deletable:false
+  },
+  {
+    title:"遵守家规",
+    lines:[
+      "家没规矩，再有钱也留不住。",
+      "规矩不是束缚，是底线。",
+      "长辈立规矩，晚辈守规矩，家才安稳。",
+      "规矩讲清楚，孩子才知道方向。",
+      "家里守规矩，出去才不会丢人。"
+    ],
+    deletable:false
+  },
+  {
+    title:"孝顺父母",
+    lines:[
+      "父母在，家就在。",
+      "孝顺不是以后，是现在。",
+      "常回家吃饭，比转账更暖心。",
+      "父母的唠叨，是最便宜的关心。",
+      "陪伴才是真孝顺，不是光给钱。"
+    ],
+    deletable:false
+  },
+  {
+    title:"邻里关系",
+    lines:[
+      "远亲不如近邻，抬头不见低头见。",
+      "打个招呼，能化解一半尴尬。",
+      "别贪邻居小便宜，迟早坏了关系。",
+      "借点小忙，将来自己也能少麻烦。",
+      "不搬弄是非，是最好的邻里修养。"
+    ],
+    deletable:false
+  },
+  {
+    title:"朋友交往",
+    lines:[
+      "真朋友，不是喝酒时陪你，而是有事时帮你。",
+      "患难见真心，顺境看热闹。",
+      "朋友之间，守信用最重要。",
+      "拿别人短处开玩笑，迟早散伙。",
+      "跟靠谱的人在一起，自己也会变靠谱。"
+    ],
+    deletable:false
+  },
+  {
+    title:"自我修养",
+    lines:[
+      "心态放平，日子才顺。",
+      "说话要有分寸，别口无遮拦。",
+      "能忍一时之气，就能少十年烦恼。",
+      "依赖谁，都不如靠自己。",
+      "每天反省一点，日子就进步一点。"
+    ],
+    deletable:false
+  },
+  {
+    title: "顶层人物常用的10大束缚语言（透明揭示版）",
+    lines: [
+      "1. “只要努力，就能成功”",
+      "2. “要忠诚，不要计较”",
+      "3. “为了大家好，你要牺牲”",
+      "4. “听话，机会就给你”",
+      "5. “钱不是最重要的”",
+      "6. “忍一忍就过去了”",
+      "7. “你们要团结”",
+      "8. “未来会更好”",
+      "9. “这是规矩，别问为什么”",
+      "10. “要知足，别贪心”"
+    ],
+    deletable: false
+  },
+  {
+    title: "1. “只要努力，就能成功”",
+    lines: [
+      "实质：",
+      " 把“社会不平等”转移成“个人不够努力”，掩盖阶层壁垒。",
+      "真相：",
+      " 资源、背景、人脉远比单纯努力更决定成败。",
+      "跨越：",
+      " 努力必须和选择赛道、资本资源结合，否则只是原地跑。"
+    ],
+    deletable: false
+  },
+  {
+    title: "2. “要忠诚，不要计较”",
+    lines: [
+      "实质：",
+      " 用“忠诚”掩盖不公，要求下层无条件付出。",
+      "真相：",
+      " 忠诚通常是单向的，少数人享受成果，多数人消耗生命。",
+      "跨越：",
+      " 在任何关系中，学会保护底线，不做被榨干的螺丝钉。"
+    ],
+    deletable: false
+  },
+  {
+    title: "3. “为了大家好，你要牺牲”",
+    lines: [
+      "实质：",
+      " 用“集体”做幌子，迫使个人牺牲，最终受益的却是少数人。",
+      "真相：",
+      " 所谓“大家”，往往是“上面的人”。",
+      "跨越：",
+      " 牺牲前先问清：利益分配是否透明？牺牲是否值得？"
+    ],
+    deletable: false
+  },
+  {
+    title: "4. “听话，机会就给你”",
+    lines: [
+      "实质：",
+      " 制造“机会稀缺”的幻觉，让人用顺从换未来。",
+      "真相：",
+      " 机会不是恩赐，而是交易。",
+      "跨越：",
+      " 靠实力主动创造机会，不做等待被选中的人。"
+    ],
+    deletable: false
+  },
+  {
+    title: "5. “钱不是最重要的”",
+    lines: [
+      "实质：",
+      " 劝说底层满足现状，好压低报酬。",
+      "真相：",
+      " 说这句话的人，早已坐拥财富。",
+      "跨越：",
+      " 金钱是生存的基础，要敢于争取属于自己的价值。"
+    ],
+    deletable: false
+  },
+  {
+    title: "6. “忍一忍就过去了”",
+    lines: [
+      "实质：",
+      " 培养“顺民”，让人习惯屈服，不敢反抗。",
+      "真相：",
+      " 忍一次，就会有第二次、第三次。",
+      "跨越：",
+      " 该忍就忍，但关键时刻要敢于拒绝和对抗。"
+    ],
+    deletable: false
+  },
+  {
+    title: "7. “你们要团结”",
+    lines: [
+      "实质：",
+      " 用团结的名义，让底层互相约束，却只为上层利益服务。",
+      "真相：",
+      " 所谓团结，常常是“让你们听话”。",
+      "跨越：",
+      " 真正的团结是基于共同利益，而不是被动服从。"
+    ],
+    deletable: false
+  },
+  {
+    title: "8. “未来会更好”",
+    lines: [
+      "实质：",
+      " 制造空头承诺，让人继续忍受现实。",
+      "真相：",
+      " 未来只是筹码，用来拖延你的反抗。",
+      "跨越：",
+      " 不依赖口头承诺，把握当下的主动权。"
+    ],
+    deletable: false
+  },
+  {
+    title: "9. “这是规矩，别问为什么”",
+    lines: [
+      "实质：",
+      " 以规矩压制质疑，让规则永远向权力倾斜。",
+      "真相：",
+      " 规则从来不是公平的，而是利益者写下的护城河。",
+      "跨越：",
+      " 理解规则背后的利益，学会运用规则，而不是盲从。"
+    ],
+    deletable: false
+  },
+  {
+    title: "10. “要知足，别贪心”",
+    lines: [
+      "实质：",
+      " 麻痹底层，让他们接受不公，不去争取。",
+      "真相：",
+      " 让你知足的人，永远不会知足。",
+      "跨越：",
+      " 知足是心态，追求更好是权利，两者不能混淆。"
+    ],
+    deletable: false
+  },
+  {
+    title: "总结",
+    lines: [
+      "顶层人物常用的“束缚语言”都有三个共性：",
+      "",
+      "把系统性不公变成个人问题（例如：努力/忍耐/知足）。",
+      "把服从包装成美德（例如：忠诚/牺牲/团结）。",
+      "用未来承诺掩盖现实剥夺（例如：机会/未来会更好）。"
+    ],
+    deletable: false
+  },
+  {
+    title: "跨越的关键",
+    lines: [
+      "识别语言背后的真实利益。",
+      "拥有自己的价值底线。",
+      "不靠“施舍”，靠自身实力和合作创造主动权。"
+    ],
+    deletable: false
+  },
+  {
+  title: "🔥 人性的傲慢与极端 · 十题",
+  lines: [
+    "1. 权力的傲慢",
+    "2. 财富的傲慢",
+    "3. 知识的傲慢",
+    "4. 道德的傲慢",
+    "5. 经验的傲慢",
+    "6. 地位的傲慢",
+    "7. 孤立的极端",
+    "8. 盲从的极端",
+    "9. 贪欲的极端",
+    "10. 否定的极端"
+  ],
+  deletable: false
+},
+{
+  title: "1. 权力的傲慢",
+  lines: [
+    "当人一旦掌握权力",
+    "就容易把规则看作自己的工具",
+    "而不是约束。"
+  ],
+  deletable: false
+},
+{
+  title: "2. 财富的傲慢",
+  lines: [
+    "有了钱的人",
+    "往往误以为一切都能用钱衡量",
+    "甚至包括人心。"
+  ],
+  deletable: false
+},
+{
+  title: "3. 知识的傲慢",
+  lines: [
+    "读书多的人常陷入",
+    "自以为聪明，",
+    "轻视那些沉默却深刻的智慧。"
+  ],
+  deletable: false
+},
+{
+  title: "4. 道德的傲慢",
+  lines: [
+    "最危险的不是恶人",
+    "而是自认为“绝对正确”的好人。"
+  ],
+  deletable: false
+},
+{
+  title: "5. 经验的傲慢",
+  lines: [
+    "老手常常轻视新手",
+    "却忘了世界随时在变。"
+  ],
+  deletable: false
+},
+{
+  title: "6. 地位的傲慢",
+  lines: [
+    "人在上位就容易把",
+    "“尊重”当成理所当然",
+    "而不是相互的。"
+  ],
+  deletable: false
+},
+{
+  title: "7. 孤立的极端",
+  lines: [
+    "有人选择彻底不信任任何人",
+    "以为冷漠能保护自己",
+    "结果只剩孤独。"
+  ],
+  deletable: false
+},
+{
+  title: "8. 盲从的极端",
+  lines: [
+    "有人为了归属感",
+    "放弃独立思考",
+    "变成群体的影子。"
+  ],
+  deletable: false
+},
+{
+  title: "9. 贪欲的极端",
+  lines: [
+    "欲望一旦失控",
+    "就会吞噬理性",
+    "让人失去分寸。"
+  ],
+  deletable: false
+},
+{
+  title: "10. 否定的极端",
+  lines: [
+    "有些人不是追求真理",
+    "而是沉迷于否定一切",
+    "最终失去方向。"
+  ],
+  deletable: false
+},
+{
+  title: "总结",
+  lines: [
+    "傲慢让人看不见别人",
+    "极端让人看不见自己。",
+    "",
+    "只有保持清醒",
+    "承认自己的局限",
+    "才能在人性陷阱里不迷失。"
+  ],
+  deletable: false
+},
+{
+  title: "🌱 人性的坚韧与智慧 · 十题",
+  lines: [
+    "逆境的坚韧",
+    "信念的坚韧",
+    "学习的坚韧",
+    "情感的坚韧",
+    "责任的坚韧",
+    "宽容的智慧",
+    "沉默的智慧",
+    "简单的智慧",
+    "平衡的智慧",
+    "自知的智慧"
+  ],
+  deletable: false
+},
+{
+  title: "逆境的坚韧",
+  lines: [
+    "真正的坚强",
+    "不是没有痛苦",
+    "而是带着伤口继续走。"
+  ],
+  deletable: false
+},
+{
+  title: "2. 信念的坚韧",
+  lines: [
+    "信念就像火种",
+    "再小",
+    "也能点亮黑暗中的路。"
+  ],
+  deletable: false
+},
+{
+  title: "3. 学习的坚韧",
+  lines: [
+    "不断学习的人",
+    "才不会被时间淘汰",
+    "而是随时更新自己。"
+  ],
+  deletable: false
+},
+{
+  title: "4. 情感的坚韧",
+  lines: [
+    "爱不是脆弱的依赖",
+    "而是风雨中依旧选择牵手。"
+  ],
+  deletable: false
+},
+{
+  title: "5. 责任的坚韧",
+  lines: [
+    "真正的担当",
+    "不是方便时的承诺",
+    "而是困难时的坚持。"
+  ],
+  deletable: false
+},
+{
+  title: "6. 宽容的智慧",
+  lines: [
+    "懂得原谅的人",
+    "比执着仇恨的人",
+    "更懂得珍惜自己。"
+  ],
+  deletable: false
+},
+{
+  title: "7. 沉默的智慧",
+  lines: [
+    "沉默不是软弱",
+    "而是明白并非所有争辩",
+    "都值得耗费精力。"
+  ],
+  deletable: false
+},
+{
+  title: "8. 简单的智慧",
+  lines: [
+    "复杂让人迷失",
+    "而简单",
+    "能让心灵保持清澈。"
+  ],
+  deletable: false
+},
+{
+  title: "9. 平衡的智慧",
+  lines: [
+    "真正的智慧",
+    "不是走极端",
+    "而是找到内心的平衡。"
+  ],
+  deletable: false
+},
+{
+  title: "10. 自知的智慧",
+  lines: [
+    "人最大的聪明",
+    "不是战胜别人",
+    "而是看清自己。"
+  ],
+  deletable: false
+},
+{
+  title: "总结",
+  lines: [
+    "坚韧让人不被击倒",
+    "智慧让人不被困住。",
+    "",
+    "只有坚韧与智慧并行",
+    "人生才能走得更远。"
+  ],
+  deletable: false
+},
+{
+  title: "三件事优先排序",
+  lines: [
+    "面对紧急工作任务，要先处理，避免压力和损失。",
+    "学习新技能虽不紧急，但长期收益最大，应安排在高效时间段。",
+    "回朋友电话重要但可延后，确保完成关键任务后再社交。",
+    "",
+    "原则：先紧急，后重要，再处理可延后事务，让生活高效清醒。",
+    "",
+    "核心理解：",
+    "清醒智慧就是学会区分“紧急与重要”，把时间花在最有价值的事情上。"
+  ],
+  deletable: false
+},
+{
+  title: "金钱使用决策",
+  lines: [
+    "投资自己学习新技能，是最值得的长期选择。",
+    "买电子设备或娱乐消费，只适合在满足长期目标后。",
+    "花钱前先分析收益：短期满足 vs 长期成长。",
+    "",
+    "原则：理性消费，把资源放在提升能力和智慧的地方。",
+    "",
+    "核心理解：",
+    "长期收益优先比短期享受更能让生活智慧积累。"
+  ],
+  deletable: false
+},
+{
+  title: "健康生活选择",
+  lines: [
+    "早上醒来，健康第一，保证身体和精神清醒。",
+    "锻炼可以提高精力和注意力，比多睡一小时更有长期收益。",
+    "刷手机虽方便，但消耗注意力，应控制时间。",
+    "",
+    "原则：权衡短期舒适与长期健康，把精力放在对自己有益的事情上。",
+    "",
+    "核心理解：",
+    "健康是高效生活的基础，身体和精神清醒才能理智做决策。"
+  ],
+  deletable: false
+},
+{
+  title: "时间管理挑战",
+  lines: [
+    "空闲时间应先处理紧急工作，提高效率。",
+    "学习和自我提升放在专注时间，积累长期价值。",
+    "放松娱乐可调节情绪，但不应占用核心学习和工作时间。",
+    "",
+    "原则：分配时间时，先保证基础需求，再安排高价值活动。",
+    "",
+    "核心理解：",
+    "时间是最宝贵的资源，高效安排才能清醒成长。"
+  ],
+  deletable: false
+},
+{
+  title: "社交智慧",
+  lines: [
+    "参加社交活动前先评估任务重要性。",
+    "如果工作或学习紧急，应优先完成核心任务。",
+    "可折中处理：先完成部分任务，再去社交，兼顾效率和关系。",
+    "",
+    "原则：学会平衡责任与人际关系，理智选择优先级。",
+    "",
+    "核心理解：",
+    "社交智慧在于兼顾责任和关系，让生活更平衡。"
+  ],
+  deletable: false
+},
+{
+  title: "消息真假判断",
+  lines: [
+    "遇到新闻或信息，不要盲目转发。",
+    "先查来源、核实真伪，再决定如何处理。",
+    "不理会不可靠消息，是保护自己和他人的方法。",
+    "",
+    "原则：培养批判性思维和信息甄别能力，避免被虚假信息误导。",
+    "",
+    "核心理解：",
+    "清醒智慧源于正确判断信息的能力，避免被虚假或噪声干扰。"
+  ],
+  deletable: false
+},
+{
+  title: "紧急问题应对",
+  lines: [
+    "遇到突发状况，先分析可行方案，避免盲目行动。",
+    "如果有替代方案，可临时应对问题，同时保证工作进度。",
+    "立即去修或等待修理，应考虑效率和风险。",
+    "",
+    "原则：培养应变能力，用最安全高效的方法解决问题。",
+    "",
+    "核心理解：",
+    "生活中总有意外，理性决策比冲动行动更有价值。"
+  ],
+  deletable: false
+},
+{
+  title: "家庭理财选择",
+  lines: [
+    "优先满足生活必需支出，如房租、水电。",
+    "投资孩子教育或自身成长是长期高价值支出。",
+    "投资理财需在确保基本需求后考虑。",
+    "",
+    "原则：用有限资源优先保障生活，再分配给成长和增值事项。",
+    "",
+    "核心理解：",
+    "理智理财 = 安全 + 成长，避免冲动消费。"
+  ],
+  deletable: false
+},
+{
+  title: "健康饮食选择",
+  lines: [
+    "选择健康饮食，即便稍贵或费时，对长期身体最有益。",
+    "快餐或省事方案虽方便，但长期不利健康。",
+    "不吃可能影响工作效率和身体状态。",
+    "",
+    "原则：短期方便不能替代长期健康，生活智慧体现于日常选择。",
+    "",
+    "核心理解：",
+    "健康选择是智慧生活的日常体现，长期收益大于短期便利。"
+  ],
+  deletable: false
+},
+{
+  title: "反思与成长",
+  lines: [
+    "对昨天的错误进行分析，找出原因。",
+    "制定具体改进措施，防止重复犯错。",
+    "总结经验，将反思变为实际行动。",
+    "",
+    "原则：自我反思和行动是清醒智慧的核心能力。",
+    "",
+    "核心理解：",
+    "从错误中学习，让每次经历都成为成长的阶梯。"
+  ],
+  deletable: false
+},
+{
+  title: "整体总结",
+  lines: [
+    "先紧急，后重要 → 管理好时间和精力。",
+    "长期价值优先 → 投资自己和成长。",
+    "健康是基础 → 身体和精神清醒，决策更理智。",
+    "理性分析与批判思维 → 信息判断、选择决策都清楚。",
+    "平衡生活各方面 → 工作、学习、社交、娱乐协调。",
+    "反思与行动结合 → 错误是智慧成长的必经路。",
+    "",
+    "💡 应用方法：",
+    "每天用“紧急重要原则”安排生活。",
+    "遇到选择问题，用“长期价值 + 健康 + 信息分析 + 平衡原则”做决策。",
+    "每天反思行动，找出提升智慧的机会。"
+  ],
+  deletable: false
+},
+{
+    title: "社会必知知识 · 页1",
+    lines: [
+      "1. 有合同才算数，光说不管用 —— 没写下来，出了事没人认账。",
+      "2. 发票就是你的护身符 —— 没票子，坏了东西你就白掏钱。",
+      "3. 借钱分期要算利息 —— 别信什么“零利率”，多半换个名字坑你钱。",
+      "4. 别乱给个人信息 —— 什么验证码、银行卡号，一问就是骗子。",
+      "5. 二手买卖记得留截图 —— 一旦闹纠纷，有图才有凭据。"
+    ],
+    deletable: false
+  },
+  {
+    title: "社会必知知识 · 页2",
+    lines: [
+      "6. 高回报都是陷阱 —— 谁敢给你高利息，还“保本”？百分百是坑。",
+      "7. 医保不是万能的 —— 不同医院、不同地方报销比例差别大。",
+      "8. 社保不能断 —— 一断，买房、落户、贷款全麻烦。",
+      "9. 加班有加班费 —— 平时1.5倍，周末2倍，节日3倍，不给就是违法。",
+      "10. 裸辞要想清楚 —— 存款不够，辞职就等着吃土。"
+    ],
+    deletable: false
+  },
+  {
+    title: "社会必知知识 · 页3",
+    lines: [
+      "11. 租房先拍照留底 —— 退房时不然中介随便扣押金。",
+      "12. 酒桌要识趣 —— 不会喝能说不会，但态度要放对。",
+      "13. 熟人介绍不一定靠谱 —— 朋友介绍的坑，往往更深。",
+      "14. 免费活动背后常带套路 —— 体检、讲座最后都想卖你东西。",
+      "15. 出车祸先报警 —— 别急着私了，不然后面保险赔不了。"
+    ],
+    deletable: false
+  },
+  {
+    title: "社会必知知识 · 页4",
+    lines: [
+      "16. 炒股炒币风险大 —— 钱亏起来比赚还快。",
+      "17. 法律问题别瞎扛 —— 该找律师时就找，花钱省大事。",
+      "18. 快递要先验货再签收 —— 贵重物品尤其如此，不然说不清。",
+      "19. 网络传言别全信 —— 截图、段子多是假的，要看官方消息。"
+    ],
+    deletable: false
+  },
+  {
+    title: "社会必知知识 · 页5",
+    lines: [
+      "20. 送礼随心意，别逞强 —— 礼金随份子，量力而行就好。",
+      "21. 一定要留点现金在手 —— 天有不测风云，兜里没钱最难熬。"
+    ],
+    deletable: false
+  },// ... 保留所有原有页面数据
+];
+
+let currentPage = 0;
+let fontSize = 1.3;
+let reading = false;
+let lineIndex = 0;
+
+const titleEl = document.getElementById("title");
+const linesEl = document.getElementById("lines");
+const pageNumberEl = document.getElementById("pageNumber");
+
+/* ---------------- 页面渲染 ---------------- */
+function renderPage(){
+  if (currentPage < 0) currentPage = 0;
+  if (currentPage >= pages.length) currentPage = pages.length - 1;
+
+  const page = pages[currentPage];
+  titleEl.textContent = page.title;
+  linesEl.innerHTML = "";
+  
+  // 添加页面切换动画
+  linesEl.classList.remove("page-transition");
+  void linesEl.offsetWidth; // 触发重排
+  linesEl.classList.add("page-transition");
+
+  page.lines.forEach(line => {
+    const div = document.createElement("div");
+    div.className = "line";
+    div.style.fontSize = fontSize + "em";
+    // 为每个字符创建span以支持TTS高亮
+    div.innerHTML = line.split("").map(c => `<span>${c}</span>`).join("");
+    linesEl.appendChild(div);
+  });
+
+  pageNumberEl.textContent = `第 ${currentPage+1} 页 / 共 ${pages.length} 页`;
+}
+renderPage();
+
+/* ---------------- 页面切换（滑动和鼠标拖拽） ---------------- */
+function prevPage(){ 
+  if(currentPage > 0){ 
+    currentPage--; 
+    renderPage(); 
+    stopReading(); 
+  } 
+}
+
+function nextPage(){ 
+  if(currentPage < pages.length-1){ 
+    currentPage++; 
+    renderPage(); 
+    stopReading(); 
+  } 
+}
+
+let startX=0, endX=0, mouseDown=false;
+document.addEventListener("touchstart", e => { 
+  startX = e.touches[0].clientX; 
+});
+
+document.addEventListener("touchend", e => {
+  endX = e.changedTouches[0].clientX;
+  if (startX - endX > 50) nextPage();
+  else if (endX - startX > 50) prevPage();
+});
+
+document.addEventListener("mousedown", e => { 
+  mouseDown=true; 
+  startX=e.clientX; 
+});
+
+document.addEventListener("mouseup", e => {
+  if(!mouseDown) return;
+  mouseDown=false; 
+  endX=e.clientX;
+  if (startX - endX > 50) nextPage();
+  else if (endX - startX > 50) prevPage();
+});
+
+/* ---------------- 页码搜索 ---------------- */
+const searchInput = document.getElementById("search-input");
+document.getElementById("search-btn").onclick = () => {
+  const n = parseInt(searchInput.value, 10);
+  if (!isNaN(n) && n>=1 && n<=pages.length){
+    currentPage = n-1;
+    renderPage();
+    stopReading();
+    searchInput.value = "";
+  } else {
+    alert("❌ 没有这个页码");
+  }
+};
+
+// 回车键跳转
+searchInput.addEventListener("keydown", (e) => {
+  if(e.key === "Enter") document.getElementById("search-btn").click();
+});
+
+/* ---------------- 字体大小调整 ---------------- */
+document.getElementById("increase").onclick = () => { 
+  fontSize += 0.1; 
+  renderPage(); 
+};
+
+document.getElementById("decrease").onclick = () => { 
+  fontSize = Math.max(0.8, fontSize-0.1); 
+  renderPage(); 
+};
+
+/* ---------------- 文字转语音 ---------------- */
+let synth = window.speechSynthesis;
+let utterance;
+
+function speakLine(){
+  if(!reading || lineIndex >= pages[currentPage].lines.length){ 
+    stopReading(); 
+    return; 
+  }
+
+  const lineDiv = linesEl.children[lineIndex];
+  const spans = Array.from(lineDiv.querySelectorAll("span"));
+  utterance = new SpeechSynthesisUtterance(pages[currentPage].lines[lineIndex]);
+  utterance.lang = "zh-CN";
+  utterance.rate = 0.9;
+  utterance.pitch = 1;
+  
+  utterance.onboundary = (ev) => {
+    if (ev.charIndex !== undefined){
+      spans.forEach(s => s.style.color="white");
+      const idx = Math.min(ev.charIndex, spans.length-1);
+      spans[idx].style.color = "#ffeb3b";
+    }
+  };
+  
+  utterance.onend = () => {
+    spans.forEach(s => s.style.color="white");
+    lineIndex++;
+    speakLine();
+  };
+  
+  synth.speak(utterance);
+}
+
+function stopReading(){
+  reading = false; 
+  synth.cancel();
+  document.getElementById("stopBtn").classList.remove("paused");
+  Array.from(document.querySelectorAll(".line span")).forEach(s => s.style.color="white");
+}
+
+document.getElementById("playBtn").onclick = () => { 
+  if(!reading){ 
+    reading=true; 
+    lineIndex=0; 
+    speakLine(); 
+  } 
+};
+
+document.getElementById("stopBtn").onclick = () => {
+  if(reading){ 
+    synth.cancel(); 
+    reading=false; 
+    document.getElementById("stopBtn").classList.add("paused");
+  } else { 
+    reading=true; 
+    speakLine(); 
+    document.getElementById("stopBtn").classList.remove("paused");
+  }
+};
+
+/* ---------------- 背景切换 + 特效 ---------------- */
+let bgIndex = 0;
+const backgrounds = [
+  'linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)',
+  'linear-gradient(135deg, #0f2027, #203a43, #2c5364)', // 深色星空背景
+  'linear-gradient(135deg, #1e3c72, #2a5298)' // 深蓝背景
+];
+
+document.getElementById("changeBg").onclick = () => {
+  bgIndex = (bgIndex + 1) % backgrounds.length;
+  document.body.style.background = backgrounds[bgIndex];
+  document.body.style.animation = 'none';
+  
+  if (bgIndex === 1){ 
+    initStars(); 
+    clearSnow(); 
+  } else if (bgIndex === 2){ 
+    initSnow(); 
+    clearStars(); 
+  } else { 
+    clearStars(); 
+    clearSnow(); 
+    document.body.style.animation = 'gradientBG 15s ease infinite';
+  }
+};
+
+/* 星星特效 */
+const starCanvas = document.getElementById("stars");
+const starCtx = starCanvas.getContext("2d");
+let starsArray = [];
+
+function initStars(){
+  starCanvas.width = window.innerWidth;
+  starCanvas.height = window.innerHeight;
+  starsArray = [];
+  
+  for(let i=0; i<150; i++){
+    starsArray.push({
+      x: Math.random()*starCanvas.width,
+      y: Math.random()*starCanvas.height,
+      r: Math.random()*2+1,
+      opacity: Math.random()
+    });
+  }
+  
+  requestAnimationFrame(drawStars);
+}
+
+function drawStars(){
+  starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+  starsArray.forEach(s => {
+    starCtx.beginPath();
+    starCtx.arc(s.x, s.y, s.r, 0, 2*Math.PI);
+    starCtx.fillStyle = `rgba(255, 255, 255, ${s.opacity})`;
+    starCtx.fill();
+    s.opacity += (Math.random()-0.5)*0.05;
+    if(s.opacity > 1) s.opacity = 1;
+    if(s.opacity < 0) s.opacity = 0;
+  });
+  
+  if (bgIndex === 1) requestAnimationFrame(drawStars);
+}
+
+function clearStars(){ 
+  starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height); 
+}
+
+/* 雪花特效 */
+const snowCanvas = document.getElementById("snow");
+const snowCtx = snowCanvas.getContext("2d");
+let snowArray = [];
+
+function initSnow(){
+  snowCanvas.width = window.innerWidth;
+  snowCanvas.height = window.innerHeight;
+  snowArray = [];
+  
+  for(let i=0; i<200; i++){
+    snowArray.push({
+      x: Math.random()*snowCanvas.width,
+      y: Math.random()*snowCanvas.height,
+      r: Math.random()*3+1,
+      speed: Math.random()*1+0.5
+    });
+  }
+  
+  requestAnimationFrame(drawSnow);
+}
+
+function drawSnow(){
+  snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
+  snowArray.forEach(s => {
+    snowCtx.beginPath();
+    snowCtx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    snowCtx.fillStyle = "rgba(255, 255, 255, 0.8)";
+    snowCtx.fill();
+    s.y += s.speed;
+    if(s.y > snowCanvas.height) s.y = 0;
+  });
+  
+  if (bgIndex === 2) requestAnimationFrame(drawSnow);
+}
+
+function clearSnow(){ 
+  snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height); 
+}
+
+/* 窗口大小调整 */
+window.onresize = () => {
+  if (bgIndex === 1) initStars();
+  if (bgIndex === 2) initSnow();
+};
+
+/* 返回首页 */
+document.getElementById('logout-btn').onclick = () => { 
+  window.location.href = "home.html"; 
+};
+
+// 初始化
+window.addEventListener('load', function() {
+  renderPage();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+# ===============================
+# 💥 Plane Shooter Game Project
+# ===============================
+
+# --- Node.js or package managers (if you ever use npm/yarn/pnpm) ---
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# --- Build or compiled output (if you bundle or minify your JS) ---
+dist/
+build/
+temp/
+cache/
+
+# --- Environment and configuration files ---
+.env
+.env.local
+.env.*.local
+config.json
+settings.json
+
+# --- Logs and debug files ---
+*.log
+debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- OS system files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Editor & IDE settings ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+
+# --- Backup or test files ---
+*.tmp
+*.temp
+*.bak
+*.old
+test/
+tests/
+
+# --- Images or assets that shouldn’t be versioned (optional) ---
+# Uncomment below if you have generated images/sprites
+# assets/generated/
+# screenshots/
+
+# --- Optional: Web cache or local save data ---
+localStorage.json
+game_save_data.json
+
+# --- Ignore backups or exports ---
+backup/
+exports/

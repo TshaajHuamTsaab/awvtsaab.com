@@ -1,0 +1,211 @@
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #fdf6e3;
+  margin: 0;
+  padding: 0;
+  color: #333;
+  overflow-x: hidden;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+
+#bookTitle {
+  text-align: center;
+  padding: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  transition: color 0.5s ease;
+}
+
+#book {
+  padding: 20px;
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto 500px auto;
+  transition: color 0.5s ease;
+}
+
+#error {
+  color: red;
+  text-align: center;
+}
+
+/* ====== 彩虹外圈 ====== */
+#outer-ring {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  border: 8px solid transparent;
+  background: conic-gradient(red, orange, yellow, green, blue, purple, red);
+  animation: rotateOuter 20s linear infinite, hueShift 10s linear infinite;
+  z-index: 899;
+  pointer-events: none;
+  filter: drop-shadow(0 0 20px rgba(255,255,255,0.7));
+}
+
+/* ====== 导航内圈 ====== */
+#nav-circle {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(16px);
+  border: 3.5px solid rgba(255,255,255,0.5);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  transition: background 0.5s ease;
+}
+
+/* ====== 遥控器主体 ====== */
+.remote {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* 播放按钮 */
+.remote .btn-play {
+  position: absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  font-size: 36px;
+  font-weight: bold;
+  background: #96dd13;
+  border: 3px solid #e6c200;
+  color: #191f1a;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(39,192,28,0.95);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.remote .btn-play:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 0 40px rgba(39,192,28,1);
+  animation: pulsePlayHover 1.5s infinite ease-in-out;
+}
+@keyframes pulsePlayHover {
+  0% { transform: translate(-50%, -50%) scale(1.1); }
+  50% { transform: translate(-50%, -50%) scale(1.2); }
+  100% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* 通用按钮样式 */
+.remote .btn {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  font-size: 22px;
+  font-weight: bold;
+  border: 2px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #222;
+  text-align: center;
+  line-height: 90px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+}
+.remote .btn:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 20px rgba(0,0,0,0.5), 0 0 30px currentColor;
+  border-image: linear-gradient(45deg,#f0f,#0ff,#f0f) 1;
+  animation: glowHover 1.2s infinite alternate;
+}
+@keyframes glowHover {
+  0% { box-shadow:0 0 12px currentColor,0 0 24px currentColor; }
+  100% { box-shadow:0 0 24px currentColor,0 0 48px currentColor; }
+}
+
+/* 按钮配色 */
+.btn-prev { background: #ff6b6b; border-color: #ff4c4c; color:#fff; }
+.btn-next { background: #4ecdc4; border-color: #38b2ac; color:#fff; }
+.btn-font-plus { background: #a29bfe; border-color: #6c5ce7; color:#fff; }
+.btn-font-minus { background: #6c5ce7; border-color: #341f97; color:#fff; }
+.btn-speed { background: #ff9ff3; border-color: #ff6f91; color:#000; }
+.btn-theme { background: #81ecec; border-color: #00b894; color:#000; }
+.btn-home { background: #fd79a8; border-color: #d63031; color:#fff; }
+.btn-light { background: #ffe066; border-color: #ffb703; color:#000; }
+
+/* 环绕布局 */
+.btn-prev { top:50%; left:5%; transform: translateY(-50%); }
+.btn-next { top:50%; right:5%; transform: translateY(-50%); }
+.btn-font-plus { top:8%; left:50%; transform: translateX(-50%); }
+.btn-font-minus { bottom:8%; left:50%; transform: translateX(-50%); }
+.btn-speed { top:18%; right:18%; }
+.btn-theme { bottom:18%; left:18%; }
+.btn-home { bottom:18%; right:18%; }
+.btn-light { top:18%; left:18%; }
+
+/* 八方旋转 */
+#square-rotation {
+  position: fixed;
+  bottom:30px;
+  left:50%;
+  transform: translateX(-50%);
+  width:400px;
+  height:400px;
+  z-index:900;
+  pointer-events:none;
+}
+.square {
+  position:absolute;
+  width:40px;
+  height:40px;
+  border-radius:6px;
+  opacity:0.9;
+  transform-origin:180px 180px;
+  box-shadow:0 0 12px rgba(0,0,0,0.4);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+/* 旋转动画 */
+@keyframes rotateOuter {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to { transform: translateX(-50%) rotate(360deg); }
+}
+@keyframes hueShift {
+  0% { filter:hue-rotate(0deg); }
+  100% { filter:hue-rotate(360deg); }
+}
+
+/* 隐藏其他按钮，仅保留播放 */
+.remote.hidden .btn:not(#play-btn) {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+/* 播放按钮放大动画 */
+.remote.hidden #play-btn {
+  width: 160px;
+  height: 160px;
+  font-size: 48px;
+  box-shadow: 0 0 35px rgba(39,192,28,0.95);
+  animation: pulsePlay 1.5s infinite ease-in-out;
+  transition: all 0.4s ease;
+}
+@keyframes pulsePlay {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.15); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* 可选边框隐藏 */
+.remote.no-border .btn { border: none; }

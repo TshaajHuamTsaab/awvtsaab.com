@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通用阅读器完整版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="css/reader3.css">
+</head>
+<body>
+    <!-- 主要内容区域 -->
+    <div id="bookTitle">加载中...</div>
+    <div id="book"></div>
+    <div id="error"></div>
+
+    <!-- 装饰元素 -->
+    <div id="outer-ring"></div>
+    <div id="square-rotation"></div>
+
+    <!-- 遥控器面板 -->
+    <div id="nav-circle">
+        <div class="remote neon-remote">
+            <button class="btn btn-play fa fa-play" id="play-btn" title="播放/暂停"></button>
+            <button class="btn btn-prev fa fa-backward" title="上一章"></button>
+            <button class="btn btn-next fa fa-forward" title="下一章"></button>
+            <button class="btn btn-font-plus fa fa-font" title="字体增大"></button>
+            <button class="btn btn-font-minus fa fa-font" title="字体减小"></button>
+            <button class="btn btn-speed fa fa-tachometer" id="speed-btn">1x</button>
+            <button class="btn btn-theme fa fa-adjust" title="切换背景"></button>
+            <button class="btn btn-home fa fa-home" title="返回首页"></button>
+            <button class="btn btn-light fa fa-lightbulb-o" title="显示/隐藏遥控器"></button>
+        </div>
+    </div>
+
+    <!-- 音频元素 -->
+    <audio id="chapter-audio"></audio>
+
+    <!-- 加载 JavaScript -->
+    <script src="js/reader3.js"></script>
+</body>
+</html>

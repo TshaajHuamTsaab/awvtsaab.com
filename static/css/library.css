@@ -1,0 +1,249 @@
+:root {
+  --bg-dark: #111;
+  --bg-mid: #1a1a1a;
+  --bg-light: #222;
+  --text-light: #00ff00;
+  --primary: #00ff00;
+  --secondary: #7fff00;
+  --radius: 14px;
+  --shadow: 0 4px 12px rgba(0,255,0,0.3);
+  --transition: all 0.3s ease;
+  --font-base: 16px;
+  --font-large: 20px;
+  --font-small: 14px;
+}
+
+html {
+  font-size: var(--font-base);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  background: linear-gradient(135deg, var(--bg-dark), var(--bg-mid), var(--bg-light));
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0 80px;
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-logo img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 12px;
+}
+
+h1, .section-title {
+  text-align: center;
+  margin: 14px 0;
+  font-size: var(--font-large);
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 20px;
+  padding: 12px;
+  width: 100%;
+  max-width: 1300px;
+}
+
+.book-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: rgba(0,0,0,0.25);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: var(--transition);
+  padding-bottom: 8px;
+  overflow: hidden; /* 防止图片或文字溢出 */
+}
+
+.book-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 25px var(--primary), 0 0 35px var(--secondary);
+}
+
+.book-card img {
+  width: 100%;
+  height: auto;           /* 自动高度，保证完整显示 */
+  max-height: 220px;      /* 限制最大高度，避免拉伸 */
+  object-fit: contain;     /* 保持比例，不裁剪内容 */
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+  display: block;
+  background: rgba(0,0,0,0.1); /* 文字遮挡时轻微底色 */
+}
+
+.book-info {
+  padding: 10px;
+  width: 100%;  /* 占满卡片宽度 */
+  box-sizing: border-box;
+  position: relative;
+}
+
+.book-info h3 {
+  font-size: 1.05rem;
+  margin: 6px 0;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.book-info p {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin: 0;
+  word-break: break-word;
+}
+
+.book-info button {
+  margin-top: 8px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  color: var(--primary);
+  transition: var(--transition);
+}
+
+.book-info button:hover {
+  color: var(--secondary);
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.95);
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  border-top: 1px solid var(--primary);
+  z-index: 100;
+}
+
+.bottom-nav a {
+  color: var(--primary);
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bottom-nav a i {
+  font-size: 1.4rem;
+  margin-bottom: 2px;
+}
+
+.bottom-nav a.active, .bottom-nav a:hover {
+  color: var(--secondary);
+  text-shadow: 0 0 5px var(--primary), 0 0 10px var(--secondary);
+}
+
+.book-section {
+  width: 100%;
+  max-width: 1300px;
+  padding: 20px 0;
+}
+
+.book-section .section-title {
+  margin: 10px 0;
+  font-size: 1.4rem;
+  text-align: center;
+  font-weight: bold;
+  text-shadow: 0 0 8px var(--primary);
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.book-section .section-title::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 2px;
+  margin: 8px auto 0;
+  background: var(--primary);
+  opacity: 0.6;
+  border-radius: 2px;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 18px;
+  padding: 0 14px;
+}
+
+.book-grid .book-card {
+  background: rgba(0,0,0,0.25);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.book-grid .book-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 20px var(--primary);
+}
+
+.book-grid .book-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.book-grid .book-info {
+  padding: 8px;
+  text-align: center;
+}
+
+.book-grid .book-info h3 {
+  font-size: 1rem;
+  margin: 4px 0;
+}
+
+.book-grid .book-info p {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+/* ✅ 响应式优化 */
+@media(max-width: 1024px){
+  html { font-size: 17px; }
+  .book-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .book-card img { max-height: 200px; }
+}
+
+@media(max-width: 768px){
+  html { font-size: 16px; }
+  .book-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+  .book-card img { max-height: 180px; }
+}
+
+@media(max-width: 480px){
+  html { font-size: 15px; }
+  .book-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .book-card img { max-height: 160px; }
+  .book-info h3 { font-size: 0.95rem; }
+  .book-info p { font-size: 0.8rem; }
+  .bottom-nav a i { font-size: 1.2rem; }
+}
+
+@media(max-width: 360px){
+  html { font-size: 14px; }
+  .book-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+  .book-card img { max-height: 140px; }
+}

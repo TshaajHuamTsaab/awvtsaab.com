@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Awvtsaab's漆书 Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      background: #000;
+      color: #0f0;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Matrix Canvas */
+    #matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+
+    .logo {
+      margin-bottom: 30px;
+    }
+
+    .logo img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px solid #0f0;
+      box-shadow: 0 0 20px #0f0;
+    }
+
+    #loginSection, #createForm {
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid #0f0;
+      border-radius: 10px;
+      padding: 30px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .rainbow-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .rainbow-header h1 {
+      font-size: 24px;
+      background: linear-gradient(90deg, #ff0000, #ff9900, #33cc33, #3399ff, #cc33ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: rainbow 3s linear infinite;
+    }
+
+    @keyframes rainbow {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #0f0;
+      text-shadow: 0 0 10px #0f0;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      background: #111;
+      border: 1px solid #0f0;
+      border-radius: 5px;
+      color: #0f0;
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #0f0;
+      box-shadow: 0 0 10px #0f0;
+    }
+
+    input::placeholder {
+      color: #0a0;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-login {
+      background: #0f0;
+      color: #000;
+    }
+
+    .btn-login:hover {
+      background: #0a0;
+      box-shadow: 0 0 15px #0f0;
+    }
+
+    .btn-create {
+      background: transparent;
+      color: #0f0;
+      border: 1px solid #0f0;
+    }
+
+    .btn-create:hover {
+      background: #0f0;
+      color: #000;
+      box-shadow: 0 0 15px #0f0;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      color: #0f0;
+    }
+
+    .message {
+      text-align: center;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+
+    .success {
+      background: rgba(0, 255, 0, 0.2);
+      border: 1px solid #0f0;
+      display: block;
+    }
+
+    .error {
+      background: rgba(255, 0, 0, 0.2);
+      border: 1px solid #f00;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+
+  <div class="container">
+    <div class="logo">
+      <img src="https://i.postimg.cc/DwzYYTWD/logo.webp" alt="Logo">
+    </div>
+      
+    <!-- 登录区域 -->
+    <div id="loginSection">
+      <div class="rainbow-header">
+        <h1>Awvtsaab's 漆书</h1>
+      </div>
+      <h2>Login</h2>
+      <div id="loginMessage" class="message"></div>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button class="btn btn-login" onclick="login()">登录</button>
+      <button class="btn btn-create" onclick="promptCreate()">创建新用户</button>
+    </div>
+
+    <!-- 创建用户表单 -->
+    <div id="createForm" style="display:none;">
+      <h2>确保隐私安全，随便即可！</h2>
+      <div id="createMessage" class="message"></div>
+      <input type="text" id="signupName" placeholder="姓名">
+      <input type="email" id="signupEmail" placeholder="邮箱">
+      <input type="password" id="signupPassword" placeholder="密码">
+      <input type="number" id="signupAge" placeholder="年龄">
+
+      <select id="signupGender">
+        <option value="" disabled selected>请选择性别</option>
+        <option value="male">男</option>
+        <option value="female">女</option>
+        <option value="other">其他</option>
+      </select>
+
+      <input type="tel" id="signupPhone" placeholder="手机号码">
+
+      <label>
+        Country
+        <select id="signupCountry" name="country">
+          <option value="">Select a country</option>
+          <option value="us">United States</option>
+          <option value="cn">China</option>
+          <option value="mm">Myanmar</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+
+      <button class="btn btn-create" onclick="confirmSignup()">确认</button>
+      <button class="btn btn-login" onclick="showLogin()">返回登录</button>
+    </div>
+  </div>
+
+  <script>
+    // Matrix背景效果
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
+    const fontSize = 14;
+    let columns = Math.floor(canvas.width / fontSize);
+    let drops = Array(columns).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0,0,0,0.06)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#0f0";
+      ctx.font = fontSize + "px monospace";
+
+      for(let i = 0; i < drops.length; i++){
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+    }
+    setInterval(drawMatrix, 33);
+
+    // 用户管理功能
+    let users = JSON.parse(localStorage.getItem('awvtsaab_users')) || [];
+
+    function showMessage(elementId, message, type) {
+      const messageEl = document.getElementById(elementId);
+      messageEl.textContent = message;
+      messageEl.className = `message ${type}`;
+      setTimeout(() => {
+        messageEl.style.display = 'none';
+      }, 3000);
+    }
+
+    function promptCreate() {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('createForm').style.display = 'block';
+    }
+
+    function showLogin() {
+      document.getElementById('createForm').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+    }
+
+    function confirmSignup() {
+      const name = document.getElementById('signupName').value;
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+      const age = document.getElementById('signupAge').value;
+      const gender = document.getElementById('signupGender').value;
+      const phone = document.getElementById('signupPhone').value;
+      const country = document.getElementById('signupCountry').value;
+
+      if (!name || !email || !password) {
+        showMessage('createMessage', '请填写姓名、邮箱和密码', 'error');
+        return;
+      }
+
+      // 检查邮箱是否已存在
+      if (users.find(user => user.email === email)) {
+        showMessage('createMessage', '该邮箱已被注册', 'error');
+        return;
+      }
+
+      // 创建新用户
+      const newUser = {
+        id: Date.now(),
+        name,
+        email,
+        password,
+        age,
+        gender,
+        phone,
+        country,
+        createdAt: new Date().toISOString()
+      };
+
+      users.push(newUser);
+      localStorage.setItem('awvtsaab_users', JSON.stringify(users));
+
+      showMessage('createMessage', '用户创建成功！', 'success');
+      
+      // 清空表单
+      document.getElementById('signupName').value = '';
+      document.getElementById('signupEmail').value = '';
+      document.getElementById('signupPassword').value = '';
+      document.getElementById('signupAge').value = '';
+      document.getElementById('signupGender').selectedIndex = 0;
+      document.getElementById('signupPhone').value = '';
+      document.getElementById('signupCountry').selectedIndex = 0;
+
+      setTimeout(() => {
+        showLogin();
+      }, 2000);
+    }
+
+    function login() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        showMessage('loginMessage', '请输入邮箱和密码', 'error');
+        return;
+      }
+
+      const user = users.find(u => u.email === email && u.password === password);
+
+      if (user) {
+        showMessage('loginMessage', '登录成功！', 'success');
+        
+        // 保存当前用户会话
+        localStorage.setItem('current_user', JSON.stringify(user));
+        
+        // 跳转到主页
+        setTimeout(() => {
+          window.location.href = 'home.html';
+        }, 1000);
+      } else {
+        showMessage('loginMessage', '邮箱或密码错误', 'error');
+      }
+    }
+
+    // 回车键登录
+    document.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        if (document.getElementById('loginSection').style.display !== 'none') {
+          login();
+        } else {
+          confirmSignup();
+        }
+      }
+    });
+
+    // 页面加载时检查是否有已登录用户
+    window.addEventListener('load', function() {
+      const currentUser = localStorage.getItem('current_user');
+      if (currentUser) {
+        // 如果用户已登录，直接跳转到主页
+        window.location.href = 'home.html';
+      }
+    });
+  </script>
+</body>
+</html>
