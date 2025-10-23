@@ -3,11 +3,12 @@ const firebaseConfig = {
   apiKey: "AIzaSyBCIVYd8e5vBeGRz-H12Nj9hd5dyqnZCDI",
   authDomain: "guardiangate-7xkgi.firebaseapp.com",
   projectId: "guardiangate-7xkgi",
-  storageBucket: "guardiangate-7xkgi.firebasestorage.app",
+  storageBucket: "guardiangate-7xkgi.appspot.com", // ✅ 修正
   messagingSenderId: "133766737758",
   appId: "1:133766737758:web:38de135254fef4664769cf"
 };
 firebase.initializeApp(firebaseConfig);
+
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -32,7 +33,7 @@ function confirmSignup() {
   const phone = document.getElementById("signupPhone").value;
 
   if (!name || !email || !password || !age || !gender || !phone) {
-    alert("⚠️ 保护您的隐私安全，随便填写即可🔐💡");
+    alert("⚠️ 请填写所有信息（测试时随便填也行）");
     return;
   }
 
@@ -63,8 +64,9 @@ async function signup(name, email, password, age, gender, phone) {
     });
 
     alert("✅ 新用户创建成功！");
-    window.location.href = "home.html"; // redirect after signup
+    window.location.href = "home.html"; // ✅ 注册后跳转
   } catch (error) {
+    console.error("Signup error:", error);
     alert("❌ " + error.message);
   }
 }
@@ -76,42 +78,45 @@ async function login() {
   try {
     await auth.signInWithEmailAndPassword(email, password);
     alert("✅ 登录成功！");
-    window.location.href = "home.html"; // redirect after login
+    window.location.href = "home.html"; // ✅ 登录后跳转
   } catch (error) {
+    console.error("Login error:", error);
     alert("❌ " + error.message);
   }
 }
 
 // ======================= Matrix Background =======================
 const canvas = document.getElementById("matrix");
-const ctx = canvas.getContext("2d");
+if (canvas) {
+  const ctx = canvas.getContext("2d");
 
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-
-const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
-const fontSize = 14;
-const columns = Math.floor(canvas.width / fontSize);
-const drops = Array(columns).fill(1);
-
-function drawMatrix() {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#0f0";
-  ctx.font = fontSize + "px monospace";
-
-  for (let i = 0; i < drops.length; i++) {
-    const text = letters.charAt(Math.floor(Math.random() * letters.length));
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-      drops[i] = 0;
-    }
-    drops[i]++;
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
   }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
+  const fontSize = 14;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
+
+  function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#0f0";
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = letters.charAt(Math.floor(Math.random() * letters.length));
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+  setInterval(drawMatrix, 33);
 }
-setInterval(drawMatrix, 33);
