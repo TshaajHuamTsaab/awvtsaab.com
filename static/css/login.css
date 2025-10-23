@@ -287,3 +287,55 @@ select:focus {
   border-color: #3bff3b;
   box-shadow: 0 0 10px #0f0;
 }
+
+/* ================= Global ================= */
+* { 
+  margin:0; 
+  padding:0; 
+  box-sizing:border-box; 
+  font-family:'Share Tech Mono', monospace; 
+}
+
+/* Body */
+body {
+  min-height: 100vh; /* instead of fixed height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black;
+  color: white;
+  overflow-x: hidden; /* allow vertical scroll only */
+  overflow-y: auto;   /* ✅ allow scroll */
+}
+
+/* Matrix background stays fixed */
+canvas#matrix {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+}
+
+/* ================= Container ================= */
+.container {
+  background: rgba(0,0,0,0.85);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,255,100,0.5);
+  text-align: center;
+  width: 320px;
+  margin: 40px 0; /* ✅ gives breathing room when scrolling */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.container:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 30px rgba(0,255,128,0.8);
+}
+
+/* ================= Signup Form ================= */
+#signupSection {
+  display: none;
+  margin-top: 20px;
+  animation: fadeIn 0.5s ease forwards;
+  padding-bottom: 30px; /* ✅ prevent content cutoff */
+}
