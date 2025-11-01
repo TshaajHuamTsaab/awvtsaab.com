@@ -333,6 +333,20 @@
       z-index: 2;
     }
     
+    /* ====== 升级徽章 ====== */
+    .upgrade-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 69, 0, 0.9);
+      color: #fff;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-weight: bold;
+      z-index: 2;
+    }
+    
     /* ====== 底部导航 ====== */
     .bottom-nav {
       position: fixed;
@@ -470,6 +484,12 @@
       margin-bottom: 15px;
       opacity: 0.5;
     }
+
+    /* Optional: Add hover effect for upgrade-required books */
+    .book-card[data-type="upgrade"]:hover {
+      border-color: rgba(255, 69, 0, 0.6);
+      box-shadow: 0 15px 30px rgba(255, 69, 0, 0.2);
+    }
   </style>
 </head>
 <body>
@@ -525,75 +545,130 @@
     // ================== 📚 已完成书籍数据 ==================
     const completedBooks = [
       { title:"趋吉避凶-叔敖", author:"叶夫根尼·普里戈任", cover:"https://i.postimg.cc/x1jWMsn3/images.jpg", link:"wagner.html?book=book1", type:"completed" },
-      { title:"21世纪21堂课", author:"Yuval Noah Harari", cover:"https://i.postimg.cc/vTQ1GFwy/6.jpg", link:"21century.html", type:"completed" },
-      { title:"乌合之众", author:"古斯塔夫·勒庞", cover:"https://i.postimg.cc/qMN7SM1m/image.jpg", link:"reader2.html?book=book1&chapter=cover", type:"completed" },
+      { title:"21世纪21堂课", author:"Yuval Noah Harari", cover:"https://i.postimg.cc/rm6KyDm7/6.gif", link:"21century.html", type:"completed" },
+      { title:"乌合之众", author:"古斯塔夫·勒庞", cover:"https://i.postimg.cc/1txfR8X1/8.gif", link:"reader2.html?book=book1&chapter=cover", type:"completed" },
       { title:"低调影人", author:"叔敖", cover:"https://i.postimg.cc/tT5TPWr9/1.jpg", link:"reader2.html?book=book2&chapter=cover", type:"completed" },
-      { title:"人性的弱点", author:"戴尔·卡耐基", cover:"https://i.postimg.cc/d3pK4r6P/5.jpg", link:"reader2.html?book=book3&chapter=cover", type:"completed" },
-      { title:"习惯的力量", author:"查尔斯·杜希格", cover:"https://i.postimg.cc/k5KscCrG/image.jpg", link:"reader2.html?book=book4&chapter=cover", type:"completed" },
-      { title:"自私的基因", author:"理查德·道金斯", cover:"https://i.postimg.cc/y8cm6FHD/image.jpg", link:"reader2.html?book=book5&chapter=cover", type:"completed" },
-      { title:"社会性动物", author:"大卫·迈尔斯", cover:"https://i.postimg.cc/RhgzG866/image.jpg", link:"reader2.html?book=book6&chapter=cover", type:"completed" },
-      { title:"人类简史", author:"尤瓦尔·赫拉利", cover:"https://i.postimg.cc/ydn5zRV2/image.jpg", link:"reader2.html?book=book7&chapter=cover", type:"completed" },
-      { title:"自卑与超越", author:"阿尔弗雷德·阿德勒", cover:"https://i.postimg.cc/3rBLV3kD/image.jpg", link:"reader2.html?book=book8&chapter=cover", type:"completed" },
-      { title:"利维坦", author:"托马斯·霍布斯", cover:"https://i.postimg.cc/pT1ZZJVV/image.jpg", link:"reader2.html?book=book9&chapter=cover", type:"completed" },
-      { title:"君主论", author:"马基雅维利", cover:"https://i.postimg.cc/k52F5tFk/image.png", link:"reader2.html?book=book10&chapter=cover", type:"completed" },
-      { title:"罪与罚", author:"陀思妥耶夫斯基", cover:"https://ik.imagekit.io/x8rf00rvnn/%E7%BD%AA%E4%B8%8E%E7%BD%9A.jpeg?updatedAt=1760285524524", link:"reader2.html?book=book11&chapter=cover", type:"completed" },
-      { title:"存在与虚无", author:"萨特", cover:"https://ik.imagekit.io/x8rf00rvnn/%E5%AD%98%E5%9C%A8%E4%B8%8E%E8%99%9A%E6%97%A0.png?updatedAt=1760285826430&tr=w-1104%2Ch-736%2Cfo-auto", link:"reader2.html?book=book12&chapter=cover", type:"completed" },
-      { title:"黄石公三略", author:"黄石公", cover:"https://ik.imagekit.io/x8rf00rvnn/%E9%BB%84%E7%9F%B3%E5%85%AC%E4%B8%89%E7%95%A5.png?updatedAt=1760286324534", link:"reader2.html?book=book13&chapter=cover", type:"completed" }
+      { title:"人性的弱点", author:"戴尔·卡耐基", cover:"https://i.postimg.cc/XJMpNrJL/5.gif", link:"reader2.html?book=book3&chapter=cover", type:"completed" },
+      { title:"习惯的力量", author:"查尔斯·杜希格", cover:"https://i.postimg.cc/fL4JWVL5/4.gif", link:"reader2.html?book=book4&chapter=cover", type:"completed" },
+      { title:"自私的基因", author:"理查德·道金斯", cover:"https://i.postimg.cc/vBRc84Bv/3.gif", link:"reader2.html?book=book5&chapter=cover", type:"completed" },
+      { title:"社会性动物", author:"大卫·迈尔斯", cover:"https://i.postimg.cc/C1yzMR1N/2.gif", link:"reader2.html?book=book6&chapter=cover", type:"completed" },
+      { title:"人类简史", author:"尤瓦尔·赫拉利", cover:"https://i.postimg.cc/tRWF6jGW/1.gif", link:"reader2.html?book=book7&chapter=cover", type:"completed" },
+      { title:"自卑与超越", author:"阿尔弗雷德·阿德勒", cover:"https://i.postimg.cc/NMh5GKM3/7.gif", link:"reader2.html?book=book8&chapter=cover", type:"completed" },
+      { title:"利维坦", author:"托马斯·霍布斯", cover:"https://i.postimg.cc/76gb5qJv/12.gif", link:"reader2.html?book=book9&chapter=cover", type:"completed" },
+      { title:"君主论", author:"马基雅维利", cover:"https://i.postimg.cc/qR8gNphP/11.gif", link:"reader2.html?book=book10&chapter=cover", type:"completed" },
+      { title:"罪与罚", author:"陀思妥耶夫斯基", cover:"https://i.postimg.cc/0Qprz9M3/10.gif", link:"reader2.html?book=book11&chapter=cover", type:"completed" },
+      { title:"存在与虚无", author:"萨特", cover:"https://i.postimg.cc/NM1LKQ9n/9.gif", link:"reader2.html?book=book12&chapter=cover", type:"completed" },
+      { title:"黄石公三略", author:"黄石公", cover:"https://i.postimg.cc/N0DNhykd/book16-1.gif", link:"reader2.html?book=book13&chapter=cover", type:"completed" }
     ];
 
-// ================== 📚 开发中书籍信息数组 ==================
 const developingBooks = [
-  { title: "创建思维", author: "璐瑶建议", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=创建思维", link: "reader3.html?book=dev1&chapter=cover", type: "developing" },
-  { title: "量子之门", author: "李雷", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=量子之门", link: "reader3.html?book=dev2&chapter=cover", type: "developing" },
-  { title: "机器觉醒", author: "王芳", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=机器觉醒", link: "reader3.html?book=dev3&chapter=cover", type: "developing" },
-  { title: "未来城市", author: "赵强", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=未来城市", link: "reader3.html?book=dev4&chapter=cover", type: "developing" },
-  { title: "星际穿越", author: "陈明", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=星际穿越", link: "reader3.html?book=dev5&chapter=cover", type: "developing" },
-  { title: "灵能边界", author: "林雪", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=灵能边界", link: "reader3.html?book=dev6&chapter=cover", type: "developing" },
-  { title: "梦境代理人", author: "韩松", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=梦境代理人", link: "reader3.html?book=dev7&chapter=cover", type: "developing" },
-  { title: "时间裂缝", author: "许楠", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=时间裂缝", link: "reader3.html?book=dev8&chapter=cover", type: "developing" },
-  { title: "数据意识", author: "周远", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=数据意识", link: "reader3.html?book=dev9&chapter=cover", type: "developing" },
-  { title: "代码帝国", author: "刘星", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=代码帝国", link: "reader3.html?book=dev10&chapter=cover", type: "developing" },
-  { title: "心灵算法", author: "王泽", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=心灵算法", link: "reader3.html?book=dev12&chapter=cover", type: "developing" },
-  { title: "暗物质战争", author: "李航", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=暗物质战争", link: "reader3.html?book=dev13&chapter=cover", type: "developing" },
-  { title: "人类备份计划", author: "赵琳", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=人类备份计划", link: "reader3.html?book=dev14&chapter=cover", type: "developing" },
-  { title: "赛博之心", author: "陈阳", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=赛博之心", link: "reader3.html?book=dev15&chapter=cover", type: "developing" },
-  { title: "平行宇宙档案", author: "郭彬", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=平行宇宙档案", link: "reader3.html?book=dev16&chapter=cover", type: "developing" },
-  { title: "人工梦境", author: "周洁", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=人工梦境", link: "reader3.html?book=dev17&chapter=cover", type: "developing" },
-  { title: "末日网络", author: "何楠", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=末日网络", link: "reader3.html?book=dev18&chapter=cover", type: "developing" },
-  { title: "AI迷城", author: "林浩", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=AI迷城", link: "reader3.html?book=dev19&chapter=cover", type: "developing" },
-  { title: "虚拟边疆", author: "孙悦", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=虚拟边疆", link: "reader3.html?book=dev20&chapter=cover", type: "developing" },
-  { title: "重启黎明", author: "魏涛", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=重启黎明", link: "reader3.html?book=dev21&chapter=cover", type: "developing" },
-  { title: "流浪地球纪元", author: "张琛", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=流浪地球纪元", link: "reader3.html?book=dev22&chapter=cover", type: "developing" },
-  { title: "未来契约", author: "刘敏", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=未来契约", link: "reader3.html?book=dev23&chapter=cover", type: "developing" },
-  { title: "机械心脏", author: "吴佳", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=机械心脏", link: "reader3.html?book=dev24&chapter=cover", type: "developing" },
-  { title: "时间黑客", author: "徐帆", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=时间黑客", link: "reader3.html?book=dev25&chapter=cover", type: "developing" },
-  { title: "虚空回响", author: "黄静", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=虚空回响", link: "reader3.html?book=dev26&chapter=cover", type: "developing" },
-  { title: "深蓝意识", author: "陈凯", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=深蓝意识", link: "reader3.html?book=dev27&chapter=cover", type: "developing" },
-  { title: "记忆工厂", author: "赵菲", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=记忆工厂", link: "reader3.html?book=dev28&chapter=cover", type: "developing" },
-  { title: "梦行者", author: "王倩", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=梦行者", link: "reader3.html?book=dev29&chapter=cover", type: "developing" },
-  { title: "幻境之城", author: "李彤", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=幻境之城", link: "reader3.html?book=dev30&chapter=cover", type: "developing" },
-  { title: "未来秩序", author: "刘泽", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=未来秩序", link: "reader3.html?book=dev31&chapter=cover", type: "developing" },
-  { title: "星尘计划", author: "周林", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=星尘计划", link: "reader3.html?book=dev32&chapter=cover", type: "developing" },
-  { title: "代码纪元", author: "赵健", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=代码纪元", link: "reader3.html?book=dev33&chapter=cover", type: "developing" },
-  { title: "AI觉醒录", author: "林峰", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=AI觉醒录", link: "reader3.html?book=dev34&chapter=cover", type: "developing" },
-  { title: "最后的文明", author: "王雪", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=最后的文明", link: "reader3.html?book=dev35&chapter=cover", type: "developing" },
-  { title: "星图秘录", author: "李博", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=星图秘录", link: "reader3.html?book=dev36&chapter=cover", type: "developing" },
-  { title: "智能陷阱", author: "周伟", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=智能陷阱", link: "reader3.html?book=dev37&chapter=cover", type: "developing" },
-  { title: "未来探针", author: "赵洁", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=未来探针", link: "reader3.html?book=dev38&chapter=cover", type: "developing" },
-  { title: "银河之心", author: "王凯", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=银河之心", link: "reader3.html?book=dev39&chapter=cover", type: "developing" },
-  { title: "异星旅人", author: "刘婷", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=异星旅人", link: "reader3.html?book=dev40&chapter=cover", type: "developing" },
-  { title: "机器黎明", author: "何斌", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=机器黎明", link: "reader3.html?book=dev41&chapter=cover", type: "developing" },
-  { title: "未来终端", author: "陈冰", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=未来终端", link: "reader3.html?book=dev42&chapter=cover", type: "developing" },
-  { title: "时间机器", author: "张亮", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=时间机器", link: "reader3.html?book=dev43&chapter=cover", type: "developing" },
-  { title: "虚拟帝国", author: "孙浩", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=虚拟帝国", link: "reader3.html?book=dev44&chapter=cover", type: "developing" },
-  { title: "人类重启", author: "林婕", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=人类重启", link: "reader3.html?book=dev45&chapter=cover", type: "developing" },
-  { title: "AI战争", author: "周超", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=AI战争", link: "reader3.html?book=dev46&chapter=cover", type: "developing" },
-  { title: "数字灵魂", author: "李梦", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=数字灵魂", link: "reader3.html?book=dev47&chapter=cover", type: "developing" },
-  { title: "深空回忆录", author: "赵翔", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=深空回忆录", link: "reader3.html?book=dev48&chapter=cover", type: "developing" },
-  { title: "量子梦境", author: "韩月", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=量子梦境", link: "reader3.html?book=dev49&chapter=cover", type: "developing" },
-  { title: "星际回声", author: "魏楠", cover: "https://via.placeholder.com/180x230/1a1a1a/00ff99?text=星际回声", link: "reader3.html?book=dev50&chapter=cover", type: "developing" }
-];
+  // First 4 books marked as upgrade required
+  { 
+    title: "创建思维", 
+    author: "璐瑶建议", 
+    cover: "../static/assets/books.logo/book (1).gif", 
+    link: "upgrade.html",  // Changed link to upgrade page
+    type: "upgrade",       // Changed type to upgrade
+    requireUpgrade: true   // Added upgrade flag
+  },
+  { 
+    title: "量子之门", 
+    author: "李雷", 
+    cover: "../static/assets/books.logo/book (2).gif", 
+    link: "upgrade.html",
+    type: "upgrade",
+    requireUpgrade: true
+  },
+  { 
+    title: "为人处世四", 
+    author: "叔敖", 
+    cover: "../static/assets/books.logo/book (3).gif", 
+    link: "upgrade.html",
+    type: "upgrade", 
+    requireUpgrade: true
+  },
+  { 
+    title: "三略完整版", 
+    author: "黄石公", 
+    cover: "../static/assets/books.logo/book (4).gif", 
+    link: "upgrade.html",
+    type: "upgrade",
+    requireUpgrade: true
+  },
+  // Rest of the developing books remain unchanged
+  {
+    title: "喜悦之皇",
+    author: "欧逊·渥恩（Ocean Vuong）",
+    cover: "../static/assets/books.logo/book (9).gif",
+    link: "reader3.html?book=dev5&chapter=cover",
+    description: "这是一部关于爱、痛苦与记忆的诗性小说。故事在家庭、移民与时代的裂隙中展开，一个儿子用文字寻找母亲与自我的意义。它温柔又残酷，像一封写给世界的告别信，也是一封给生命的情书。"
+  },
+  {
+    title: "心灯：短篇故事集",
+    author: "巴努·穆什塔克（Banu Mushtaq）",
+    cover: "../static/assets/books.logo/book (10).gif",
+    link: "reader3.html?book=dev6&chapter=cover",
+    description: "来自印度南部穆斯林女性作家的真实声音。每一个故事都像一盏小灯，照亮社会边缘被忽视的角落。讲述身份、信仰、爱情与自由的挣扎，用细腻笔触呈现人性的力量。"
+  },
+  {
+    title: "重燃的黎明",
+    author: "苏珊·柯林斯（Suzanne Collins）",
+    cover: "../static/assets/books.logo/book (11).gif",
+    link: "reader3.html?book=dev7&chapter=cover",
+    description: "《饥饿游戏》系列最新前传，带你回到权力与反抗的起点。故事聚焦“第十届饥饿游戏”的幕后真相，揭示权力如何制造恐惧，又如何被勇气点燃。"
+  },
+  {
+    title: "第一绅士",
+    author: "比尔·克林顿 & 詹姆斯·帕特森",
+    cover: "../static/assets/books.logo/book (12).gif",
+    link: "reader3.html?book=dev8&chapter=cover",
+    description: "政治惊悚小说，讲述一位‘第一先生’卷入全球阴谋的惊心事件。融合克林顿的政治洞察与帕特森的叙事张力，真实又紧张。权力、婚姻与人性交织成一场危机。"
+  },
+  { title: "数据意识", author: "周远", cover: "../static/assets/books.logo/book (9).gif", link: "reader3.html?book=dev9&chapter=cover" },
+  { title: "代码帝国", author: "刘星", cover: "../static/assets/books.logo/book (10).gif", link: "reader3.html?book=dev10&chapter=cover" },
+  { title: "星海归途", author: "张婷", cover: "../static/assets/books.logo/book (11).gif", link: "reader3.html?book=dev11&chapter=cover" },
+  { title: "心灵算法", author: "王泽", cover: "../static/assets/books.logo/book (12).gif", link: "reader3.html?book=dev12&chapter=cover" },
+  { title: "暗物质战争", author: "李航", cover: "../static/assets/books.logo/book (13).gif", link: "reader3.html?book=dev13&chapter=cover" },
+  { title: "人类备份计划", author: "赵琳", cover: "../static/assets/books.logo/book(14).gif", link: "reader3.html?book=dev14&chapter=cover" },
+  { title: "赛博之心", author: "陈阳", cover: "../static/assets/books.logo/book(15).gif", link: "reader3.html?book=dev15&chapter=cover" },
 
+  // 其余 16 ~ 50 本书保持原封面链接
+  { title: "平行宇宙档案", author: "郭彬", cover: "../static/assets/books.logo/book16 (1).gif", link: "reader3.html?book=dev16&chapter=cover" },
+  { title: "人工梦境", author: "周洁", cover: "../static/assets/books.logo/book16 (2).gif", link: "reader3.html?book=dev17&chapter=cover" },
+  { title: "末日网络", author: "何楠", cover: "../static/assets/books.logo/book16 (3).gif", link: "reader3.html?book=dev18&chapter=cover" },
+  { title: "AI迷城", author: "林浩", cover: "../static/assets/books.logo/book16 (4).gif", link: "reader3.html?book=dev19&chapter=cover" },
+  { title: "虚拟边疆", author: "孙悦", cover: "../static/assets/books.logo/book16 (5).gif", link: "reader3.html?book=dev20&chapter=cover" },
+  { title: "重启黎明", author: "魏涛", cover: "../static/assets/books.logo/book16 (6).gif", link: "reader3.html?book=dev21&chapter=cover" },
+  { title: "流浪地球纪元", author: "张琛", cover: "../static/assets/books.logo/book16 (7).gif", link: "reader3.html?book=dev22&chapter=cover" },
+  { title: "未来契约", author: "刘敏", cover: "../static/assets/books.logo/book16 (8).gif", link: "reader3.html?book=dev23&chapter=cover" },
+  { title: "机械心脏", author: "吴佳", cover: "../static/assets/books.logo/book16 (9).gif", link: "reader3.html?book=dev24&chapter=cover" },
+  { title: "时间黑客", author: "徐帆", cover: "../static/assets/books.logo/book16 (10).gif", link: "reader3.html?book=dev25&chapter=cover" },
+  { title: "虚空回响", author: "黄静", cover: "../static/assets/books.logo/book16 (11).gif", link: "reader3.html?book=dev26&chapter=cover" },
+  { title: "深蓝意识", author: "陈凯", cover: "../static/assets/books.logo/book16 (12).gif", link: "reader3.html?book=dev27&chapter=cover" },
+  { title: "记忆工厂", author: "赵菲", cover: "../static/assets/books.logo/book16 (13).gif", link: "reader3.html?book=dev28&chapter=cover" },
+  { title: "梦行者", author: "王倩", cover: "../static/assets/books.logo/book16 (14).gif", link: "reader3.html?book=dev29&chapter=cover" },
+  { title: "幻境之城", author: "李彤", cover: "../static/assets/books.logo/book16 (15).gif", link: "reader3.html?book=dev30&chapter=cover" },
+  { title: "未来秩序", author: "刘泽", cover: "../static/assets/books.logo/book16 (16).gif", link: "reader3.html?book=dev31&chapter=cover" },
+  { title: "星尘计划", author: "周林", cover: "../static/assets/books.logo/book16 (17).gif", link: "reader3.html?book=dev32&chapter=cover" },
+  { title: "代码纪元", author: "赵健", cover: "../static/assets/books.logo/book16 (18).gif", link: "reader3.html?book=dev33&chapter=cover" },
+  { title: "AI觉醒录", author: "林峰", cover: "../static/assets/books.logo/book16 (19).gif", link: "reader3.html?book=dev34&chapter=cover" },
+  { title: "最后的文明", author: "王雪", cover: "../static/assets/books.logo/book16 (20).gif", link: "reader3.html?book=dev35&chapter=cover" },
+  { title: "星图秘录", author: "李博", cover: "../static/assets/books.logo/book16 (21).gif", link: "reader3.html?book=dev36&chapter=cover" },
+  { title: "智能陷阱", author: "周伟", cover: "../static/assets/books.logo/book16 (22).gif", link: "reader3.html?book=dev37&chapter=cover" },
+  { title: "未来探针", author: "赵洁", cover: "../static/assets/books.logo/book16 (23).gif", link: "reader3.html?book=dev38&chapter=cover" },
+  { title: "银河之心", author: "王凯", cover: "../static/assets/books.logo/book16 (24).gif", link: "reader3.html?book=dev39&chapter=cover" },
+  { title: "异星旅人", author: "刘婷", cover: "../static/assets/books.logo/book16 (25).gif", link: "reader3.html?book=dev40&chapter=cover" },
+  { title: "机器黎明", author: "何斌", cover: "../static/assets/books.logo/book16 (26).gif", link: "reader3.html?book=dev41&chapter=cover" },
+  { title: "未来终端", author: "陈冰", cover: "../static/assets/books.logo/book16 (27).gif", link: "reader3.html?book=dev42&chapter=cover" },
+  { title: "时间机器", author: "张亮", cover: "../static/assets/books.logo/book16 (28).gif", link: "reader3.html?book=dev43&chapter=cover" },
+  { title: "虚拟帝国", author: "孙浩", cover: "../static/assets/books.logo/book16 (29).gif", link: "reader3.html?book=dev44&chapter=cover" },
+  { title: "人类重启", author: "林婕", cover: "../static/assets/books.logo/book16 (30).gif", link: "reader3.html?book=dev45&chapter=cover" },
+  { title: "AI战争", author: "周超", cover: "../static/assets/books.logo/book16 (31).gif", link: "reader3.html?book=dev46&chapter=cover" },
+  { title: "数字灵魂", author: "李梦", cover: "../static/assets/books.logo/book16 (32).gif", link: "reader3.html?book=dev47&chapter=cover" },
+  { title: "深空回忆录", author: "赵翔", cover: "../static/assets/books.logo/book16 (33).gif", link: "reader3.html?book=dev48&chapter=cover" },
+  { title: "量子梦境", author: "韩月", cover: "../static/assets/books.logo/book16 (34).gif", link: "reader3.html?book=dev49&chapter=cover" },
+  { title: "星际回声", author: "魏楠", cover: "../static/assets/books.logo/book16 (35).gif", link: "reader3.html?book=dev50&chapter=cover" }
+];
     // ================== 📢 Toast 提示 ==================
     function showToast(msg){
       const toast = document.createElement("div");
@@ -691,6 +766,18 @@ const developingBooks = [
         badge.className = "developing-badge";
         badge.textContent = "开发中";
         card.appendChild(badge);
+      } else if (book.type === "upgrade") {
+        const badge = document.createElement("div");
+        badge.className = "upgrade-badge";
+        badge.textContent = "升级会员";
+        card.appendChild(badge);
+        
+        // Change the card click behavior for upgrade-required books
+        card.onclick = (e) => {
+          e.preventDefault();
+          showToast("此书籍需要升级会员才能阅读");
+          window.location.href = "upgrade.html"; // Redirect to upgrade page
+        };
       }
 
       card.appendChild(img);
@@ -709,20 +796,28 @@ const developingBooks = [
         const searchTerm = searchInput.value.toLowerCase().trim();
         const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
         
-        // 获取所有书籍卡片
-        const allBooks = [...completedBooks, ...developingBooks];
-        let filteredBooks = allBooks;
+        // Get all books
+        let filteredBooks = [];
         
-        // 应用筛选
-        if (activeFilter === 'completed') {
-          filteredBooks = completedBooks;
-        } else if (activeFilter === 'developing') {
-          filteredBooks = developingBooks;
-        } else if (activeFilter === 'favorites') {
-          filteredBooks = JSON.parse(localStorage.getItem("favorites") || "[]");
+        // Apply initial filter
+        switch(activeFilter) {
+          case 'completed':
+            filteredBooks = completedBooks.map(book => ({...book, type: 'completed'}));
+            break;
+          case 'developing':
+            filteredBooks = developingBooks.map(book => ({...book, type: 'developing'}));
+            break;
+          case 'favorites':
+            filteredBooks = JSON.parse(localStorage.getItem("favorites") || "[]");
+            break;
+          default: // 'all'
+            filteredBooks = [
+              ...completedBooks.map(book => ({...book, type: 'completed'})),
+              ...developingBooks.map(book => ({...book, type: 'developing'}))
+            ];
         }
         
-        // 应用搜索
+        // Apply search filter
         if (searchTerm) {
           filteredBooks = filteredBooks.filter(book => 
             book.title.toLowerCase().includes(searchTerm) || 
@@ -730,21 +825,21 @@ const developingBooks = [
           );
         }
         
-        // 显示/隐藏相应部分
+        // Reset sections display
         document.getElementById('completed-section').style.display = 'none';
         document.getElementById('developing-section').style.display = 'none';
         document.getElementById('favorites-section').style.display = 'none';
         
+        // Display completed books
         if (activeFilter === 'all' || activeFilter === 'completed' || searchTerm) {
           const completedContainer = document.getElementById('completed-books');
+          const completedResults = filteredBooks.filter(book => book.type === 'completed');
           completedContainer.innerHTML = '';
           
-          const completedResults = filteredBooks.filter(book => book.type === 'completed');
+          document.getElementById('completed-section').style.display = 'block';
           if (completedResults.length > 0) {
-            document.getElementById('completed-section').style.display = 'block';
             completedResults.forEach(book => renderBook(completedContainer, book));
-          } else if (activeFilter === 'completed' || searchTerm) {
-            document.getElementById('completed-section').style.display = 'block';
+          } else {
             completedContainer.innerHTML = `
               <div class="empty-state">
                 <i class="fas fa-search"></i>
@@ -754,16 +849,16 @@ const developingBooks = [
           }
         }
         
+        // Display developing books
         if (activeFilter === 'all' || activeFilter === 'developing' || searchTerm) {
           const developingContainer = document.getElementById('developing-books');
+          const developingResults = filteredBooks.filter(book => book.type === 'developing');
           developingContainer.innerHTML = '';
           
-          const developingResults = filteredBooks.filter(book => book.type === 'developing');
+          document.getElementById('developing-section').style.display = 'block';
           if (developingResults.length > 0) {
-            document.getElementById('developing-section').style.display = 'block';
             developingResults.forEach(book => renderBook(developingContainer, book));
-          } else if (activeFilter === 'developing' || searchTerm) {
-            document.getElementById('developing-section').style.display = 'block';
+          } else {
             developingContainer.innerHTML = `
               <div class="empty-state">
                 <i class="fas fa-search"></i>
@@ -773,15 +868,15 @@ const developingBooks = [
           }
         }
         
+        // Display favorites
         if (activeFilter === 'favorites') {
           const favoritesContainer = document.getElementById('favorites-books');
           favoritesContainer.innerHTML = '';
+          document.getElementById('favorites-section').style.display = 'block';
           
           if (filteredBooks.length > 0) {
-            document.getElementById('favorites-section').style.display = 'block';
             filteredBooks.forEach(book => renderBook(favoritesContainer, book));
           } else {
-            document.getElementById('favorites-section').style.display = 'block';
             favoritesContainer.innerHTML = `
               <div class="empty-state">
                 <i class="fas fa-bookmark"></i>
