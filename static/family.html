@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>衷心语境</title>
+<title>衷心语境 - 自动阅读器</title>
 <!-- 引入CDN资源 -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
@@ -136,6 +136,10 @@
     background: linear-gradient(45deg, #00c853, #64dd17);
   }
   
+  #autoPlayBtn {
+    background: linear-gradient(45deg, #00b0ff, #0091ea);
+  }
+  
   #stopBtn {
     background: linear-gradient(45deg, #ff1744, #f50057);
   }
@@ -202,6 +206,28 @@
     box-shadow: 0 4px 15px rgba(0, 176, 255, 0.4);
   }
   
+  /* 播放进度条 */
+  #progress-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 600px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+    z-index: 3;
+  }
+  
+  #progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #00c853, #64dd17);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+  
   /* 特效画布 */
   #stars, #snow {
     position: absolute;
@@ -235,6 +261,10 @@
     #search-bar {
       top: 70px;
     }
+    
+    #progress-container {
+      width: 90%;
+    }
   }
   
   /* 页面切换动画 */
@@ -252,7 +282,8 @@
 
 <!-- 控制栏 -->
 <div id="controls">
-  <button id="playBtn" class="control-btn"><i class="fas fa-play"></i> 播放</button>
+  <button id="playBtn" class="control-btn"><i class="fas fa-play"></i> 播放本页</button>
+  <button id="autoPlayBtn" class="control-btn"><i class="fas fa-forward"></i> 自动播放</button>
   <button id="stopBtn" class="control-btn"><i class="fas fa-stop"></i> 停止</button>
   <button id="increase" class="control-btn"><i class="fas fa-search-plus"></i> 放大</button>
   <button id="decrease" class="control-btn"><i class="fas fa-search-minus"></i> 缩小</button>
@@ -273,6 +304,11 @@
   <div id="pageNumber"></div>
 </div>
 
+<!-- 播放进度条 -->
+<div id="progress-container">
+  <div id="progress-bar"></div>
+</div>
+
 <!-- 特效画布 -->
 <canvas id="stars"></canvas>
 <canvas id="snow"></canvas>
@@ -281,6 +317,19 @@
 <script>
 // 页面数据 - 保留您原有的所有内容
 let pages = [
+  {
+    "title": "富人的底层定律",
+    "lines": [
+      "【1️⃣ 复利法则】 时间会让你的每一份努力变得更值钱，耐心是最大的财富加速器。",
+      "【2️⃣ 杠杆法则】 学会用人、钱、信息和工具放大自己的能力，而不是单靠双手。",
+      "【3️⃣ 机会法则】 运气只青睐那些做好充分准备的人，机会从不会等人。",
+      "【4️⃣ 耐心法则】 快不代表赢，能坚持更久的人，才有可能胜出。",
+      "【5️⃣ 认知法则】 你赚不到超出你认知范围的钱，不断学习和思考是收入上限的钥匙。",
+      "【6️⃣ 信任法则】 信用比现金更宝贵，信任一旦建立，比金钱更能创造价值。",
+      "【7️⃣ 心态法则】 不焦虑的人，才有战略眼光，冷静决定方向，稳步前行。"
+    ],
+    "deletable": false
+  },
   {
     title: "格局胜过金钱",
     lines: [
@@ -1035,11 +1084,13 @@ let pages = [
 let currentPage = 0;
 let fontSize = 1.3;
 let reading = false;
+let autoReading = false;
 let lineIndex = 0;
 
 const titleEl = document.getElementById("title");
 const linesEl = document.getElementById("lines");
 const pageNumberEl = document.getElementById("pageNumber");
+const progressBar = document.getElementById("progress-bar");
 
 /* ---------------- 页面渲染 ---------------- */
 function renderPage(){
@@ -1065,8 +1116,15 @@ function renderPage(){
   });
 
   pageNumberEl.textContent = `第 ${currentPage+1} 页 / 共 ${pages.length} 页`;
+  
+  // 更新进度条
+  updateProgressBar();
 }
-renderPage();
+
+function updateProgressBar() {
+  const progress = ((currentPage + 1) / pages.length) * 100;
+  progressBar.style.width = `${progress}%`;
+}
 
 /* ---------------- 页面切换（滑动和鼠标拖拽） ---------------- */
 function prevPage(){ 
@@ -1145,8 +1203,17 @@ let utterance;
 
 function speakLine(){
   if(!reading || lineIndex >= pages[currentPage].lines.length){ 
-    stopReading(); 
-    return; 
+    // 如果是自动播放模式且当前页面播放完毕，则继续下一页
+    if (autoReading && currentPage < pages.length - 1) {
+      currentPage++;
+      renderPage();
+      lineIndex = 0;
+      setTimeout(speakLine, 500); // 延迟500ms开始下一页
+      return;
+    } else {
+      stopReading(); 
+      return; 
+    }
   }
 
   const lineDiv = linesEl.children[lineIndex];
@@ -1175,24 +1242,42 @@ function speakLine(){
 
 function stopReading(){
   reading = false; 
+  autoReading = false;
   synth.cancel();
   document.getElementById("stopBtn").classList.remove("paused");
+  document.getElementById("autoPlayBtn").classList.remove("active");
   Array.from(document.querySelectorAll(".line span")).forEach(s => s.style.color="white");
 }
 
+// 播放当前页
 document.getElementById("playBtn").onclick = () => { 
   if(!reading){ 
     reading=true; 
+    autoReading = false;
     lineIndex=0; 
     speakLine(); 
   } 
 };
 
+// 自动播放所有页面
+document.getElementById("autoPlayBtn").onclick = () => {
+  if(!reading){ 
+    reading=true; 
+    autoReading = true;
+    lineIndex=0; 
+    document.getElementById("autoPlayBtn").classList.add("active");
+    speakLine(); 
+  } 
+};
+
+// 停止播放
 document.getElementById("stopBtn").onclick = () => {
   if(reading){ 
     synth.cancel(); 
     reading=false; 
+    autoReading = false;
     document.getElementById("stopBtn").classList.add("paused");
+    document.getElementById("autoPlayBtn").classList.remove("active");
   } else { 
     reading=true; 
     speakLine(); 
@@ -1313,9 +1398,9 @@ window.onresize = () => {
   if (bgIndex === 2) initSnow();
 };
 
-/* 返回首页 */
-document.getElementById('logout-btn').onclick = () => { 
-  window.location.href = "home.html"; 
+// 首页按钮点击返回 home.html
+document.getElementById('logout-btn').onclick = () => {
+  window.location.href = "../home.html"; // ✅ use relative path
 };
 
 // 初始化
