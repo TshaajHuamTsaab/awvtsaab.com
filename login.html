@@ -1,120 +1,383 @@
+<!-- save as login_realtime.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Awvtsaab's 漆书</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Awvtsaab's 漆书 — Login</title>
 
-  <!-- Font Awesome CDN for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
-  <!-- Optional: Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    /* ---------- 视觉样式（简洁版，保留动感背景） ---------- */
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family: "Share Tech Mono", monospace, Arial;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#000;
+  overflow:hidden;
+}
 
-  <!-- Your login.css -->
-  <link rel="stylesheet" href="static/css/login.css">
+/* 背景 GIF / 视频 占位 */
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background:url('static/assets/bg.gif') center/cover no-repeat;
+  filter:brightness(.45) blur(3px);
+  z-index:-2;
+}
+body::after{
+  content:"";
+  position:fixed; inset:0;
+  background: linear-gradient(135deg, rgba(0,255,200,0.03), rgba(0,100,255,0.03));
+  z-index:-1;
+}
+
+/* 登录卡片 */
+.card{
+  width:420px;        /* 之前380px -> 调大一点 */
+  max-width:95vw;
+  padding:32px;       /* 稍微加大内边距 */
+  border-radius:16px;
+  background:rgba(10,10,12,0.4);
+  backdrop-filter: blur(10px);
+  box-shadow:0 10px 50px rgba(0,0,0,0.6);
+  border: 2px solid rgba(0,200,255,0.3); /* 更新边框颜色，更明显 */
+}
+
+/* logo */
+.logo{
+  display:flex;
+  justify-content:center;
+  margin-bottom:16px;
+}
+.logo img{ width:96px; filter: drop-shadow(0 4px 16px rgba(0,180,255,0.15)); }
+
+h1{ text-align:center; margin:8px 0 20px; font-size:22px; letter-spacing:1px; }
+
+.field{margin-bottom:12px;}
+input, select {
+  width:100%; padding:13px 14px; border-radius:10px; border:none;
+  background: rgba(255,255,255,0.08); /* 不同于 card 背景 */
+  color:#fff; outline:none;
+  font-size:15px;
+}
+input::placeholder{ color: rgba(255,255,255,0.6); font-size:14px; }
+
+/* select 单独设置 */
+select { 
+  background: rgba(0,150,255,0.15); /* 区分 card 背景 */
+  color: #fff;
+}
+
+/* 按钮 */
+.row{display:flex; gap:10px;}
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  justify-content:center;
+  width:100%; padding:13px; border-radius:12px; border:none;
+  cursor:pointer; font-weight:600; letter-spacing:0.6px;
+  background: linear-gradient(90deg,#00e0ff,#0078ff);
+  transition:transform .18s, box-shadow .18s;
+  color:#031018;
+}
+.btn:hover{ transform: translateY(-2px); box-shadow:0 10px 32px rgba(0,200,255,0.15); }
+
+.link-btn{
+  width:100%; margin-top:10px; padding:12px; border-radius:12px;
+  background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.08);
+  cursor:pointer;
+}
+
+/* 提示/状态信息 */
+.status {
+  margin-top:14px; padding:12px; border-radius:10px;
+  background: rgba(0,0,0,0.5);  /* 背景区别于 card */
+  font-size:14px; min-height:38px;
+}
+.status.success{ border-left:4px solid #3be37a; }
+.status.error{ border-left:4px solid #ff6b6b; }
+
+.hidden{ display:none; }
+
+/* small / muted */
+.small{ font-size:14px; color:rgba(255,255,255,0.8); text-align:center; margin-top:12px; }
+.muted{ color:rgba(255,255,255,0.65); font-size:13px; }
+
+/* responsive */
+@media (max-width:420px){
+  .card{ padding:24px; width:90vw; }
+  h1{ font-size:20px; }
+  input, select{ padding:11px; font-size:14px; }
+  .btn{ padding:11px; font-size:14px; }
+}
+
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="logo">
-      <img src="static/assets/logo.png" alt="Logo">
-    </div>
+  <div class="card" role="region" aria-label="登录卡片">
+    <div class="logo"><img src="static/assets/logo.gif" alt="logo"></div>
 
-    <!-- Login Section -->
-    <div id="loginSection">
-      <h1 id="loginTitle">Login</h1>
-      <input type="email" id="loginEmail" placeholder="Email">
-      <input type="password" id="loginPassword" placeholder="Password">
-      <button class="btn-login" onclick="login()">
-        <i class="fas fa-sign-in-alt"></i> <span id="loginBtnText">Login</span>
-      </button>
-      <button class="btn-create" onclick="showSignup()">
-        <i class="fas fa-user-plus"></i> <span id="signupBtnText">Create Account</span>
-      </button>
+    <div id="authViews">
+      <!-- ===== LOGIN VIEW ===== -->
+      <div id="loginView">
+        <h1 id="loginTitle">Login</h1>
 
-      <div style="margin-top:10px;">
-        <label for="langSelect"><i class="fas fa-globe"></i></label>
-        <select id="langSelect" onchange="changeLanguage(this.value)">
-          <option value="en">English</option>
-          <option value="zh">中文</option>
-          <option value="mm">မြန်မာ</option>
-        </select>
+        <div class="field"><input id="loginEmail" type="email" placeholder="Email"></div>
+        <div class="field"><input id="loginPassword" type="password" placeholder="Password"></div>
+
+        <button class="btn" id="btnLogin" onclick="login()" aria-live="polite">
+          <i class="fa-solid fa-right-to-bracket"></i><span id="btnLoginText">Login</span>
+        </button>
+
+        <button class="link-btn" onclick="showSignup()">
+          <i class="fa-solid fa-user-plus"></i> Create account
+        </button>
+
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;justify-content:center;">
+          <i class="fa-solid fa-globe muted"></i>
+          <select id="langSelect" onchange="changeLanguage(this.value)">
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+            <option value="mm">မြန်မာ</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ===== SIGNUP VIEW ===== -->
+      <div id="signupView" class="hidden">
+        <h1 id="signupTitle">Create Account</h1>
+
+        <div class="field"><input id="signupName" type="text" placeholder="Name"></div>
+        <div class="field"><input id="signupEmail" type="email" placeholder="Email"></div>
+        <div class="field"><input id="signupPassword" type="password" placeholder="Password (min 6)"></div>
+        <div class="field"><input id="signupAge" type="number" min="1" placeholder="Age"></div>
+        <div class="field">
+          <select id="signupGender">
+            <option value="">Select Gender</option>
+            <option value="male">Male</option><option value="female">Female</option><option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field"><input id="signupPhone" type="tel" placeholder="Phone (optional)"></div>
+
+        <button class="btn" id="btnSignup" onclick="signup()"><i class="fa-solid fa-check"></i> <span>Confirm</span></button>
+        <button class="link-btn" onclick="showLogin()"><i class="fa-solid fa-arrow-left"></i> Back to login</button>
       </div>
     </div>
 
-    <!-- Signup Section -->
-    <div id="signupSection" style="display:none;">
-      <h1 id="signupTitle">Create Account</h1>
-      <input type="text" id="signupName" placeholder="Name">
-      <input type="email" id="signupEmail" placeholder="Email">
-      <input type="password" id="signupPassword" placeholder="Password">
-      <input type="number" id="signupAge" placeholder="Age">
-      <select id="signupGender">
-        <option value="" disabled selected>Select Gender</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-        <option value="other">Other</option>
-      </select>
-      <input type="tel" id="signupPhone" placeholder="Phone">
-      <button class="btn-login" onclick="signup()">
-        <i class="fas fa-check"></i> <span id="confirmBtnText">Confirm</span>
-      </button>
-      <button class="btn-create" onclick="showLogin()">
-        <i class="fas fa-arrow-left"></i> <span id="backBtnText">Back to Login</span>
-      </button>
+    <!-- ===== Logged-in Panel ===== -->
+    <div id="userView" class="hidden">
+      <h1 id="welcomeTitle">Welcome</h1>
+      <div class="muted" id="userInfo">Loading user...</div>
+
+      <div style="margin-top:12px;" class="row">
+        <button class="btn" onclick="signout()"><i class="fa-solid fa-right-from-bracket"></i> Sign out</button>
+      </div>
+      <div style="margin-top:8px;" class="small">Presence: <strong id="presenceText">—</strong></div>
     </div>
+
+    <div id="statusBox" class="status muted">Ready</div>
   </div>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase compat libs (easy to integrate with existing code) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <!-- Your login.js -->
-  <script src="static/js/login.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
-    // ================= Language Support =================
-    const translations = {
-      en: {
-        loginTitle: "Login",
-        loginBtnText: "Login",
-        signupBtnText: "Create Account",
-        signupTitle: "Create Account",
-        confirmBtnText: "Confirm",
-        backBtnText: "Back to Login",
-      },
-      zh: {
-        loginTitle: "登录",
-        loginBtnText: "登录",
-        signupBtnText: "创建账户",
-        signupTitle: "创建账户",
-        confirmBtnText: "确认",
-        backBtnText: "返回登录",
-      },
-      mm: {
-        loginTitle: "လော့ဂ်အင်",
-        loginBtnText: "လော့ဂ်အင်",
-        signupBtnText: "အကောင့်ဖန်တီးရန်",
-        signupTitle: "အကောင့်ဖန်တီးရန်",
-        confirmBtnText: "အတည်ပြုရန်",
-        backBtnText: "Login သို့ပြန်ရန်",
-      }
+  /*********************** REPLACE THIS WITH YOUR FIREBASE CONFIG ***********************/
+      const firebaseConfig = {
+      apiKey: "AIzaSyBCIVYd8e5vBeGRz-H12Nj9hd5dyqnZCDI",
+      authDomain: "guardiangate-7xkgi.firebaseapp.com",
+      databaseURL: "https://guardiangate-7xkgi-default-rtdb.firebaseio.com",
+      projectId: "guardiangate-7xkgi",
+      storageBucket: "guardiangate-7xkgi.firebasestorage.appspot.com",
+      messagingSenderId: "133766737758",
+      appId: "1:133766737758:web:38de135254fef4664769cf"
     };
+  /***************************************************************************************/
 
-    function changeLanguage(lang) {
-      const t = translations[lang];
-      if (!t) return;
-      document.getElementById("loginTitle").textContent = t.loginTitle;
-      document.getElementById("loginBtnText").textContent = t.loginBtnText;
-      document.getElementById("signupBtnText").textContent = t.signupBtnText;
-      document.getElementById("signupTitle").textContent = t.signupTitle;
-      document.getElementById("confirmBtnText").textContent = t.confirmBtnText;
-      document.getElementById("backBtnText").textContent = t.backBtnText;
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
+
+  // ---------- UI helpers ----------
+  const statusBox = document.getElementById('statusBox');
+  function setStatus(msg, type) {
+    statusBox.className = 'status';
+    if (type === 'success') { statusBox.classList.add('success'); }
+    else if (type === 'error') { statusBox.classList.add('error'); }
+    else { /* neutral */ }
+    statusBox.textContent = msg;
+  }
+
+  function showSignup(){ document.getElementById('loginView').classList.add('hidden'); document.getElementById('signupView').classList.remove('hidden'); }
+  function showLogin() { document.getElementById('signupView').classList.add('hidden'); document.getElementById('loginView').classList.remove('hidden'); }
+
+  // Translate (minimal)
+  const translations = {
+    en: { loginTitle:"Login", signupTitle:"Create Account", btnLoginText:"Login" },
+    zh: { loginTitle:"登录", signupTitle:"创建账户", btnLoginText:"登录" },
+    mm: { loginTitle:"လော့ဂ်အင်", signupTitle:"အကောင့်ဖန်တီးရန်", btnLoginText:"လော့ဂ်အင်" }
+  };
+  function changeLanguage(lang){
+    const t = translations[lang] || translations.en;
+    document.getElementById('loginTitle').textContent = t.loginTitle;
+    document.getElementById('signupTitle').textContent = t.signupTitle;
+    document.getElementById('btnLoginText').textContent = t.btnLoginText;
+  }
+  changeLanguage('en');
+
+  // ---------- Auth logic ----------
+  async function signup(){
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const age = document.getElementById('signupAge').value;
+    const gender = document.getElementById('signupGender').value;
+    const phone = document.getElementById('signupPhone').value.trim();
+
+    if (!name || !email || password.length < 6) {
+      setStatus('Please fill name, email and password (min 6).', 'error'); return;
     }
 
-    // Optional: default language
-    changeLanguage("en");
+    setStatus('Creating account...', null);
+    try {
+      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+      const uid = userCredential.user.uid;
+
+      // Save profile to Realtime Database
+      const profile = {
+        name,
+        email,
+        age: age? Number(age) : null,
+        gender: gender || null,
+        phone: phone || null,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      };
+
+      await db.ref('users/' + uid).set(profile);
+
+      setStatus('Account created. Logged in!', 'success');
+
+      // Optionally send email verification
+      // await userCredential.user.sendEmailVerification();
+    } catch (err) {
+      console.error(err);
+      setStatus('Signup error: ' + (err.message || err), 'error');
+    }
+  }
+
+  async function login() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { 
+    setStatus('Enter email and password.', 'error'); 
+    return; 
+  }
+
+  setStatus('Logging in...', null);
+  try {
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    setStatus('Login successful.', 'success');
+
+    // 🔑 Redirect to home.html after login
+    window.location.href = 'home.html';
+  } catch (err) {
+    console.error(err);
+    setStatus('Login failed: ' + (err.message || err), 'error');
+  }
+}
+
+  function signout(){
+    setStatus('Signing out...', null);
+    auth.signOut().then(()=>{ setStatus('Signed out.', null); }).catch(err=>{
+      setStatus('Sign out error: ' + err.message, 'error');
+    });
+  }
+
+  // ---------- Presence (Realtime) ----------
+  // We'll write to /status/{uid}:
+  // { state: 'online'|'offline', last_changed: TIMESTAMP }
+  function setUserPresence(user) {
+    if (!user) return;
+    const uid = user.uid;
+    const userStatusRef = db.ref('/status/' + uid);
+
+    // Prepare presence objects
+    const isOfflineForDatabase = {
+      state: 'offline',
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    };
+    const isOnlineForDatabase = {
+      state: 'online',
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    // Use Realtime Database's .info/connected to detect connection state
+    const connectedRef = db.ref('.info/connected');
+    connectedRef.on('value', snap => {
+      if (snap.val() === true) {
+        // when connected set online and set onDisconnect to offline
+        userStatusRef.onDisconnect().set(isOfflineForDatabase).then(() => {
+          userStatusRef.set(isOnlineForDatabase);
+        });
+      } else {
+        // not connected
+        // nothing to do here — onDisconnect will handle last state
+      }
+    });
+  }
+
+  // ---------- Auth state listener ----------
+  auth.onAuthStateChanged(async user => {
+    if (user) {
+      // Show user view
+      document.getElementById('loginView').classList.add('hidden');
+      document.getElementById('signupView').classList.add('hidden');
+      document.getElementById('userView').classList.remove('hidden');
+
+      setStatus('Authenticated. Loading profile...', null);
+
+      // load profile from DB
+      const profileSnap = await db.ref('users/' + user.uid).once('value');
+      const profile = profileSnap.val() || {};
+      document.getElementById('welcomeTitle').textContent = `Welcome, ${profile.name || (user.email || 'User')}`;
+      document.getElementById('userInfo').textContent = `Email: ${user.email}  ·  Age: ${profile.age || '—'}  ·  Gender: ${profile.gender || '—'}`;
+
+      // Set presence
+      setUserPresence(user);
+
+      // Listen to presence changes for this user and show them
+      const presRef = db.ref('status/' + user.uid);
+      presRef.on('value', snap => {
+        const v = snap.val();
+        document.getElementById('presenceText').textContent = v ? v.state + ' (updated ' + (v.last_changed ? new Date(v.last_changed).toLocaleString() : '—') + ')' : '—';
+      });
+
+      setStatus('Ready.', 'success');
+    } else {
+      // Not logged in: show login
+      document.getElementById('userView').classList.add('hidden');
+      document.getElementById('signupView').classList.add('hidden');
+      document.getElementById('loginView').classList.remove('hidden');
+
+      setStatus('Please login or create an account.', null);
+      document.getElementById('presenceText').textContent = '—';
+    }
+  });
+
+  // ---------- OPTIONAL: real-time monitor for a specific user's presence ----------
+  // Example: show if user with uid 'abc' is online:
+  // db.ref('status/abc').on('value', snap => console.log('abc presence', snap.val()));
+
   </script>
 </body>
 </html>
