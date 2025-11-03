@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Awv's漆书 - 支持黑屏播放</title>
+
+    <!-- 样式与图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="css/reader3.css">
+
     <!-- PWA配置 -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+
     <style>
         /* 保证切换按钮始终可见 */
         #dj-toggle-btn {
@@ -20,7 +25,7 @@
             right: 20px;
             z-index: 999;
         }
-        
+
         /* 黑屏播放提示样式 */
         .background-play-notification {
             position: fixed;
@@ -41,23 +46,14 @@
             animation: slideInDown 0.5s ease;
             border: 2px solid rgba(255, 255, 255, 0.3);
         }
-        
-        .background-play-notification.show {
-            display: flex;
-        }
-        
+        .background-play-notification.show { display: flex; }
+
         @keyframes slideInDown {
-            from {
-                transform: translateX(-50%) translateY(-100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(-50%) translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
-        
-        /* 音频元素完全隐藏 */
+
+        /* 隐藏音频元素 */
         #chapter-audio {
             position: absolute;
             left: -9999px;
@@ -66,7 +62,7 @@
             width: 0;
             height: 0;
         }
-        
+
         /* 加载动画 */
         .loading-spinner {
             display: none;
@@ -76,31 +72,20 @@
             transform: translate(-50%, -50%);
             z-index: 9999;
         }
-        
-        .loading-spinner.active {
-            display: block;
-        }
-        
+        .loading-spinner.active { display: block; }
         .spinner {
-            width: 50px;
-            height: 50px;
+            width: 50px; height: 50px;
             border: 5px solid rgba(0, 255, 255, 0.3);
             border-top: 5px solid #0ff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
     </style>
 </head>
 <body>
     <!-- 加载动画 -->
-    <div class="loading-spinner" id="loading-spinner">
-        <div class="spinner"></div>
-    </div>
+    <div class="loading-spinner" id="loading-spinner"><div class="spinner"></div></div>
 
     <!-- 主要内容区域 -->
     <div id="bookTitle">加载中...</div>
@@ -114,115 +99,236 @@
     <!-- 黑屏播放提示 -->
     <div id="background-play-notification" class="background-play-notification">
         <i class="fas fa-headphones"></i>
-        <span>后台播放已启用 - 锁屏后仍可继续收听</span>
+        <span>黑屏播放已启用 - 锁屏后仍可继续收听</span>
     </div>
 
     <!-- DJ风格播放控制器 -->
     <div id="dj-player" class="dj-player">
-        <!-- 章节信息 -->
         <div class="dj-chapter-info">
             <div class="dj-chapter-title" id="dj-chapter-title">加载中...</div>
             <div class="dj-chapter-progress" id="dj-chapter-progress">- / -</div>
         </div>
-        
-        <!-- 主控制按钮 -->
+
         <div class="dj-main-controls">
             <button class="dj-btn dj-prev-btn" title="上一章">
-                <i class="fas fa-backward-step"></i>
-                <span class="btn-text">上一章</span>
+                <i class="fas fa-backward-step"></i><span class="btn-text">上一章</span>
             </button>
             <button class="dj-btn dj-play-btn" id="dj-play-btn" title="播放/暂停">
-                <i class="fas fa-play"></i>
-                <span class="btn-text">播放</span>
+                <i class="fas fa-play"></i><span class="btn-text">播放</span>
             </button>
             <button class="dj-btn dj-next-btn" title="下一章">
-                <i class="fas fa-forward-step"></i>
-                <span class="btn-text">下一章</span>
+                <i class="fas fa-forward-step"></i><span class="btn-text">下一章</span>
             </button>
         </div>
-        
-        <!-- 进度条 -->
+
         <div class="dj-progress">
             <div class="dj-time-display">
                 <span id="dj-current-time">00:00</span>
                 <span id="dj-duration">00:00</span>
             </div>
-            <div class="dj-progress-bar">
-                <div class="dj-progress-fill" id="dj-progress-fill"></div>
-            </div>
+            <div class="dj-progress-bar"><div class="dj-progress-fill" id="dj-progress-fill"></div></div>
         </div>
-        
-        <!-- 可视化效果 -->
-        <div class="dj-visualizer" id="dj-visualizer">
-            <!-- 动态生成音频可视化条 -->
-        </div>
-        
-        <!-- 次要控制按钮 -->
+
+        <div class="dj-visualizer" id="dj-visualizer"></div>
+
         <div class="dj-secondary-controls">
             <button class="dj-btn dj-speed-btn" id="dj-speed-btn" title="播放速度">
-                <i class="fas fa-gauge-high"></i>
-                <span class="btn-text">1x</span>
+                <i class="fas fa-gauge-high"></i><span class="btn-text">1x</span>
             </button>
             <button class="dj-btn dj-theme-btn" title="切换主题">
-                <i class="fas fa-palette"></i>
-                <span class="btn-text">主题</span>
+                <i class="fas fa-palette"></i><span class="btn-text">主题</span>
             </button>
             <button class="dj-btn dj-font-btn dj-font-minus" title="减小字体">
-                <i class="fas fa-font"></i>
-                <span class="btn-text">A-</span>
+                <i class="fas fa-font"></i><span class="btn-text">A-</span>
             </button>
             <button class="dj-btn dj-font-btn dj-font-plus" title="增大字体">
-                <i class="fas fa-font"></i>
-                <span class="btn-text">A+</span>
+                <i class="fas fa-font"></i><span class="btn-text">A+</span>
             </button>
             <button class="dj-btn dj-home-btn" title="返回首页">
-                <i class="fas fa-home"></i>
-                <span class="btn-text">首页</span>
+                <i class="fas fa-home"></i><span class="btn-text">首页</span>
             </button>
         </div>
     </div>
 
-    <!-- 保持切换按钮在 player 外面 -->
     <button id="dj-toggle-btn" class="dj-btn dj-toggle-btn">
-        <i class="fas fa-eye"></i>
-        <span class="btn-text">显示/隐藏</span>
+        <i class="fas fa-eye"></i><span class="btn-text">显示/隐藏</span>
     </button>
 
     <!-- 音频元素 -->
-    <audio id="chapter-audio" crossorigin="anonymous"></audio>
+    <audio id="chapter-audio" preload="auto" playsinline crossorigin="anonymous"></audio>
 
-    <!-- 加载 JavaScript -->
+    <!-- 原有逻辑 -->
     <script src="js/reader3.js"></script>
-    
-    <!-- Service Worker 注册 -->
+
+    <!-- Service Worker 注册 + 黑屏播放增强 -->
     <script>
         // 注册Service Worker
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
+            window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('ServiceWorker 注册成功: ', registration.scope);
-                    })
-                    .catch(function(error) {
-                        console.log('ServiceWorker 注册失败: ', error);
-                    });
+                    .then(reg => console.log('ServiceWorker 注册成功:', reg.scope))
+                    .catch(err => console.log('ServiceWorker 注册失败:', err));
             });
         }
-        
-        // 检测黑屏播放支持
+
+        // 黑屏播放支持检测
         function checkBackgroundPlaySupport() {
             const support = {
                 mediaSession: 'mediaSession' in navigator,
                 serviceWorker: 'serviceWorker' in navigator,
-                wakeLock: 'wakeLock' in navigator
+                wakeLock: 'wakeLock' in navigator,
+                backgroundPlay: true
             };
-            
             console.log('黑屏播放支持检测:', support);
             return support;
         }
-        
-        // 页面加载完成后检测
-        window.addEventListener('DOMContentLoaded', checkBackgroundPlaySupport);
+
+        // 初始化黑屏播放功能
+        function initBackgroundPlayback() {
+            console.log('🎧 初始化黑屏播放功能...');
+            
+            const audio = document.getElementById('chapter-audio');
+            const notification = document.getElementById('background-play-notification');
+            
+            if (!audio) return;
+
+            // 设置Media Session API（锁屏控制）
+            if ('mediaSession' in navigator) {
+                updateMediaSessionMetadata();
+                
+                // 设置锁屏控制按钮
+                navigator.mediaSession.setActionHandler('play', () => {
+                    audio.play().catch(console.error);
+                });
+                
+                navigator.mediaSession.setActionHandler('pause', () => {
+                    audio.pause();
+                });
+                
+                navigator.mediaSession.setActionHandler('previoustrack', () => {
+                    // 上一章逻辑
+                    if (window.ReaderApp && window.ReaderApp.changeChapter) {
+                        window.ReaderApp.changeChapter(-1);
+                    }
+                });
+                
+                navigator.mediaSession.setActionHandler('nexttrack', () => {
+                    // 下一章逻辑
+                    if (window.ReaderApp && window.ReaderApp.changeChapter) {
+                        window.ReaderApp.changeChapter(1);
+                    }
+                });
+
+                console.log('📱 Media Session API 初始化成功');
+            }
+
+            // 监听页面可见性变化
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    // 页面进入后台（切换标签页、锁屏等）
+                    console.log('📱 页面进入后台，音频继续播放');
+                    if (notification) {
+                        notification.classList.add('show');
+                        setTimeout(() => notification.classList.remove('show'), 3000);
+                    }
+                    
+                    // 确保音频继续播放
+                    if (!audio.paused) {
+                        // 保存播放状态
+                        localStorage.setItem('backgroundPlayState', 'playing');
+                    }
+                } else {
+                    // 页面回到前台
+                    console.log('📱 页面回到前台');
+                    if (notification) {
+                        notification.classList.remove('show');
+                    }
+                }
+            });
+
+            // 监听音频播放状态
+            audio.addEventListener('play', () => {
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'playing';
+                }
+                // 保存播放状态
+                savePlaybackState();
+            });
+
+            audio.addEventListener('pause', () => {
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'paused';
+                }
+                // 保存播放状态
+                savePlaybackState();
+            });
+
+            // 定期保存播放状态
+            setInterval(savePlaybackState, 10000);
+
+            console.log('✅ 黑屏播放功能初始化完成');
+        }
+
+        // 更新Media Session元数据
+        function updateMediaSessionMetadata() {
+            if (!('mediaSession' in navigator)) return;
+            
+            const bookTitle = document.getElementById('bookTitle')?.textContent || 'Awv\'s漆书';
+            const chapterTitle = document.getElementById('dj-chapter-title')?.textContent || '当前章节';
+            
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: `${bookTitle} - ${chapterTitle}`,
+                artist: 'Awv\'s漆书朗读器',
+                album: '电子书音频',
+                artwork: [
+                    { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+                    { src: 'icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+                ]
+            });
+        }
+
+        // 保存播放状态
+        function savePlaybackState() {
+            const audio = document.getElementById('chapter-audio');
+            if (!audio) return;
+            
+            const playbackState = {
+                currentTime: audio.currentTime,
+                isPlaying: !audio.paused,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('playbackState', JSON.stringify(playbackState));
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            checkBackgroundPlaySupport();
+            initBackgroundPlayback();
+            
+            // 暴露更新媒体元数据的方法
+            window.updateMediaSessionMetadata = updateMediaSessionMetadata;
+        });
+
+        // 监听在线状态变化
+        window.addEventListener('online', () => {
+            console.log('📶 网络连接恢复');
+        });
+
+        window.addEventListener('offline', () => {
+            console.log('📶 网络连接断开');
+            const errorDiv = document.getElementById('error');
+            if (errorDiv) {
+                const oldMessage = errorDiv.textContent;
+                errorDiv.textContent = '网络连接已断开，但音频播放不受影响';
+                setTimeout(() => {
+                    if (errorDiv.textContent === '网络连接已断开，但音频播放不受影响') {
+                        errorDiv.textContent = oldMessage;
+                    }
+                }, 3000);
+            }
+        });
+
     </script>
 </body>
 </html>
