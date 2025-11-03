@@ -3,10 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Awv's漆书</title>
+    <title>Awv's漆书 - 支持黑屏播放</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="css/reader3.css">
+    <!-- PWA配置 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         /* 保证切换按钮始终可见 */
         #dj-toggle-btn {
@@ -15,9 +20,88 @@
             right: 20px;
             z-index: 999;
         }
+        
+        /* 黑屏播放提示样式 */
+        .background-play-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #00ff88, #0ff);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 25px;
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.5);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            animation: slideInDown 0.5s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .background-play-notification.show {
+            display: flex;
+        }
+        
+        @keyframes slideInDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        /* 音频元素完全隐藏 */
+        #chapter-audio {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+            width: 0;
+            height: 0;
+        }
+        
+        /* 加载动画 */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+        
+        .loading-spinner.active {
+            display: block;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 255, 255, 0.3);
+            border-top: 5px solid #0ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+    <!-- 加载动画 -->
+    <div class="loading-spinner" id="loading-spinner">
+        <div class="spinner"></div>
+    </div>
+
     <!-- 主要内容区域 -->
     <div id="bookTitle">加载中...</div>
     <div id="book"></div>
@@ -26,6 +110,12 @@
     <!-- 装饰元素 -->
     <div id="outer-ring"></div>
     <div id="square-rotation"></div>
+
+    <!-- 黑屏播放提示 -->
+    <div id="background-play-notification" class="background-play-notification">
+        <i class="fas fa-headphones"></i>
+        <span>后台播放已启用 - 锁屏后仍可继续收听</span>
+    </div>
 
     <!-- DJ风格播放控制器 -->
     <div id="dj-player" class="dj-player">
@@ -99,9 +189,40 @@
     </button>
 
     <!-- 音频元素 -->
-    <audio id="chapter-audio"></audio>
+    <audio id="chapter-audio" crossorigin="anonymous"></audio>
 
     <!-- 加载 JavaScript -->
     <script src="js/reader3.js"></script>
+    
+    <!-- Service Worker 注册 -->
+    <script>
+        // 注册Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker 注册成功: ', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker 注册失败: ', error);
+                    });
+            });
+        }
+        
+        // 检测黑屏播放支持
+        function checkBackgroundPlaySupport() {
+            const support = {
+                mediaSession: 'mediaSession' in navigator,
+                serviceWorker: 'serviceWorker' in navigator,
+                wakeLock: 'wakeLock' in navigator
+            };
+            
+            console.log('黑屏播放支持检测:', support);
+            return support;
+        }
+        
+        // 页面加载完成后检测
+        window.addEventListener('DOMContentLoaded', checkBackgroundPlaySupport);
+    </script>
 </body>
 </html>
