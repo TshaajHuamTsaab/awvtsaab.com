@@ -3,8 +3,6 @@ const bookDiv = document.getElementById("book");
 const bookTitleDiv = document.getElementById("bookTitle");
 const errorDiv = document.getElementById("error");
 const audio = document.getElementById("chapter-audio");
-const speedBtn = document.getElementById("speed-btn");
-const playBtn = document.getElementById("play-btn");
 
 // 路径配置 - 根据您的文件结构调整
 const PATH_CONFIG = {
@@ -27,12 +25,12 @@ let currentBookData = null;
 const bookDataMap = {
     'dev1': { title: '创建思维', author: '璐瑶建议' },
     'dev2': { title: '量子之门', author: '李雷' },
-    'dev3': { title: '机器觉醒', author: '王芳' },
+    'dev3': { title: '为人处事', author: '叔敖' },
     'dev4': { title: '未来城市', author: '赵强' },
-    'dev5': { title: '星际穿越', author: '陈明' },
-    'dev6': { title: '灵能边界', author: '林雪' },
-    'dev7': { title: '梦境代理人', author: '韩松' },
-    'dev8': { title: '时间裂缝', author: '许楠' },
+    'dev5': { title: '《喜悦之皇》', author: '欧逊·渥恩（Ocean Vuong）' },
+    'dev6': { title: '《心灯：短篇故事集》', author: '巴努·穆什塔克（Banu Mushtaq）' },
+    'dev7': { title: '《重燃的黎明》', author: '苏珊·柯林斯（Suzanne Collins）' },
+    'dev8': { title: '《第一绅士》', author: '比尔·克林顿 & 詹姆斯·帕特森' },
     'dev9': { title: '数据意识', author: '周远' },
     'dev10': { title: '代码帝国', author: '刘星' },
     'dev11': { title: '星海归途', author: '张婷' },
@@ -176,12 +174,12 @@ async function loadAudio(book, num) {
             });
         } else {
             // 重置播放按钮状态
-            setPlayBtnToPlay();
+            setDJPlayBtnToPlay();
         }
     } catch (err) {
         errorDiv.textContent = "⚠️ " + err.message;
         isPlayingSequence = false;
-        setPlayBtnToPlay();
+        setDJPlayBtnToPlay();
     }
 }
 
@@ -205,7 +203,7 @@ async function loadAudioIfExists(book, num) {
     } catch (err) {
         errorDiv.textContent = "⚠️ " + err.message;
         isPlayingSequence = false;
-        setPlayBtnToPlay();
+        setDJPlayBtnToPlay();
     }
 }
 
@@ -216,84 +214,6 @@ function updateURL(book, chapter) {
     const newUrl = `${window.location.pathname}?book=${book}&chapter=${chapter}`;
     window.history.replaceState({}, '', newUrl);
 }
-
-// ========== 播放控制 ==========
-
-/**
- * 设置播放按钮状态
- */
-function setPlayBtnToPlay() {
-    if (playBtn) {
-        playBtn.className = "btn btn-play fa fa-play";
-        playBtn.title = "播放";
-    }
-}
-
-function setPlayBtnToPause() {
-    if (playBtn) {
-        playBtn.className = "btn btn-play fa fa-pause";
-        playBtn.title = "暂停";
-    }
-}
-
-/**
- * 播放/暂停控制
- */
-if (playBtn) {
-    playBtn.addEventListener("click", async () => {
-        if (!audio.src) {
-            await loadAudioIfExists(bookFolder, chapterNum);
-            return;
-        }
-        
-        try {
-            if (audio.paused) {
-                // 开始播放
-                isPlayingSequence = true;
-                await audio.play();
-                setPlayBtnToPause();
-                errorDiv.textContent = ""; // 清除错误信息
-            } else {
-                // 暂停播放
-                isPlayingSequence = false;
-                audio.pause();
-                setPlayBtnToPlay();
-            }
-        } catch (err) {
-            console.error('播放控制错误:', err);
-            errorDiv.textContent = "⚠️ 播放失败: " + err.message;
-        }
-    });
-}
-
-/**
- * 音频事件处理
- */
-audio.addEventListener("loadeddata", () => {
-    console.log('音频加载完成:', audio.src);
-});
-
-audio.addEventListener("canplay", () => {
-    console.log('音频可以播放了');
-});
-
-audio.addEventListener("error", (e) => {
-    console.error('音频错误:', e);
-    errorDiv.textContent = "⚠️ 音频加载错误";
-});
-
-/**
- * 音频播放结束处理 - 自动下一章
- */
-audio.addEventListener("ended", async () => {
-    if (!isPlayingSequence) {
-        setPlayBtnToPlay();
-        return;
-    }
-
-    const nextChapter = getNextChapterNumber();
-    await tryLoadNextChapter(nextChapter);
-});
 
 /**
  * 获取下一章编号
@@ -324,7 +244,7 @@ async function tryLoadNextChapter(nextNum) {
         }
     } catch (err) {
         isPlayingSequence = false;
-        setPlayBtnToPlay();
+        setDJPlayBtnToPlay();
         errorDiv.textContent = "🎉 已播放到最后一章";
         
         // 3秒后清除提示
@@ -335,8 +255,6 @@ async function tryLoadNextChapter(nextNum) {
         }, 3000);
     }
 }
-
-// ========== 章节导航 ==========
 
 /**
  * 切换章节
@@ -371,7 +289,7 @@ async function loadChapterIfExists(newChapter) {
         // 停止当前播放
         isPlayingSequence = false;
         audio.pause();
-        setPlayBtnToPlay();
+        setDJPlayBtnToPlay();
         
         await loadChapter(bookFolder, newChapter);
     } else {
@@ -386,96 +304,372 @@ async function loadChapterIfExists(newChapter) {
     }
 }
 
-// ========== 事件绑定 ==========
+// ========== DJ播放器功能 ==========
 
 /**
- * 初始化所有事件监听器
+ * 初始化DJ播放器
  */
-function initEventListeners() {
-    // 按钮事件
-    const prevBtn = document.querySelector(".btn-prev");
-    const nextBtn = document.querySelector(".btn-next");
-    const fontPlus = document.querySelector(".btn-font-plus");
-    const fontMinus = document.querySelector(".btn-font-minus");
-    const themeBtn = document.querySelector(".btn-theme");
-    const homeBtn = document.querySelector(".btn-home");
-    const lightBtn = document.querySelector(".btn-light");
+function initDJPlayer() {
+    console.log('🎧 初始化DJ播放器...');
     
-    if (prevBtn) prevBtn.addEventListener("click", () => changeChapter(-1));
-    if (nextBtn) nextBtn.addEventListener("click", () => changeChapter(1));
+    // 绑定DJ播放器事件
+    bindDJPlayerEvents();
     
-    // 键盘控制
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowLeft") changeChapter(-1);
-        if (e.key === "ArrowRight") changeChapter(1);
-        if (e.key === " ") {
-            e.preventDefault();
-            playBtn?.click();
-        }
-        if (e.key === "Escape") {
-            toggleRemoteVisibility();
-        }
-    });
+    // 初始化音频可视化
+    initAudioVisualizer();
     
-    // 触屏滑动
-    let touchStartX = 0;
-    document.addEventListener("touchstart", (e) => {
-        touchStartX = e.changedTouches[0].clientX;
-    }, { passive: true });
+    // 初始化进度更新
+    initProgressUpdater();
     
-    document.addEventListener("touchend", (e) => {
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        if (Math.abs(dx) > 50) {
-            if (dx > 0) changeChapter(-1);
-            else changeChapter(1);
-        }
-    }, { passive: true });
+    console.log('✅ DJ播放器初始化完成');
+}
+
+/**
+ * 绑定DJ播放器事件
+ */
+function bindDJPlayerEvents() {
+    const djPlayBtn = document.getElementById('dj-play-btn');
+    const djPrevBtn = document.querySelector('.dj-prev-btn');
+    const djNextBtn = document.querySelector('.dj-next-btn');
+    const djSpeedBtn = document.getElementById('dj-speed-btn');
+    const djThemeBtn = document.querySelector('.dj-theme-btn');
+    const djHomeBtn = document.querySelector('.dj-home-btn');
+    const djToggleBtn = document.querySelector('.dj-toggle-btn');
+    const djProgressBar = document.querySelector('.dj-progress-bar');
+    const djFontMinus = document.querySelector('.dj-font-minus');
+    const djFontPlus = document.querySelector('.dj-font-plus');
     
-    // 字体大小控制
-    if (fontPlus) fontPlus.addEventListener("click", () => changeTextSize(2));
-    if (fontMinus) fontMinus.addEventListener("click", () => changeTextSize(-2));
-    
-    // 主题切换
-    if (themeBtn) {
-        themeBtn.addEventListener("click", switchTheme);
+    // 播放/暂停
+    if (djPlayBtn) {
+        djPlayBtn.addEventListener('click', handleDJPlayPause);
     }
     
-    // 首页按钮
-    if (homeBtn) {
-        homeBtn.addEventListener("click", () => {
-            // 停止播放并记录时间
+    // 上一章/下一章
+    if (djPrevBtn) djPrevBtn.addEventListener('click', () => changeChapter(-1));
+    if (djNextBtn) djNextBtn.addEventListener('click', () => changeChapter(1));
+    
+    // 播放速度
+    if (djSpeedBtn) {
+        djSpeedBtn.addEventListener('click', handleDJSpeedChange);
+    }
+    
+    // 主题切换
+    if (djThemeBtn) {
+        djThemeBtn.addEventListener('click', switchTheme);
+    }
+    
+    // 字体大小调整
+    if (djFontMinus) djFontMinus.addEventListener('click', () => changeTextSize(-1));
+    if (djFontPlus) djFontPlus.addEventListener('click', () => changeTextSize(1));
+    
+    // 返回首页
+    if (djHomeBtn) {
+        djHomeBtn.addEventListener('click', () => {
             isPlayingSequence = false;
             audio.pause();
             window.location.href = "library.html";
         });
     }
     
-    // 显示/隐藏遥控器
-    if (lightBtn) {
-        lightBtn.addEventListener("click", toggleRemoteVisibility);
+    // 显示/隐藏控制器
+    if (djToggleBtn) {
+        djToggleBtn.addEventListener('click', toggleDJPlayerVisibility);
     }
     
-    // 播放速度控制
-    initSpeedControl();
+    // 进度条点击跳转
+    if (djProgressBar) {
+        djProgressBar.addEventListener('click', handleProgressBarClick);
+    }
+    
+    // 键盘控制
+    document.addEventListener('keydown', handleDJKeyboardControl);
 }
 
 /**
- * 初始化播放速度控制
+ * 处理DJ播放/暂停
  */
-function initSpeedControl() {
-    let speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
-    let speedIndex = 2;
+function handleDJPlayPause() {
+    if (!audio.src) {
+        loadAudioIfExists(bookFolder, chapterNum);
+        return;
+    }
     
-    if (speedBtn) {
-        speedBtn.textContent = speeds[speedIndex] + "x";
-        speedBtn.addEventListener("click", () => {
-            speedIndex = (speedIndex + 1) % speeds.length;
-            audio.playbackRate = speeds[speedIndex];
-            speedBtn.textContent = speeds[speedIndex] + "x";
+    try {
+        if (audio.paused) {
+            // 开始播放
+            isPlayingSequence = true;
+            audio.play().then(() => {
+                setDJPlayBtnToPause();
+                errorDiv.textContent = "";
+            }).catch(err => {
+                console.log('自动播放被阻止:', err);
+                errorDiv.textContent = "🔇 点击播放按钮开始播放";
+            });
+        } else {
+            // 暂停播放
+            isPlayingSequence = false;
+            audio.pause();
+            setDJPlayBtnToPlay();
+        }
+    } catch (err) {
+        console.error('播放控制错误:', err);
+        errorDiv.textContent = "⚠️ 播放失败: " + err.message;
+    }
+}
+
+/**
+ * 设置DJ播放按钮状态
+ */
+function setDJPlayBtnToPlay() {
+    const djPlayBtn = document.getElementById('dj-play-btn');
+    if (djPlayBtn) {
+        const icon = djPlayBtn.querySelector('i');
+        const text = djPlayBtn.querySelector('.btn-text');
+        icon.className = "fas fa-play";
+        text.textContent = "播放";
+        djPlayBtn.classList.remove('playing');
+    }
+}
+
+function setDJPlayBtnToPause() {
+    const djPlayBtn = document.getElementById('dj-play-btn');
+    if (djPlayBtn) {
+        const icon = djPlayBtn.querySelector('i');
+        const text = djPlayBtn.querySelector('.btn-text');
+        icon.className = "fas fa-pause";
+        text.textContent = "暂停";
+        djPlayBtn.classList.add('playing');
+    }
+}
+
+/**
+ * 处理DJ播放速度切换
+ */
+function handleDJSpeedChange() {
+    const djSpeedBtn = document.getElementById('dj-speed-btn');
+    if (!djSpeedBtn) return;
+    
+    let speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+    let speedIndex = speeds.indexOf(audio.playbackRate);
+    if (speedIndex === -1) speedIndex = 2;
+    
+    speedIndex = (speedIndex + 1) % speeds.length;
+    audio.playbackRate = speeds[speedIndex];
+    
+    const text = djSpeedBtn.querySelector('.btn-text');
+    text.textContent = speeds[speedIndex] + "x";
+    
+    showTempMessage(`播放速度: ${speeds[speedIndex]}x`);
+}
+
+/**
+ * 切换DJ播放器可见性
+ */
+function toggleDJPlayerVisibility() {
+    const djPlayer = document.getElementById('dj-player');
+    const djToggleBtn = document.getElementById('dj-toggle-btn');
+
+    if (!djPlayer || !djToggleBtn) return;
+
+    const isHidden = djPlayer.classList.contains('hidden');
+    const icon = djToggleBtn.querySelector('i');
+    const text = djToggleBtn.querySelector('.btn-text');
+
+    if (isHidden) {
+        djPlayer.classList.remove('hidden');
+        icon.className = "fas fa-eye";
+        text.textContent = "隐藏";
+        localStorage.setItem("djPlayerVisible", "true");
+        showTempMessage('显示控制器');
+    } else {
+        djPlayer.classList.add('hidden');
+        icon.className = "fas fa-eye-slash";
+        text.textContent = "显示";
+        localStorage.setItem("djPlayerVisible", "false");
+        showTempMessage('隐藏控制器');
+    }
+}
+
+/**
+ * 处理DJ键盘控制
+ */
+function handleDJKeyboardControl(e) {
+    if (e.key === " ") {
+        e.preventDefault();
+        handleDJPlayPause();
+    }
+    if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        changeChapter(-1);
+    }
+    if (e.key === "ArrowRight") {
+        e.preventDefault();
+        changeChapter(1);
+    }
+    if (e.key === "Escape") {
+        e.preventDefault();
+        toggleDJPlayerVisibility();
+    }
+}
+
+/**
+ * 初始化进度更新
+ */
+function initProgressUpdater() {
+    // 更新时间显示
+    audio.addEventListener('timeupdate', updateDJProgress);
+    
+    // 更新总时长
+    audio.addEventListener('loadedmetadata', updateDJDuration);
+    
+    // 章节加载时更新信息
+    updateDJChapterInfo();
+}
+
+/**
+ * 更新DJ进度显示
+ */
+function updateDJProgress() {
+    const progressFill = document.getElementById('dj-progress-fill');
+    const currentTimeEl = document.getElementById('dj-current-time');
+    
+    if (progressFill && currentTimeEl) {
+        const progress = (audio.currentTime / audio.duration) * 100 || 0;
+        progressFill.style.width = `${progress}%`;
+        
+        // 更新时间显示
+        currentTimeEl.textContent = formatTime(audio.currentTime);
+    }
+}
+
+/**
+ * 更新DJ总时长
+ */
+function updateDJDuration() {
+    const durationEl = document.getElementById('dj-duration');
+    if (durationEl) {
+        durationEl.textContent = formatTime(audio.duration);
+    }
+}
+
+/**
+ * 更新DJ章节信息
+ */
+function updateDJChapterInfo() {
+    const chapterTitleEl = document.getElementById('dj-chapter-title');
+    const chapterProgressEl = document.getElementById('dj-chapter-progress');
+    
+    if (chapterTitleEl && chapterProgressEl) {
+        const chapterText = chapterNum === "cover" ? "封面" : `第 ${chapterNum} 章`;
+        chapterTitleEl.textContent = chapterText;
+        
+        // 这里可以添加更多章节进度信息
+        chapterProgressEl.textContent = `${chapterNum === "cover" ? 0 : chapterNum} / ?`;
+    }
+}
+
+/**
+ * 处理进度条点击
+ */
+function handleProgressBarClick(e) {
+    const progressBar = e.currentTarget;
+    const clickX = e.offsetX;
+    const width = progressBar.offsetWidth;
+    const percentage = clickX / width;
+    
+    audio.currentTime = percentage * audio.duration;
+}
+
+/**
+ * 格式化时间显示
+ */
+function formatTime(seconds) {
+    if (!isFinite(seconds)) return "00:00";
+    
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
+ * 初始化音频可视化
+ */
+function initAudioVisualizer() {
+    const visualizer = document.getElementById('dj-visualizer');
+    if (!visualizer) return;
+    
+    // 清空可视化容器
+    visualizer.innerHTML = '';
+    
+    // 创建音频分析器
+    let audioContext, analyser, dataArray;
+    
+    // 创建可视化条
+    for (let i = 0; i < 20; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'visualizer-bar';
+        bar.style.height = '2px';
+        visualizer.appendChild(bar);
+    }
+    
+    const bars = document.querySelectorAll('.visualizer-bar');
+    
+    // 设置音频分析
+    function setupAudioAnalysis() {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
             
-            // 显示速度提示
-            showTempMessage(`播放速度: ${speeds[speedIndex]}x`);
+            const source = audioContext.createMediaElementSource(audio);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+            
+            analyser.fftSize = 64;
+            const bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+        }
+    }
+    
+    // 更新可视化
+    function updateVisualizer() {
+        if (!analyser || !isPlayingSequence) return;
+        
+        analyser.getByteFrequencyData(dataArray);
+        
+        bars.forEach((bar, i) => {
+            const value = dataArray[i] / 255;
+            const height = Math.max(2, value * 30);
+            bar.style.height = `${height}px`;
+            bar.style.opacity = 0.3 + value * 0.7;
         });
+        
+        requestAnimationFrame(updateVisualizer);
+    }
+    
+    // 监听播放开始
+    audio.addEventListener('play', () => {
+        setupAudioAnalysis();
+        updateVisualizer();
+    });
+}
+
+/**
+ * 加载DJ播放器偏好设置
+ */
+function loadDJPlayerPreferences() {
+    const djPlayer = document.getElementById('dj-player');
+    const djToggleBtn = document.querySelector('.dj-toggle-btn');
+    
+    if (djPlayer && djToggleBtn) {
+        const playerVisible = localStorage.getItem("djPlayerVisible");
+        const icon = djToggleBtn.querySelector('i');
+        const text = djToggleBtn.querySelector('.btn-text');
+        
+        if (playerVisible === "false") {
+            djPlayer.classList.add('hidden');
+            icon.className = "fas fa-eye-slash";
+            text.textContent = "显示";
+        }
     }
 }
 
@@ -525,22 +719,6 @@ function getThemeName(theme) {
         'pink': '梦幻粉'
     };
     return names[theme] || theme;
-}
-
-/**
- * 显示/隐藏遥控器
- */
-function toggleRemoteVisibility() {
-    const remote = document.querySelector('.remote.neon-remote');
-    if (remote) {
-        const isHidden = remote.style.display === 'none';
-        remote.style.display = isHidden ? 'flex' : 'none';
-        
-        // 保存偏好
-        localStorage.setItem("remoteVisible", !isHidden);
-        
-        showTempMessage(isHidden ? '显示遥控器' : '隐藏遥控器');
-    }
 }
 
 /**
@@ -600,18 +778,6 @@ function recordReadingTime() {
         localStorage.setItem("readingHistory", JSON.stringify(history));
     }
 }
-
-// 页面离开时记录时间
-window.addEventListener("beforeunload", recordReadingTime);
-
-// 页面隐藏时记录时间（切换标签页等）
-document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-        recordReadingTime();
-    } else {
-        startTime = Date.now(); // 重新开始计时
-    }
-});
 
 // ========== 装饰动画 ==========
 
@@ -690,11 +856,14 @@ async function init() {
     try {
         console.log('🚀 初始化阅读器...');
         
-        // 初始化事件监听
-        initEventListeners();
+        // 初始化DJ播放器
+        initDJPlayer();
         
         // 初始化装饰
         initDecorations();
+        
+        // 加载DJ播放器偏好设置
+        loadDJPlayerPreferences();
         
         // 加载初始章节
         await loadChapter(bookFolder, chapterNum);
@@ -706,6 +875,38 @@ async function init() {
         errorDiv.textContent = "⚠️ 初始化失败: " + error.message;
     }
 }
+
+// ========== 事件监听器 ==========
+
+// 页面离开时记录时间
+window.addEventListener("beforeunload", recordReadingTime);
+
+// 页面隐藏时记录时间（切换标签页等）
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        recordReadingTime();
+    } else {
+        startTime = Date.now(); // 重新开始计时
+    }
+});
+
+// 更新音频事件处理
+audio.addEventListener("ended", async () => {
+    if (!isPlayingSequence) {
+        setDJPlayBtnToPlay();
+        return;
+    }
+
+    const nextChapter = getNextChapterNumber();
+    await tryLoadNextChapter(nextChapter);
+});
+
+// 修改音频加载错误处理
+audio.addEventListener("error", (e) => {
+    console.error('音频错误:', e);
+    errorDiv.textContent = "⚠️ 音频加载错误";
+    setDJPlayBtnToPlay();
+});
 
 // 当DOM加载完成后初始化
 if (document.readyState === 'loading') {
@@ -719,6 +920,6 @@ window.ReaderApp = {
     loadChapter,
     changeChapter,
     switchTheme,
-    toggleRemoteVisibility,
+    toggleDJPlayerVisibility,
     getCurrentBook: () => ({ book: bookFolder, chapter: chapterNum, title: bookTitle })
 };
