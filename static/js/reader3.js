@@ -32,7 +32,7 @@ const bookDataMap = {
     'dev7': { title: '《重燃的黎明》', author: '苏珊·柯林斯（Suzanne Collins）' },
     'dev8': { title: '《第一绅士》', author: '比尔·克林顿 & 詹姆斯·帕特森' },
     'dev9': { title: '数据意识', author: '周远' },
-    'dev10': { title: '代码帝国', author: '刘星' },
+    'dev10': { title: '东南亚新趋势&未来', author: '叔敖' },
     'dev11': { title: '星海归途', author: '张婷' },
     'dev12': { title: '心灵算法', author: '王泽' },
     'dev13': { title: '暗物质战争', author: '李航' },
@@ -333,6 +333,117 @@ function initBackgroundPlayback() {
     
     console.log('✅ 黑屏播放功能初始化完成');
 }
+
+// ======== 🔥 黑屏播放增强模块 ========
+
+/**
+ * 启用黑屏播放模式：锁屏时或用户点击“黑屏”按钮后仍保持播放
+ */
+function enableBlackScreenMode() {
+    console.log("🌓 启用黑屏播放模式");
+    const overlay = document.createElement('div');
+    overlay.id = "black-screen-overlay";
+    Object.assign(overlay.style, {
+        position: "fixed",
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: "#000",
+        zIndex: 99999,
+        transition: "opacity 0.5s ease",
+        opacity: 1,
+        cursor: "none"
+    });
+    document.body.appendChild(overlay);
+
+    // 点击屏幕可退出黑屏
+    overlay.addEventListener('click', () => {
+        disableBlackScreenMode();
+    });
+
+    // 防止屏幕睡眠
+    requestWakeLock();
+
+    // 保存状态
+    localStorage.setItem("blackScreenEnabled", "true");
+}
+
+/**
+ * 关闭黑屏播放模式
+ */
+function disableBlackScreenMode() {
+    const overlay = document.getElementById('black-screen-overlay');
+    if (overlay) {
+        overlay.style.opacity = 0;
+        setTimeout(() => overlay.remove(), 300);
+    }
+    releaseWakeLock();
+    localStorage.removeItem("blackScreenEnabled");
+}
+
+/**
+ * 屏幕唤醒锁 - 防止自动休眠
+ */
+let wakeLock = null;
+
+async function requestWakeLock() {
+    if ('wakeLock' in navigator) {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log('🔒 屏幕保持唤醒');
+
+            wakeLock.addEventListener('release', () => {
+                console.log('🔓 唤醒锁已释放');
+            });
+        } catch (err) {
+            console.error('⚠️ 请求唤醒锁失败:', err);
+        }
+    } else {
+        console.log('❌ 当前浏览器不支持 Wake Lock API');
+    }
+}
+
+/**
+ * 释放唤醒锁
+ */
+function releaseWakeLock() {
+    if (wakeLock) {
+        wakeLock.release()
+            .then(() => {
+                wakeLock = null;
+                console.log('🔓 唤醒锁手动释放');
+            });
+    }
+}
+
+// ======== 黑屏按钮（添加入口） ========
+function createBlackScreenButton() {
+    const btn = document.createElement("button");
+    btn.id = "black-screen-btn";
+    btn.className = "dj-btn";
+    btn.innerHTML = `<i class="fas fa-moon"></i><span class="btn-text">黑屏</span>`;
+    Object.assign(btn.style, {
+        position: "fixed",
+        bottom: "80px",
+        right: "20px",
+        zIndex: 9999,
+    });
+    document.body.appendChild(btn);
+
+    btn.addEventListener("click", () => {
+        const enabled = localStorage.getItem("blackScreenEnabled") === "true";
+        if (enabled) disableBlackScreenMode();
+        else enableBlackScreenMode();
+    });
+}
+
+// ======== 页面初始化 ========
+window.addEventListener('DOMContentLoaded', () => {
+    createBlackScreenButton();
+
+    // 如果用户上次启用了黑屏，则自动恢复
+    if (localStorage.getItem("blackScreenEnabled") === "true") {
+        enableBlackScreenMode();
+    }
+});
 
 /**
  * 初始化Media Session API
