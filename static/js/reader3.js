@@ -139,8 +139,14 @@ async function loadChapter(book, num) {
         // 重置阅读时间
         startTime = Date.now();
         
+        // 更新媒体元数据（黑屏播放功能）
+        updateMediaMetadata();
+        
         // 加载音频
         await loadAudio(book, num);
+        
+        // 恢复播放状态（黑屏播放功能）
+        restorePlaybackState();
         
     } catch (err) {
         console.error('加载章节失败:', err);
@@ -302,6 +308,235 @@ async function loadChapterIfExists(newChapter) {
             }
         }, 3000);
     }
+}
+
+// ========== 黑屏播放功能 ==========
+
+/**
+ * 初始化黑屏播放功能
+ */
+function initBackgroundPlayback() {
+    console.log('🎧 初始化黑屏播放功能...');
+    
+    // 设置Media Session API
+    initMediaSession();
+    
+    // 监听页面可见性变化
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // 监听音频播放状态
+    audio.addEventListener('play', handleAudioPlay);
+    audio.addEventListener('pause', handleAudioPause);
+    
+    // 请求后台播放权限
+    requestBackgroundPlayPermission();
+    
+    console.log('✅ 黑屏播放功能初始化完成');
+}
+
+/**
+ * 初始化Media Session API
+ */
+function initMediaSession() {
+    if ('mediaSession' in navigator) {
+        // 设置媒体元数据
+        updateMediaMetadata();
+        
+        // 设置媒体控制动作
+        navigator.mediaSession.setActionHandler('play', () => {
+            handleDJPlayPause();
+        });
+        
+        navigator.mediaSession.setActionHandler('pause', () => {
+            handleDJPlayPause();
+        });
+        
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+            changeChapter(-1);
+        });
+        
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+            changeChapter(1);
+        });
+        
+        navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+            const skipTime = details.seekOffset || 10;
+            audio.currentTime = Math.max(0, audio.currentTime - skipTime);
+        });
+        
+        navigator.mediaSession.setActionHandler('seekforward', (details) => {
+            const skipTime = details.seekOffset || 10;
+            audio.currentTime = Math.min(audio.duration, audio.currentTime + skipTime);
+        });
+        
+        console.log('📱 Media Session API 初始化成功');
+    } else {
+        console.log('❌ 当前浏览器不支持 Media Session API');
+    }
+}
+
+/**
+ * 更新媒体元数据
+ */
+function updateMediaMetadata() {
+    if ('mediaSession' in navigator) {
+        const chapterText = chapterNum === "cover" ? "封面" : `第 ${chapterNum} 章`;
+        
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: `${bookTitle} - ${chapterText}`,
+            artist: currentBookData?.author || '未知作者',
+            album: 'Awv\'s漆书',
+            artwork: [
+                { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+                { src: 'icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+            ]
+        });
+    }
+}
+
+/**
+ * 处理页面可见性变化
+ */
+function handleVisibilityChange() {
+    if (document.hidden) {
+        // 页面隐藏时（切换标签页、锁屏等）
+        console.log('📱 页面进入后台');
+        showBackgroundPlayNotification();
+        
+        // 确保音频继续播放
+        if (isPlayingSequence && audio.paused) {
+            audio.play().catch(err => {
+                console.log('后台播放失败:', err);
+            });
+        }
+    } else {
+        // 页面重新可见
+        console.log('📱 页面回到前台');
+        hideBackgroundPlayNotification();
+    }
+}
+
+/**
+ * 处理音频播放事件
+ */
+function handleAudioPlay() {
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'playing';
+    }
+    
+    // 保存播放状态到本地存储
+    savePlaybackState();
+}
+
+/**
+ * 处理音频暂停事件
+ */
+function handleAudioPause() {
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'paused';
+    }
+    
+    // 保存播放状态到本地存储
+    savePlaybackState();
+}
+
+/**
+ * 保存播放状态
+ */
+function savePlaybackState() {
+    const playbackState = {
+        book: bookFolder,
+        chapter: chapterNum,
+        currentTime: audio.currentTime,
+        isPlaying: !audio.paused,
+        timestamp: Date.now()
+    };
+    
+    localStorage.setItem('playbackState', JSON.stringify(playbackState));
+}
+
+/**
+ * 恢复播放状态
+ */
+function restorePlaybackState() {
+    try {
+        const savedState = localStorage.getItem('playbackState');
+        if (savedState) {
+            const state = JSON.parse(savedState);
+            
+            // 检查状态是否过期（超过1小时）
+            const isExpired = (Date.now() - state.timestamp) > 3600000;
+            
+            if (!isExpired && state.book === bookFolder && state.chapter === chapterNum) {
+                // 恢复播放位置
+                audio.currentTime = state.currentTime;
+                
+                // 如果之前正在播放，自动继续播放
+                if (state.isPlaying && !audio.paused) {
+                    audio.play().catch(err => {
+                        console.log('自动恢复播放失败:', err);
+                    });
+                }
+                
+                console.log('🎵 播放状态恢复成功');
+            }
+        }
+    } catch (err) {
+        console.error('恢复播放状态失败:', err);
+    }
+}
+
+/**
+ * 显示后台播放通知
+ */
+function showBackgroundPlayNotification() {
+    const notification = document.getElementById('background-play-notification');
+    if (notification) {
+        notification.classList.add('show');
+        
+        // 3秒后自动隐藏
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
+}
+
+/**
+ * 隐藏后台播放通知
+ */
+function hideBackgroundPlayNotification() {
+    const notification = document.getElementById('background-play-notification');
+    if (notification) {
+        notification.classList.remove('show');
+    }
+}
+
+/**
+ * 请求后台播放权限
+ */
+function requestBackgroundPlayPermission() {
+    // 在支持的浏览器中请求后台播放权限
+    if ('requestBackgroundPlayPermission' in audio) {
+        audio.requestBackgroundPlayPermission().then(() => {
+            console.log('✅ 后台播放权限已获得');
+        }).catch(err => {
+            console.log('❌ 后台播放权限被拒绝:', err);
+        });
+    }
+}
+
+/**
+ * 检查后台播放支持
+ */
+function checkBackgroundPlaySupport() {
+    const supportInfo = {
+        mediaSession: 'mediaSession' in navigator,
+        serviceWorker: 'serviceWorker' in navigator,
+        wakeLock: 'wakeLock' in navigator
+    };
+    
+    console.log('📱 后台播放支持情况:', supportInfo);
+    return supportInfo;
 }
 
 // ========== DJ播放器功能 ==========
@@ -856,8 +1091,14 @@ async function init() {
     try {
         console.log('🚀 初始化阅读器...');
         
+        // 检查后台播放支持
+        checkBackgroundPlaySupport();
+        
         // 初始化DJ播放器
         initDJPlayer();
+        
+        // 初始化黑屏播放功能
+        initBackgroundPlayback();
         
         // 初始化装饰
         initDecorations();
@@ -906,6 +1147,33 @@ audio.addEventListener("error", (e) => {
     console.error('音频错误:', e);
     errorDiv.textContent = "⚠️ 音频加载错误";
     setDJPlayBtnToPlay();
+});
+
+// 定期保存播放状态
+setInterval(savePlaybackState, 10000); // 每10秒保存一次
+
+// 监听音频时间更新
+audio.addEventListener('timeupdate', () => {
+    // 每5秒保存一次播放进度
+    if (Math.floor(audio.currentTime) % 5 === 0) {
+        savePlaybackState();
+    }
+});
+
+// 监听页面卸载
+window.addEventListener('beforeunload', () => {
+    recordReadingTime();
+    savePlaybackState();
+});
+
+// 监听在线状态变化
+window.addEventListener('online', () => {
+    console.log('📶 网络连接恢复');
+});
+
+window.addEventListener('offline', () => {
+    console.log('📶 网络连接断开');
+    showTempMessage('网络连接已断开，但音频播放不受影响');
 });
 
 // 当DOM加载完成后初始化
