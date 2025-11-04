@@ -30,6 +30,37 @@
             z-index: 999;
         }
 
+        /* 不睡眠按钮 */
+        #no-sleep-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 999;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        #no-sleep-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        #no-sleep-btn.active {
+            background: linear-gradient(135deg, #00ff88, #0ff);
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        #no-sleep-btn .btn-text {
+            margin-left: 8px;
+        }
+
         /* 锁屏播放提示样式 */
         .background-play-notification {
             position: fixed;
@@ -106,6 +137,11 @@
         <span>锁屏播放已启用 - 锁屏后仍可继续收听</span>
     </div>
 
+    <!-- 不睡眠按钮 -->
+    <button id="no-sleep-btn" class="dj-btn" title="保持屏幕常亮">
+        <i class="fas fa-moon"></i><span class="btn-text">保持常亮</span>
+    </button>
+
     <!-- DJ风格播放控制器 -->
     <div id="dj-player" class="dj-player">
         <div class="dj-chapter-info">
@@ -166,10 +202,142 @@
 
     <!-- 纯净的锁屏播放支持核心代码 -->
     <script>
+        // ========== 屏幕常亮控制模块 ==========
+        class NoSleepManager {
+            constructor() {
+                this.isActive = false;
+                this.noSleepTimer = null;
+                this.videoElement = null;
+                this.init();
+            }
+
+            init() {
+                this.createVideoElement();
+                this.setupButton();
+            }
+
+            createVideoElement() {
+                // 创建一个隐藏的视频元素来保持屏幕唤醒
+                this.videoElement = document.createElement('video');
+                this.videoElement.setAttribute('playsinline', '');
+                this.videoElement.setAttribute('webkit-playsinline', '');
+                this.videoElement.setAttribute('muted', '');
+                this.videoElement.setAttribute('volume', '0');
+                this.videoElement.style.display = 'none';
+                
+                // 创建一个透明的1x1像素视频
+                const canvas = document.createElement('canvas');
+                canvas.width = 1;
+                canvas.height = 1;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, 1, 1);
+                
+                const stream = canvas.captureStream();
+                this.videoElement.srcObject = stream;
+                
+                document.body.appendChild(this.videoElement);
+            }
+
+            setupButton() {
+                const button = document.getElementById('no-sleep-btn');
+                button.addEventListener('click', () => {
+                    this.toggleNoSleep();
+                });
+            }
+
+            toggleNoSleep() {
+                if (this.isActive) {
+                    this.disableNoSleep();
+                } else {
+                    this.enableNoSleep();
+                }
+            }
+
+            enableNoSleep() {
+                if (!this.isActive) {
+                    console.log('🔆 启用屏幕常亮');
+                    this.isActive = true;
+                    
+                    // 播放视频来保持屏幕唤醒
+                    this.videoElement.play().catch(e => {
+                        console.log('视频播放失败，使用备用方案:', e);
+                        this.startTimerMethod();
+                    });
+                    
+                    // 更新按钮状态
+                    this.updateButtonState();
+                    
+                    // 显示提示
+                    this.showNotification('屏幕常亮已启用');
+                }
+            }
+
+            disableNoSleep() {
+                if (this.isActive) {
+                    console.log('💤 关闭屏幕常亮');
+                    this.isActive = false;
+                    
+                    // 停止视频
+                    this.videoElement.pause();
+                    
+                    // 清除定时器
+                    if (this.noSleepTimer) {
+                        clearInterval(this.noSleepTimer);
+                        this.noSleepTimer = null;
+                    }
+                    
+                    // 更新按钮状态
+                    this.updateButtonState();
+                    
+                    // 显示提示
+                    this.showNotification('屏幕常亮已关闭');
+                }
+            }
+
+            startTimerMethod() {
+                // 备用方案：定期发送用户活动信号
+                this.noSleepTimer = setInterval(() => {
+                    // 模拟用户活动
+                    window.dispatchEvent(new Event('mousemove'));
+                    window.dispatchEvent(new Event('keydown'));
+                }, 15000); // 每15秒触发一次
+            }
+
+            updateButtonState() {
+                const button = document.getElementById('no-sleep-btn');
+                const icon = button.querySelector('i');
+                const text = button.querySelector('.btn-text');
+                
+                if (this.isActive) {
+                    button.classList.add('active');
+                    icon.className = 'fas fa-sun';
+                    text.textContent = '常亮中';
+                } else {
+                    button.classList.remove('active');
+                    icon.className = 'fas fa-moon';
+                    text.textContent = '保持常亮';
+                }
+            }
+
+            showNotification(message) {
+                const notification = document.getElementById('background-play-notification');
+                if (notification) {
+                    notification.querySelector('span').textContent = message;
+                    notification.classList.add('show');
+                    
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                    }, 2000);
+                }
+            }
+        }
+
         // ========== 锁屏播放支持核心模块 ==========
         class LockScreenPlayback {
             constructor() {
                 this.audio = document.getElementById('chapter-audio');
+                this.noSleepManager = new NoSleepManager();
                 this.init();
             }
 
@@ -316,6 +484,7 @@
             showLockScreenNotification() {
                 const notification = document.getElementById('background-play-notification');
                 if (notification) {
+                    notification.querySelector('span').textContent = '锁屏播放已启用 - 锁屏后仍可继续收听';
                     notification.classList.add('show');
                     
                     setTimeout(() => {
