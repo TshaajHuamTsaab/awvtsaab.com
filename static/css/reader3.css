@@ -1,688 +1,572 @@
-/* ========== CSS变量和基础样式 ========== */
-:root {
-    --primary-color: #0ff;
-    --secondary-color: #00ff88;
-    --accent-color: #ff4c4c;
-    --bg-primary: #111;
-    --bg-secondary: #1a1a2e;
-    --bg-tertiary: #16213e;
-    --text-primary: #0ff;
-    --text-secondary: rgba(0, 255, 255, 0.8);
-    --border-radius: 50px;
-    --transition: all 0.3s ease;
-    --shadow: 0 0 30px rgba(0, 255, 255, 0.4);
-    --shadow-inset: 0 0 60px rgba(0, 255, 255, 0.2) inset;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    margin: 0;
-    padding: 0;
-    transition: var(--transition);
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-/* ========== 黑屏播放相关样式 ========== */
-.background-play-notification {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-    color: #000;
-    padding: 12px 24px;
-    border-radius: 25px;
-    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.5);
-    z-index: 10000;
-    display: none;
-    align-items: center;
-    gap: 12px;
-    font-weight: bold;
-    font-size: 14px;
-    animation: slideInDown 0.5s ease;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-.background-play-notification.show {
-    display: flex;
-}
-
-@keyframes slideInDown {
-    from {
-        transform: translateX(-50%) translateY(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(-50%) translateY(0);
-        opacity: 1;
-    }
-}
-
-/* 加载动画 */
-.loading-spinner {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-}
-
-.loading-spinner.active {
-    display: block;
-}
-
-.spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid rgba(0, 255, 255, 0.3);
-    border-top: 5px solid #0ff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* 锁屏媒体控制样式优化 */
-@media (max-width: 768px) {
-    /* 确保在移动设备上有更好的媒体控制体验 */
-    .dj-player {
-        -webkit-tap-highlight-color: transparent;
-    }
-}
-
-/* 防止文本选择干扰播放控制 */
-.dj-btn {
-    user-select: none;
-    -webkit-user-select: none;
-}
-
-/* 音频元素优化 */
-#chapter-audio {
-    position: absolute;
-    left: -9999px;
-    opacity: 0;
-    pointer-events: none;
-    width: 0;
-    height: 0;
-}
-
-/* ========== 书籍标题 ========== */
-#bookTitle {
-    text-align: center;
-    font-size: 24px;
-    margin: 20px 0;
-    text-shadow: 0 0 8px var(--primary-color);
-    padding: 0 20px;
-    font-weight: 600;
-}
-
-/* ========== 书籍内容区域 ========== */
-#book {
-    max-width: 800px;
-    margin: 0 auto 200px auto;
-    padding: 20px;
-    font-size: 18px;
-    line-height: 1.8;
-    text-align: justify;
-    transition: font-size 0.3s ease;
-}
-
-#book h1, #book h2, #book h3 {
-    text-align: center;
-    margin: 30px 0 20px 0;
-    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
-}
-
-#book p {
-    margin-bottom: 1.2em;
-}
-
-/* ========== 错误提示 ========== */
-#error {
-    text-align: center;
-    color: #ff6b6b;
-    margin: 10px 20px;
-    padding: 10px;
-    border-radius: 5px;
-    background: rgba(255, 107, 107, 0.1);
-    min-height: 20px;
-}
-
-/* ========== DJ风格播放控制器 ========== */
-.dj-player {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-    padding: 20px 25px;
-    border-radius: 20px;
-    box-shadow: var(--shadow), var(--shadow-inset), 0 10px 30px rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(15px);
-    border: 2px solid rgba(0, 255, 255, 0.3);
-    z-index: 1000;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    min-width: 400px;
-}
-
-.dj-player::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(45deg, var(--primary-color), #f0f, var(--primary-color), var(--secondary-color), var(--primary-color));
-    border-radius: 22px;
-    z-index: -1;
-    opacity: 0.6;
-    animation: djBorderRotate 4s linear infinite;
-}
-
-.dj-player::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, 
-        rgba(0, 255, 255, 0.1) 0%, 
-        rgba(255, 0, 255, 0.05) 50%, 
-        rgba(0, 255, 136, 0.1) 100%);
-    border-radius: 18px;
-    z-index: -1;
-}
-
-@keyframes djBorderRotate {
-    0% { filter: hue-rotate(0deg) blur(1px); }
-    100% { filter: hue-rotate(360deg) blur(1px); }
-}
-
-.dj-player.hidden {
-    transform: translateX(-50%) translateY(150%);
-    opacity: 0;
-}
-
-/* DJ控制按钮组 */
-.dj-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.dj-main-controls {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.dj-secondary-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-left: 15px;
-    padding-left: 15px;
-    border-left: 1px solid rgba(0, 255, 255, 0.3);
-}
-
-/* 圆形按钮样式 */
-.dj-btn {
-    position: relative;
-    width: 60px;
-    height: 60px;
-    font-size: 18px;
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.4);
-    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3),
-                0 0 20px rgba(0, 255, 255, 0.1) inset;
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.dj-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, 
-        transparent, 
-        rgba(0, 255, 255, 0.4), 
-        transparent);
-    transition: left 0.5s ease;
-}
-
-.dj-btn:hover::before {
-    left: 100%;
-}
-
-.dj-btn:hover {
-    color: #fff;
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.5),
-                0 0 30px rgba(0, 255, 255, 0.2) inset;
-    border-color: var(--secondary-color);
-}
-
-.dj-btn:active {
-    transform: translateY(0) scale(0.95);
-    box-shadow: 0 2px 10px rgba(0, 255, 255, 0.3),
-                0 0 20px rgba(0, 255, 255, 0.1) inset;
-}
-
-/* 按钮文字 */
-.btn-text {
-    font-size: 10px;
-    margin-top: 2px;
-    font-weight: bold;
-    opacity: 0.8;
-}
-
-/* 主播放按钮特殊样式 */
-.dj-play-btn {
-    width: 70px;
-    height: 70px;
-    font-size: 22px;
-    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
-    color: #000;
-    border: none;
-    box-shadow: 0 6px 25px rgba(0, 255, 255, 0.5),
-                0 0 30px rgba(0, 255, 136, 0.3) inset;
-}
-
-.dj-play-btn:hover {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: #000;
-    box-shadow: 0 8px 30px rgba(0, 255, 255, 0.7),
-                0 0 40px rgba(0, 255, 136, 0.4) inset;
-}
-
-/* 速度显示按钮 */
-.dj-speed-btn {
-    min-width: 60px;
-    font-size: 14px;
-    font-weight: bold;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid var(--secondary-color);
-}
-
-/* 字体按钮 */
-.dj-font-btn {
-    width: 50px;
-    height: 50px;
-    font-size: 14px;
-}
-
-/* 进度显示 */
-.dj-progress {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin: 0 15px;
-}
-
-.dj-progress-bar {
-    width: 100%;
-    height: 6px;
-    background: rgba(0, 255, 255, 0.2);
-    border-radius: 3px;
-    overflow: hidden;
-    position: relative;
-}
-
-.dj-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
-    border-radius: 3px;
-    width: 0%;
-    transition: width 0.1s linear;
-    position: relative;
-}
-
-.dj-progress-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 10px;
-    height: 100%;
-    background: #fff;
-    border-radius: 50%;
-    box-shadow: 0 0 10px #fff;
-}
-
-.dj-time-display {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: var(--text-secondary);
-    font-family: 'Courier New', monospace;
-}
-
-/* 可视化效果 */
-.dj-visualizer {
-    display: flex;
-    align-items: end;
-    gap: 2px;
-    height: 30px;
-    margin-left: 15px;
-    padding-left: 15px;
-    border-left: 1px solid rgba(0, 255, 255, 0.3);
-}
-
-.visualizer-bar {
-    width: 3px;
-    background: linear-gradient(to top, var(--secondary-color), var(--primary-color));
-    border-radius: 2px;
-    transition: height 0.2s ease;
-}
-
-/* 章节信息 */
-.dj-chapter-info {
-    font-size: 12px;
-    color: var(--text-secondary);
-    text-align: center;
-    min-width: 120px;
-}
-
-.dj-chapter-title {
-    font-weight: bold;
-    color: var(--secondary-color);
-    margin-bottom: 2px;
-}
-
-.dj-chapter-progress {
-    font-size: 11px;
-    opacity: 0.7;
-}
-
-/* ========== 装饰动画元素 ========== */
-#outer-ring {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    height: 300px;
-    border: 2px solid rgba(0, 255, 255, 0.3);
-    border-radius: 50%;
-    animation: rotate 20s linear infinite;
-    z-index: -1;
-    pointer-events: none;
-}
-
-#square-rotation {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    transform: translate(-50%, -50%);
-    z-index: -1;
-    pointer-events: none;
-}
-
-.square {
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform-origin: 0 160px;
-    border-radius: 4px;
-    opacity: 0.7;
-}
-
-@keyframes rotate {
-    from { transform: translate(-50%, -50%) rotate(0deg); }
-    to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-/* ========== 响应式设计 ========== */
-@media (max-width: 768px) {
-    #bookTitle {
-        font-size: 20px;
-        margin: 15px 0;
-    }
-        
-    #book {
-        padding: 15px;
-        font-size: 16px;
-        margin-bottom: 180px;
-    }
-    
-    .dj-player {
-        min-width: 350px;
-        padding: 15px 20px;
-        gap: 12px;
-    }
-    
-    .dj-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 16px;
-    }
-    
-    .dj-play-btn {
-        width: 60px;
-        height: 60px;
-        font-size: 20px;
-    }
-    
-    .dj-progress {
-        margin: 0 10px;
-    }
-    
-    .dj-visualizer {
-        display: none; /* 在小屏幕上隐藏可视化效果 */
-    }
-    
-    #outer-ring {
-        width: 200px;
-        height: 200px;
-    }
-    
-    .background-play-notification {
-        padding: 10px 20px;
-        font-size: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    #book {
-        font-size: 15px;
-        line-height: 1.6;
-        margin-bottom: 160px;
-    }
-    
-    .dj-player {
-        min-width: 300px;
-        padding: 12px 15px;
-        gap: 8px;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .dj-progress {
-        order: 3;
-        width: 100%;
-        margin: 10px 0 0 0;
-    }
-    
-    .dj-secondary-controls {
-        margin-left: 0;
-        padding-left: 0;
-        border-left: none;
-    }
-    
-    .dj-chapter-info {
-        min-width: 100px;
-    }
-    
-    .dj-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 16px;
-        flex-shrink: 0;
-    }
-    
-    .btn-text {
-        font-size: 8px;
-    }
-    
-    .background-play-notification {
-        padding: 8px 16px;
-        font-size: 11px;
-    }
-}
-
-/* ========== 主题样式 ========== */
-.theme-light {
-    --bg-primary: #fdf6e3;
-    --bg-secondary: #f0f0f0;
-    --bg-tertiary: #e8e8e8;
-    --text-primary: #222;
-    --text-secondary: rgba(0, 0, 0, 0.7);
-    --primary-color: #0088cc;
-    --secondary-color: #00aaff;
-}
-
-.theme-light #bookTitle {
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-}
-
-.theme-light #book h1, 
-.theme-light #book h2, 
-.theme-light #book h3 {
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-}
-
-.theme-light .background-play-notification {
-    background: linear-gradient(135deg, #00aaff, #0088cc);
-    color: white;
-}
-
-.theme-dark {
-    --bg-primary: #001;
-    --bg-secondary: #001100;
-    --bg-tertiary: #002200;
-    --text-primary: #0f0;
-    --text-secondary: rgba(0, 255, 0, 0.8);
-    --primary-color: #0f0;
-    --secondary-color: #00aa00;
-}
-
-.theme-pink {
-    --bg-primary: #1a1a2e;
-    --bg-secondary: #2d1b3d;
-    --bg-tertiary: #3d2b4d;
-    --text-primary: #e94560;
-    --text-secondary: rgba(233, 69, 96, 0.8);
-    --primary-color: #e94560;
-    --secondary-color: #ff6b8b;
-}
-
-.theme-pink .background-play-notification {
-    background: linear-gradient(135deg, #ff6b8b, #e94560);
-}
-
-/* ========== 加载动画 ========== */
-.loading {
-    opacity: 0.7;
-    pointer-events: none;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-#book {
-    animation: fadeIn 0.5s ease;
-}
-
-/* 动画效果 */
-@keyframes djPulse {
-    0% { box-shadow: 0 6px 25px rgba(0, 255, 255, 0.5); }
-    50% { box-shadow: 0 6px 30px rgba(0, 255, 255, 0.8); }
-    100% { box-shadow: 0 6px 25px rgba(0, 255, 255, 0.5); }
-}
-
-.dj-play-btn.playing {
-    animation: djPulse 2s infinite;
-}
-
-/* 触摸设备优化 */
-@media (hover: none) and (pointer: coarse) {
-    .dj-btn:hover {
-        transform: none;
-        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3),
-                    0 0 20px rgba(0, 255, 255, 0.1) inset;
-    }
-    
-    .dj-btn:active {
-        transform: scale(0.95);
-    }
-}
-
-/* 高对比度模式支持 */
-@media (prefers-contrast: high) {
-    .dj-btn {
-        border-width: 3px;
-    }
-    
-    .dj-progress-bar {
-        height: 8px;
-    }
-    
-    .dj-progress-fill::after {
-        width: 12px;
-    }
-}
-
-/* 减少动画模式支持 */
-@media (prefers-reduced-motion: reduce) {
-    .dj-player::before,
-    .dj-play-btn.playing,
-    #outer-ring,
-    .square,
-    .spinner,
-    .background-play-notification {
-        animation: none;
-    }
-    
-    .dj-btn,
-    .dj-progress-fill {
-        transition: none;
-    }
-    
-    #book {
-        animation: none;
-    }
-}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awv's漆书 - 锁屏播放支持</title>
+
+    <!-- 样式与图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="css/reader3.css">
+
+    <!-- PWA配置 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Awv's漆书">
+
+    <!-- 苹果Safari特定配置 -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+
+    <style>
+        /* 保证切换按钮始终可见 */
+        #dj-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+        }
+
+        /* 不睡眠按钮 */
+        #no-sleep-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 999;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        #no-sleep-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        #no-sleep-btn.active {
+            background: linear-gradient(135deg, #00ff88, #0ff);
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        #no-sleep-btn .btn-text {
+            margin-left: 8px;
+        }
+
+        /* 锁屏播放提示样式 */
+        .background-play-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #00ff88, #0ff);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 25px;
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.5);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            animation: slideInDown 0.5s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .background-play-notification.show { display: flex; }
+
+        @keyframes slideInDown {
+            from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* 隐藏音频元素 */
+        #chapter-audio {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+            width: 0;
+            height: 0;
+        }
+
+        /* 加载动画 */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+        .loading-spinner.active { display: block; }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 5px solid rgba(0, 255, 255, 0.3);
+            border-top: 5px solid #0ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
+    </style>
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div class="loading-spinner" id="loading-spinner"><div class="spinner"></div></div>
+
+    <!-- 主要内容区域 -->
+    <div id="bookTitle">加载中...</div>
+    <div id="book"></div>
+    <div id="error"></div>
+
+    <!-- 装饰元素 -->
+    <div id="outer-ring"></div>
+    <div id="square-rotation"></div>
+
+    <!-- 锁屏播放提示 -->
+    <div id="background-play-notification" class="background-play-notification">
+        <i class="fas fa-headphones"></i>
+        <span>锁屏播放已启用 - 锁屏后仍可继续收听</span>
+    </div>
+
+    <!-- 不睡眠按钮 -->
+    <button id="no-sleep-btn" class="dj-btn" title="保持屏幕常亮">
+        <i class="fas fa-moon"></i><span class="btn-text">保持常亮</span>
+    </button>
+
+    <!-- DJ风格播放控制器 -->
+    <div id="dj-player" class="dj-player">
+        <div class="dj-chapter-info">
+            <div class="dj-chapter-title" id="dj-chapter-title">加载中...</div>
+            <div class="dj-chapter-progress" id="dj-chapter-progress">- / -</div>
+        </div>
+
+        <div class="dj-main-controls">
+            <button class="dj-btn dj-prev-btn" title="上一章">
+                <i class="fas fa-backward-step"></i><span class="btn-text">上一章</span>
+            </button>
+            <button class="dj-btn dj-play-btn" id="dj-play-btn" title="播放/暂停">
+                <i class="fas fa-play"></i><span class="btn-text">播放</span>
+            </button>
+            <button class="dj-btn dj-next-btn" title="下一章">
+                <i class="fas fa-forward-step"></i><span class="btn-text">下一章</span>
+            </button>
+        </div>
+
+        <div class="dj-progress">
+            <div class="dj-time-display">
+                <span id="dj-current-time">00:00</span>
+                <span id="dj-duration">00:00</span>
+            </div>
+            <div class="dj-progress-bar"><div class="dj-progress-fill" id="dj-progress-fill"></div></div>
+        </div>
+
+        <div class="dj-visualizer" id="dj-visualizer"></div>
+
+        <div class="dj-secondary-controls">
+            <button class="dj-btn dj-speed-btn" id="dj-speed-btn" title="播放速度">
+                <i class="fas fa-gauge-high"></i><span class="btn-text">1x</span>
+            </button>
+            <button class="dj-btn dj-theme-btn" title="切换主题">
+                <i class="fas fa-palette"></i><span class="btn-text">主题</span>
+            </button>
+            <button class="dj-btn dj-font-btn dj-font-minus" title="减小字体">
+                <i class="fas fa-font"></i><span class="btn-text">A-</span>
+            </button>
+            <button class="dj-btn dj-font-btn dj-font-plus" title="增大字体">
+                <i class="fas fa-font"></i><span class="btn-text">A+</span>
+            </button>
+            <button class="dj-btn dj-home-btn" title="返回首页">
+                <i class="fas fa-home"></i><span class="btn-text">首页</span>
+            </button>
+        </div>
+    </div>
+
+    <button id="dj-toggle-btn" class="dj-btn dj-toggle-btn">
+        <i class="fas fa-eye"></i><span class="btn-text">显示/隐藏</span>
+    </button>
+
+    <!-- 音频元素 -->
+    <audio id="chapter-audio" preload="auto" playsinline crossorigin="anonymous"></audio>
+
+    <!-- 原有逻辑 -->
+    <script src="js/reader3.js"></script>
+
+    <!-- 纯净的锁屏播放支持核心代码 -->
+    <script>
+        // ========== 屏幕常亮控制模块 ==========
+        class NoSleepManager {
+            constructor() {
+                this.isActive = false;
+                this.noSleepTimer = null;
+                this.videoElement = null;
+                this.init();
+            }
+
+            init() {
+                this.createVideoElement();
+                this.setupButton();
+            }
+
+            createVideoElement() {
+                // 创建一个隐藏的视频元素来保持屏幕唤醒
+                this.videoElement = document.createElement('video');
+                this.videoElement.setAttribute('playsinline', '');
+                this.videoElement.setAttribute('webkit-playsinline', '');
+                this.videoElement.setAttribute('muted', '');
+                this.videoElement.setAttribute('volume', '0');
+                this.videoElement.style.display = 'none';
+                
+                // 创建一个透明的1x1像素视频
+                const canvas = document.createElement('canvas');
+                canvas.width = 1;
+                canvas.height = 1;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, 1, 1);
+                
+                const stream = canvas.captureStream();
+                this.videoElement.srcObject = stream;
+                
+                document.body.appendChild(this.videoElement);
+            }
+
+            setupButton() {
+                const button = document.getElementById('no-sleep-btn');
+                button.addEventListener('click', () => {
+                    this.toggleNoSleep();
+                });
+            }
+
+            toggleNoSleep() {
+                if (this.isActive) {
+                    this.disableNoSleep();
+                } else {
+                    this.enableNoSleep();
+                }
+            }
+
+            enableNoSleep() {
+                if (!this.isActive) {
+                    console.log('🔆 启用屏幕常亮');
+                    this.isActive = true;
+                    
+                    // 播放视频来保持屏幕唤醒
+                    this.videoElement.play().catch(e => {
+                        console.log('视频播放失败，使用备用方案:', e);
+                        this.startTimerMethod();
+                    });
+                    
+                    // 更新按钮状态
+                    this.updateButtonState();
+                    
+                    // 显示提示
+                    this.showNotification('屏幕常亮已启用');
+                }
+            }
+
+            disableNoSleep() {
+                if (this.isActive) {
+                    console.log('💤 关闭屏幕常亮');
+                    this.isActive = false;
+                    
+                    // 停止视频
+                    this.videoElement.pause();
+                    
+                    // 清除定时器
+                    if (this.noSleepTimer) {
+                        clearInterval(this.noSleepTimer);
+                        this.noSleepTimer = null;
+                    }
+                    
+                    // 更新按钮状态
+                    this.updateButtonState();
+                    
+                    // 显示提示
+                    this.showNotification('屏幕常亮已关闭');
+                }
+            }
+
+            startTimerMethod() {
+                // 备用方案：定期发送用户活动信号
+                this.noSleepTimer = setInterval(() => {
+                    // 模拟用户活动
+                    window.dispatchEvent(new Event('mousemove'));
+                    window.dispatchEvent(new Event('keydown'));
+                }, 15000); // 每15秒触发一次
+            }
+
+            updateButtonState() {
+                const button = document.getElementById('no-sleep-btn');
+                const icon = button.querySelector('i');
+                const text = button.querySelector('.btn-text');
+                
+                if (this.isActive) {
+                    button.classList.add('active');
+                    icon.className = 'fas fa-sun';
+                    text.textContent = '常亮中';
+                } else {
+                    button.classList.remove('active');
+                    icon.className = 'fas fa-moon';
+                    text.textContent = '保持常亮';
+                }
+            }
+
+            showNotification(message) {
+                const notification = document.getElementById('background-play-notification');
+                if (notification) {
+                    notification.querySelector('span').textContent = message;
+                    notification.classList.add('show');
+                    
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                    }, 2000);
+                }
+            }
+        }
+
+        // ========== 锁屏播放支持核心模块 ==========
+        class LockScreenPlayback {
+            constructor() {
+                this.audio = document.getElementById('chapter-audio');
+                this.noSleepManager = new NoSleepManager();
+                this.init();
+            }
+
+            init() {
+                console.log('🚀 初始化锁屏播放支持...');
+                
+                // 初始化媒体会话（锁屏控制）
+                this.initMediaSession();
+                
+                // 初始化事件监听
+                this.initEventListeners();
+                
+                // 恢复播放状态
+                this.restorePlaybackState();
+                
+                console.log('✅ 锁屏播放支持初始化完成');
+            }
+
+            // 初始化媒体会话（锁屏控制）
+            initMediaSession() {
+                if ('mediaSession' in navigator) {
+                    this.updateMediaSessionMetadata();
+                    
+                    // 设置锁屏控制按钮
+                    const actions = ['play', 'pause', 'previoustrack', 'nexttrack'];
+                    
+                    actions.forEach(action => {
+                        try {
+                            navigator.mediaSession.setActionHandler(action, (details) => {
+                                this.handleMediaSessionAction(action, details);
+                            });
+                        } catch (error) {
+                            console.log(`⚠️ ${action} 动作不支持:`, error);
+                        }
+                    });
+                    
+                    console.log('✅ 锁屏控制初始化成功');
+                }
+            }
+
+            // 处理锁屏控制动作
+            handleMediaSessionAction(action, details) {
+                console.log('📱 锁屏控制动作:', action);
+                
+                switch (action) {
+                    case 'play':
+                        this.audio.play().catch(console.error);
+                        break;
+                    case 'pause':
+                        this.audio.pause();
+                        break;
+                    case 'previoustrack':
+                        if (window.ReaderApp && window.ReaderApp.changeChapter) {
+                            window.ReaderApp.changeChapter(-1);
+                        }
+                        break;
+                    case 'nexttrack':
+                        if (window.ReaderApp && window.ReaderApp.changeChapter) {
+                            window.ReaderApp.changeChapter(1);
+                        }
+                        break;
+                }
+                
+                this.savePlaybackState();
+            }
+
+            // 更新锁屏显示信息
+            updateMediaSessionMetadata() {
+                if (!('mediaSession' in navigator)) return;
+                
+                const bookTitle = document.getElementById('bookTitle')?.textContent || 'Awv\'s漆书';
+                const chapterTitle = document.getElementById('dj-chapter-title')?.textContent || '当前章节';
+                
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: `${bookTitle} - ${chapterTitle}`,
+                    artist: 'Awv\'s漆书朗读器',
+                    album: '电子书音频',
+                    artwork: [
+                        { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+                        { src: 'icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+                    ]
+                });
+            }
+
+            // 初始化事件监听
+            initEventListeners() {
+                // 页面可见性变化（锁屏/切换应用）
+                document.addEventListener('visibilitychange', () => {
+                    this.handleVisibilityChange();
+                });
+
+                // 音频播放状态
+                this.audio.addEventListener('play', () => {
+                    this.handleAudioPlay();
+                });
+
+                this.audio.addEventListener('pause', () => {
+                    this.handleAudioPause();
+                });
+
+                // 定期保存播放状态
+                setInterval(() => {
+                    this.savePlaybackState();
+                }, 10000);
+
+                // 页面卸载前保存状态
+                window.addEventListener('beforeunload', () => {
+                    this.savePlaybackState();
+                });
+            }
+
+            // 处理页面可见性变化（锁屏）
+            handleVisibilityChange() {
+                if (document.hidden) {
+                    // 页面进入后台（锁屏、切换应用等）
+                    console.log('📱 页面进入后台，锁屏播放已启用');
+                    this.showLockScreenNotification();
+                    
+                    // 确保音频继续播放 - 不进行任何干预，让系统自然处理
+                } else {
+                    // 页面回到前台
+                    console.log('📱 页面回到前台');
+                    this.hideLockScreenNotification();
+                }
+            }
+
+            // 处理音频播放
+            handleAudioPlay() {
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'playing';
+                }
+                this.savePlaybackState();
+            }
+
+            // 处理音频暂停
+            handleAudioPause() {
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'paused';
+                }
+                this.savePlaybackState();
+            }
+
+            // 显示锁屏播放通知
+            showLockScreenNotification() {
+                const notification = document.getElementById('background-play-notification');
+                if (notification) {
+                    notification.querySelector('span').textContent = '锁屏播放已启用 - 锁屏后仍可继续收听';
+                    notification.classList.add('show');
+                    
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                    }, 3000);
+                }
+            }
+
+            // 隐藏锁屏播放通知
+            hideLockScreenNotification() {
+                const notification = document.getElementById('background-play-notification');
+                if (notification) {
+                    notification.classList.remove('show');
+                }
+            }
+
+            // 保存播放状态
+            savePlaybackState() {
+                const playbackState = {
+                    currentTime: this.audio.currentTime,
+                    isPlaying: !this.audio.paused,
+                    playbackRate: this.audio.playbackRate,
+                    volume: this.audio.volume,
+                    timestamp: Date.now(),
+                    book: window.bookFolder || 'dev1',
+                    chapter: window.chapterNum || 'cover'
+                };
+                
+                localStorage.setItem('lockScreenPlayState', JSON.stringify(playbackState));
+            }
+
+            // 恢复播放状态
+            restorePlaybackState() {
+                try {
+                    const savedState = localStorage.getItem('lockScreenPlayState');
+                    if (savedState) {
+                        const state = JSON.parse(savedState);
+                        
+                        // 检查状态是否过期（超过1小时）
+                        const isExpired = (Date.now() - state.timestamp) > 3600000;
+                        
+                        if (!isExpired) {
+                            // 恢复播放位置和设置
+                            this.audio.currentTime = state.currentTime || 0;
+                            this.audio.playbackRate = state.playbackRate || 1;
+                            this.audio.volume = state.volume || 1;
+                            
+                            console.log('🎵 播放状态恢复成功');
+                        }
+                    }
+                } catch (err) {
+                    console.error('恢复播放状态失败:', err);
+                }
+            }
+        }
+
+        // ========== 页面初始化 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // 创建锁屏播放管理器实例
+            window.lockScreenPlayback = new LockScreenPlayback();
+            
+            // 暴露更新媒体元数据的方法
+            window.updateMediaSessionMetadata = function() {
+                if (window.lockScreenPlayback) {
+                    window.lockScreenPlayback.updateMediaSessionMetadata();
+                }
+            };
+        });
+
+        // ========== Service Worker 注册 ==========
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('✅ ServiceWorker 注册成功:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ ServiceWorker 注册失败:', error);
+                    });
+            });
+        }
+
+    </script>
+</body>
+</html>
