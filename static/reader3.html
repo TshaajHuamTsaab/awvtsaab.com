@@ -164,7 +164,7 @@
     <!-- 原有逻辑 -->
     <script src="js/reader3.js"></script>
 
-    <!-- 锁屏播放支持核心代码 -->
+    <!-- 纯净的锁屏播放支持核心代码 -->
     <script>
         // ========== 锁屏播放支持核心模块 ==========
         class LockScreenPlayback {
@@ -287,6 +287,8 @@
                     // 页面进入后台（锁屏、切换应用等）
                     console.log('📱 页面进入后台，锁屏播放已启用');
                     this.showLockScreenNotification();
+                    
+                    // 确保音频继续播放 - 不进行任何干预，让系统自然处理
                 } else {
                     // 页面回到前台
                     console.log('📱 页面回到前台');
