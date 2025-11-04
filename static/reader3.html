@@ -3,12 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>通用阅读器完整版</title>
+    <title>Awv's漆书 - 锁屏播放支持</title>
+
+    <!-- 样式与图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="css/reader3.css">
+
+    <!-- PWA配置 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Awv's漆书">
+
+    <!-- 苹果Safari特定配置 -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+
+    <style>
+        /* 保证切换按钮始终可见 */
+        #dj-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+        }
+
+        /* 锁屏播放提示样式 */
+        .background-play-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #00ff88, #0ff);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 25px;
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.5);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            animation: slideInDown 0.5s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .background-play-notification.show { display: flex; }
+
+        @keyframes slideInDown {
+            from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* 隐藏音频元素 */
+        #chapter-audio {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+            width: 0;
+            height: 0;
+        }
+
+        /* 加载动画 */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+        .loading-spinner.active { display: block; }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 5px solid rgba(0, 255, 255, 0.3);
+            border-top: 5px solid #0ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
+    </style>
 </head>
 <body>
+    <!-- 加载动画 -->
+    <div class="loading-spinner" id="loading-spinner"><div class="spinner"></div></div>
+
     <!-- 主要内容区域 -->
     <div id="bookTitle">加载中...</div>
     <div id="book"></div>
@@ -17,6 +99,12 @@
     <!-- 装饰元素 -->
     <div id="outer-ring"></div>
     <div id="square-rotation"></div>
+
+    <!-- 锁屏播放提示 -->
+    <div id="background-play-notification" class="background-play-notification">
+        <i class="fas fa-headphones"></i>
+        <span>锁屏播放已启用 - 锁屏后仍可继续收听</span>
+    </div>
 
     <!-- DJ风格播放控制器 -->
     <div id="dj-player" class="dj-player">
@@ -66,15 +154,250 @@
         </div>
     </div>
 
-    <!-- 显示/隐藏控制器按钮 -->
     <button id="dj-toggle-btn" class="dj-btn dj-toggle-btn">
         <i class="fas fa-eye"></i><span class="btn-text">显示/隐藏</span>
     </button>
 
     <!-- 音频元素 -->
-    <audio id="chapter-audio"></audio>
+    <audio id="chapter-audio" preload="auto" playsinline crossorigin="anonymous"></audio>
 
-    <!-- 加载 JavaScript -->
+    <!-- 原有逻辑 -->
     <script src="js/reader3.js"></script>
+
+    <!-- 纯净的锁屏播放支持核心代码 -->
+    <script>
+        // ========== 锁屏播放支持核心模块 ==========
+        class LockScreenPlayback {
+            constructor() {
+                this.audio = document.getElementById('chapter-audio');
+                this.init();
+            }
+
+            init() {
+                console.log('🚀 初始化锁屏播放支持...');
+                
+                // 初始化媒体会话（锁屏控制）
+                this.initMediaSession();
+                
+                // 初始化事件监听
+                this.initEventListeners();
+                
+                // 恢复播放状态
+                this.restorePlaybackState();
+                
+                console.log('✅ 锁屏播放支持初始化完成');
+            }
+
+            // 初始化媒体会话（锁屏控制）
+            initMediaSession() {
+                if ('mediaSession' in navigator) {
+                    this.updateMediaSessionMetadata();
+                    
+                    // 设置锁屏控制按钮
+                    const actions = ['play', 'pause', 'previoustrack', 'nexttrack'];
+                    
+                    actions.forEach(action => {
+                        try {
+                            navigator.mediaSession.setActionHandler(action, (details) => {
+                                this.handleMediaSessionAction(action, details);
+                            });
+                        } catch (error) {
+                            console.log(`⚠️ ${action} 动作不支持:`, error);
+                        }
+                    });
+                    
+                    console.log('✅ 锁屏控制初始化成功');
+                }
+            }
+
+            // 处理锁屏控制动作
+            handleMediaSessionAction(action, details) {
+                console.log('📱 锁屏控制动作:', action);
+                
+                switch (action) {
+                    case 'play':
+                        this.audio.play().catch(console.error);
+                        break;
+                    case 'pause':
+                        this.audio.pause();
+                        break;
+                    case 'previoustrack':
+                        if (window.ReaderApp && window.ReaderApp.changeChapter) {
+                            window.ReaderApp.changeChapter(-1);
+                        }
+                        break;
+                    case 'nexttrack':
+                        if (window.ReaderApp && window.ReaderApp.changeChapter) {
+                            window.ReaderApp.changeChapter(1);
+                        }
+                        break;
+                }
+                
+                this.savePlaybackState();
+            }
+
+            // 更新锁屏显示信息
+            updateMediaSessionMetadata() {
+                if (!('mediaSession' in navigator)) return;
+                
+                const bookTitle = document.getElementById('bookTitle')?.textContent || 'Awv\'s漆书';
+                const chapterTitle = document.getElementById('dj-chapter-title')?.textContent || '当前章节';
+                
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: `${bookTitle} - ${chapterTitle}`,
+                    artist: 'Awv\'s漆书朗读器',
+                    album: '电子书音频',
+                    artwork: [
+                        { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+                        { src: 'icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+                    ]
+                });
+            }
+
+            // 初始化事件监听
+            initEventListeners() {
+                // 页面可见性变化（锁屏/切换应用）
+                document.addEventListener('visibilitychange', () => {
+                    this.handleVisibilityChange();
+                });
+
+                // 音频播放状态
+                this.audio.addEventListener('play', () => {
+                    this.handleAudioPlay();
+                });
+
+                this.audio.addEventListener('pause', () => {
+                    this.handleAudioPause();
+                });
+
+                // 定期保存播放状态
+                setInterval(() => {
+                    this.savePlaybackState();
+                }, 10000);
+
+                // 页面卸载前保存状态
+                window.addEventListener('beforeunload', () => {
+                    this.savePlaybackState();
+                });
+            }
+
+            // 处理页面可见性变化（锁屏）
+            handleVisibilityChange() {
+                if (document.hidden) {
+                    // 页面进入后台（锁屏、切换应用等）
+                    console.log('📱 页面进入后台，锁屏播放已启用');
+                    this.showLockScreenNotification();
+                    
+                    // 确保音频继续播放 - 不进行任何干预，让系统自然处理
+                } else {
+                    // 页面回到前台
+                    console.log('📱 页面回到前台');
+                    this.hideLockScreenNotification();
+                }
+            }
+
+            // 处理音频播放
+            handleAudioPlay() {
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'playing';
+                }
+                this.savePlaybackState();
+            }
+
+            // 处理音频暂停
+            handleAudioPause() {
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'paused';
+                }
+                this.savePlaybackState();
+            }
+
+            // 显示锁屏播放通知
+            showLockScreenNotification() {
+                const notification = document.getElementById('background-play-notification');
+                if (notification) {
+                    notification.classList.add('show');
+                    
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                    }, 3000);
+                }
+            }
+
+            // 隐藏锁屏播放通知
+            hideLockScreenNotification() {
+                const notification = document.getElementById('background-play-notification');
+                if (notification) {
+                    notification.classList.remove('show');
+                }
+            }
+
+            // 保存播放状态
+            savePlaybackState() {
+                const playbackState = {
+                    currentTime: this.audio.currentTime,
+                    isPlaying: !this.audio.paused,
+                    playbackRate: this.audio.playbackRate,
+                    volume: this.audio.volume,
+                    timestamp: Date.now(),
+                    book: window.bookFolder || 'dev1',
+                    chapter: window.chapterNum || 'cover'
+                };
+                
+                localStorage.setItem('lockScreenPlayState', JSON.stringify(playbackState));
+            }
+
+            // 恢复播放状态
+            restorePlaybackState() {
+                try {
+                    const savedState = localStorage.getItem('lockScreenPlayState');
+                    if (savedState) {
+                        const state = JSON.parse(savedState);
+                        
+                        // 检查状态是否过期（超过1小时）
+                        const isExpired = (Date.now() - state.timestamp) > 3600000;
+                        
+                        if (!isExpired) {
+                            // 恢复播放位置和设置
+                            this.audio.currentTime = state.currentTime || 0;
+                            this.audio.playbackRate = state.playbackRate || 1;
+                            this.audio.volume = state.volume || 1;
+                            
+                            console.log('🎵 播放状态恢复成功');
+                        }
+                    }
+                } catch (err) {
+                    console.error('恢复播放状态失败:', err);
+                }
+            }
+        }
+
+        // ========== 页面初始化 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // 创建锁屏播放管理器实例
+            window.lockScreenPlayback = new LockScreenPlayback();
+            
+            // 暴露更新媒体元数据的方法
+            window.updateMediaSessionMetadata = function() {
+                if (window.lockScreenPlayback) {
+                    window.lockScreenPlayback.updateMediaSessionMetadata();
+                }
+            };
+        });
+
+        // ========== Service Worker 注册 ==========
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('✅ ServiceWorker 注册成功:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ ServiceWorker 注册失败:', error);
+                    });
+            });
+        }
+
+    </script>
 </body>
 </html>
