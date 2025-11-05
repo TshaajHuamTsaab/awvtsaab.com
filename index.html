@@ -43,14 +43,15 @@
       padding: 20px;
     }
 
-    .language-selector {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
+        .language-selector {
+      position: relative;          /* no longer fixed */
+      margin-top: 20px;            /* space below 欢迎 text */
       display: flex;
-      gap: 10px;
-      z-index: 100;
+      justify-content: center;     /* center horizontally */
+      gap: 12px;
+      z-index: 10;
     }
+
 
     .lang-btn {
       background: rgba(255, 255, 255, 0.1);
@@ -140,7 +141,7 @@
     }
 
     .countdown-2 {
-      background: linear-gradient(90deg, #ff9f43, #feca57);
+      background: linear-gradient(90deg, #434cff, #fe57cc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow: 0 0 25px rgba(255, 159, 67, 0.7);
@@ -305,7 +306,7 @@
     
     <div class="countdown" id="countdown">3</div>
     
-    <div class="redirect-text" id="redirect-text">即将跳转到登录页面...</div>
+    <div class="redirect-text" id="redirect-text">请稍后跳转到登录页面...</div>
 
     <div class="features" id="features">
       <div class="feature-card">
@@ -404,7 +405,7 @@ const JsonUtils = {
     const translations = {
       zh: {
         subtitle: "您的个人数字图书馆",
-        welcome: "欢迎来到漆书",
+        welcome: "欢迎来到Hmoobtsaab's漆书",
         redirect: "即将跳转到登录页面...",
         feature1: "无限阅读",
         feature1desc: "畅读海量书籍，随时随地享受阅读乐趣",
@@ -412,7 +413,7 @@ const JsonUtils = {
         feature2desc: "下载书籍到本地，无网络也能阅读",
         feature3: "会员特权",
         feature3desc: "尊享会员专属内容和无广告体验",
-        footer: "© 2023 Hmoobtsaab's 漆书 - 让阅读成为一种生活方式"
+        footer: "© 2025 Awvtsaab's 漆书 - 让阅读成为一种生活方式"
       },
       en: {
         subtitle: "Your Personal Digital Library",
@@ -424,11 +425,11 @@ const JsonUtils = {
         feature2desc: "Download books for offline reading without internet",
         feature3: "Premium Benefits",
         feature3desc: "Enjoy exclusive content and ad-free experience",
-        footer: "© 2023 Hmoobtsaab's Book - Make reading a lifestyle"
+        footer: "© 2025 Awvtsaab's Book - Make reading a lifestyle"
       },
       my: {
         subtitle: "သင့်ရဲ့ဒစ်ဂျစ်တယ်စာကြည့်တိုက်",
-        welcome: "Hmoobtsaab's Book မှကြိုဆိုပါတယ်",
+        welcome: "Hmoobtsaab's စာပေ မှကြိုဆိုပါတယ်",
         redirect: "လော့ဂ်အင်စာမျက်နှာသို့ခေါ်ဆောင်သွားမည်...",
         feature1: "အကန့်အသတ်မရှိဖတ်ရှုခြင်း",
         feature1desc: "မည်သည့်နေရာ၊ မည်သည့်အချိန်မဆိုစာအုပ်စာပေများစွာဖတ်ရှုပါ",
@@ -436,7 +437,7 @@ const JsonUtils = {
         feature2desc: "အင်တာနက်မလိုဘဲအော့ဖ်လိုင်းဖတ်ရှုရန်စာအုပ်များဒေါင်းလုဒ်လုပ်ပါ",
         feature3: "ပရီမီယံအခွင့်အရေးများ",
         feature3desc: "သီးသန့်အကြောင်းအရာများနှင့်ကြော်ငြာမပါသောအတွေ့အကြုံကိုခံစားပါ",
-        footer: "© 2023 Hmoobtsaab's Book - စာဖတ်ခြင်းကိုဘဝနေထိုင်မှုပုံစံတစ်ခုအဖြစ်ပြုလုပ်ပါ"
+        footer: "© 2025 Awvtsaab's Book - စာဖတ်ခြင်းကိုဘဝနေထိုင်မှုပုံစံတစ်ခုအဖြစ်ပြုလုပ်ပါ"
       }
     };
 
