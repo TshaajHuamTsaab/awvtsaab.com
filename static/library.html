@@ -490,6 +490,88 @@
       border-color: rgba(255, 69, 0, 0.6);
       box-shadow: 0 15px 30px rgba(255, 69, 0, 0.2);
     }
+
+    /* ---- Category Section ---- */
+.category {
+  text-align: center;
+  margin: 40px auto;
+  padding: 10px;
+}
+
+/* Make the whole icon + text clickable like a button */
+.category-header {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--primary);
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 16px;
+  padding: 14px 18px;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+/* Smooth hover effect */
+.category-header:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 0 20px var(--primary), 0 0 35px var(--secondary);
+}
+
+/* Icon styling */
+.category-header img {
+  width: 65px;
+  height: 65px;
+  object-fit: contain;
+  border-radius: 18%;
+  margin-bottom: 8px;
+  background: rgba(0, 255, 0, 0.05);
+  padding: 8px;
+  transition: var(--transition);
+}
+
+/* Text styling under the icon */
+.category-header span {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-light);
+  text-align: center;
+  letter-spacing: 0.5px;
+  transition: var(--transition);
+}
+
+/* Hover glow on text */
+.category-header:hover span {
+  color: var(--secondary);
+  text-shadow: 0 0 6px var(--primary);
+}
+
+/* Responsive: smaller screens */
+@media (max-width: 768px) {
+  .category-header img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .category-header span {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-header img {
+    width: 55px;
+    height: 55px;
+  }
+
+  .category-header span {
+    font-size: 0.85rem;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -540,6 +622,14 @@
     <a href="history.html"><i class="fa-solid fa-clock"></i><span>阅读记录</span></a>
     <a href="profile.html"><i class="fa-solid fa-user"></i><span>我</span></a>
   </div>
+
+      <section class="category">
+        <a href="../static2/library.html" class="category-header">
+          <img src="https://i.postimg.cc/3Rdt3Ky5/icon.jpg" alt="Philosophy Icon">
+          <span>进入富书库</span>
+        </a>
+        <div class="book-grid" id="philosophyBooks"></div>
+      </section>
 
   <script>
     // ================== 📚 已完成书籍数据 ==================
@@ -625,9 +715,9 @@ const developingBooks = [
     description: "政治惊悚小说，讲述一位‘第一先生’卷入全球阴谋的惊心事件。融合克林顿的政治洞察与帕特森的叙事张力，真实又紧张。权力、婚姻与人性交织成一场危机。"
   },
   { title: "数据意识", author: "周远", cover: "../static/assets/books.logo/book (9).gif", link: "reader3.html?book=dev9&chapter=cover" },
-  { title: "代码帝国", author: "刘星", cover: "../static/assets/books.logo/book (10).gif", link: "reader3.html?book=dev10&chapter=cover" },
-  { title: "星海归途", author: "张婷", cover: "../static/assets/books.logo/book (11).gif", link: "reader3.html?book=dev11&chapter=cover" },
-  { title: "心灵算法", author: "王泽", cover: "../static/assets/books.logo/book (12).gif", link: "reader3.html?book=dev12&chapter=cover" },
+  { title: "东南亚新趋势&未来", author: "叔敖", cover: "../static/assets/books.logo/book (10).gif", link: "reader3.html?book=dev10&chapter=cover" },
+  { title: "《权力的48条法则》", author: "Robert Greene（罗伯特·格林）", cover: "../static/assets/books.logo/book (11).gif", link: "reader3.html?book=dev11&chapter=cover" },
+  { title: "အာဏာစက် နည်းဥပဒေသ (၄၈-ရပ်)", author: "မမေရိကန်-Viking Press", cover: "../static/assets/books.logo/book (12).gif", link: "reader3.html?book=dev12&chapter=cover" },
   { title: "暗物质战争", author: "李航", cover: "../static/assets/books.logo/book (13).gif", link: "reader3.html?book=dev13&chapter=cover" },
   { title: "人类备份计划", author: "赵琳", cover: "../static/assets/books.logo/book(14).gif", link: "reader3.html?book=dev14&chapter=cover" },
   { title: "赛博之心", author: "陈阳", cover: "../static/assets/books.logo/book(15).gif", link: "reader3.html?book=dev15&chapter=cover" },
