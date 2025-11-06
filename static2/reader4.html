@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Awv 智慧阅读器</title>
+
+  <style>
+    body {
+      background: radial-gradient(circle at center, #0a0018, #000);
+      color: #fff;
+      font-family: "Poppins", "Noto Sans SC", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    h2 {
+      margin-bottom: 8px;
+      font-size: 1.4rem;
+    }
+
+    h4 {
+      margin-top: 0;
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
+    img#bookCover {
+      width: 180px;
+      height: 180px;
+      border-radius: 16px;
+      box-shadow: 0 0 25px #7b47ff;
+      margin-bottom: 20px;
+      transition: transform 0.5s ease;
+    }
+
+    img#bookCover.playing {
+      transform: rotate(6deg) scale(1.08);
+      box-shadow: 0 0 35px #b875ff;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .play-btn {
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(135deg, #7a3ff2, #b462ff);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+      box-shadow: 0 0 20px #8a2be2;
+    }
+
+    .play-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 40px #b085ff;
+    }
+
+    .progress-container {
+      width: 80%;
+      height: 6px;
+      background: #333;
+      border-radius: 4px;
+      margin-top: 20px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #8a2be2, #b462ff);
+      transition: width 0.2s;
+    }
+
+    .time {
+      display: flex;
+      justify-content: space-between;
+      width: 80%;
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-top: 8px;
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: none;
+      border: 2px solid #6f3fd3;
+      color: #fff;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      cursor: pointer;
+      font-size: 1.4rem;
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background: #6f3fd3;
+    }
+
+    @media (max-width: 500px) {
+      img#bookCover { width: 140px; height: 140px; }
+      .play-btn { width: 70px; height: 70px; font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="back-btn" onclick="history.back()">⟵</button>
+  <img id="bookCover" src="" alt="封面">
+  <h2 id="bookTitle">加载中...</h2>
+  <h4 id="bookAuthor"></h4>
+
+  <div class="controls">
+    <button id="playBtn" class="play-btn">▶</button>
+  </div>
+
+  <div class="progress-container" id="progressContainer">
+    <div class="progress" id="progress"></div>
+  </div>
+  <div class="time">
+    <span id="currentTime">0:00</span>
+    <span id="duration">0:00</span>
+  </div>
+
+  <audio id="audio"></audio>
+
+  <script type="module">
+    import { categories } from "./js/categories.js";
+
+    const params = new URLSearchParams(location.search);
+    const catId = params.get("cat");
+    const bookId = parseInt(params.get("id"), 10);
+
+    const cat = categories.find(c => c.id === catId);
+    const book = cat ? cat.books.find(b => b.id === bookId) : null;
+
+    const audio = document.getElementById("audio");
+    const playBtn = document.getElementById("playBtn");
+    const bookCover = document.getElementById("bookCover");
+    const progress = document.getElementById("progress");
+    const progressContainer = document.getElementById("progressContainer");
+    const currentTimeEl = document.getElementById("currentTime");
+    const durationEl = document.getElementById("duration");
+
+    if (book) {
+      document.getElementById("bookTitle").textContent = book.title;
+      document.getElementById("bookAuthor").textContent = book.author;
+      bookCover.src = book.cover;
+      audio.src = book.audio;
+    } else {
+      document.getElementById("bookTitle").textContent = "找不到书籍";
+    }
+
+    // Play / Pause
+    playBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        playBtn.textContent = "⏸";
+        bookCover.classList.add("playing");
+      } else {
+        audio.pause();
+        playBtn.textContent = "▶";
+        bookCover.classList.remove("playing");
+      }
+    });
+
+    // Progress bar update
+    audio.addEventListener("timeupdate", () => {
+      const { currentTime, duration } = audio;
+      const progressPercent = (currentTime / duration) * 100;
+      progress.style.width = `${progressPercent}%`;
+      currentTimeEl.textContent = formatTime(currentTime);
+      durationEl.textContent = isNaN(duration) ? "0:00" : formatTime(duration);
+    });
+
+    // Click to seek
+    progressContainer.addEventListener("click", (e) => {
+      const width = progressContainer.clientWidth;
+      const clickX = e.offsetX;
+      const duration = audio.duration;
+      audio.currentTime = (clickX / width) * duration;
+    });
+
+    // When audio ends
+    audio.addEventListener("ended", () => {
+      playBtn.textContent = "▶";
+      bookCover.classList.remove("playing");
+    });
+
+    function formatTime(sec) {
+      const minutes = Math.floor(sec / 60);
+      const seconds = Math.floor(sec % 60);
+      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+  </script>
+</body>
+</html>

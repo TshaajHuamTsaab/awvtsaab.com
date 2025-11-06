@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>书籍图书馆 | Awv's Books</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(180deg, #050505, #111);
+      color: white;
+      padding-bottom: 60px;
+    }
+
+    header {
+      text-align: center;
+      padding: 25px 10px;
+      background: #0a0a0a;
+      box-shadow: 0 2px 10px rgba(255,255,255,0.05);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      background: linear-gradient(to right, #9d72ff, #7cfaff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .category {
+      margin: 40px 0;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 1.5rem;
+      color: #fff;
+      margin-bottom: 10px;
+      text-decoration: none;
+    }
+
+    .category-header img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 20px;
+      padding: 0 20px;
+    }
+
+    .book {
+      background: #1a1a1a;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .book:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 0 15px #7d5fff;
+    }
+
+    .book img {
+      width: 100%;
+      height: 210px;
+      object-fit: cover;
+    }
+
+    .book-info {
+      padding: 10px;
+    }
+
+    .book-title {
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    .book-author {
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #777;
+      padding: 25px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📚 Awv's 智慧书库</h1>
+  </header>
+
+  <!-- IQ Category -->
+  <section class="category">
+    <div class="category-header">
+      <img src="https://i.postimg.cc/PxFz5QtN/100x100-B16-7.gif" alt="IQ Icon">
+      <span>智商书籍 (iQ Intelligence)</span>
+    </div>
+    <div class="book-grid" id="iqBooks"></div>
+  </section>
+
+  <!-- EQ Category -->
+  <section class="category">
+    <div class="category-header">
+      <img src="https://i.postimg.cc/fLgjRfwR/100x100-B16-3.gif" alt="EQ Icon">
+      <span>情商书籍 (EQ Emotion)</span>
+    </div>
+    <div class="book-grid" id="eqBooks"></div>
+  </section>
+
+  <!-- Philosophy Category -->
+  <section class="category">
+    <div class="category-header">
+      <img src="https://i.postimg.cc/1tzrSj1T/100x100-B16-1.gif" alt="Philosophy Icon">
+      <span>哲学书籍 (Philosophy)</span>
+    </div>
+    <div class="book-grid" id="philosophyBooks"></div>
+  </section>
+
+  <footer>
+    © 2025 Awv's Books — 无限智慧书架
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="js/books/iqBooks.js"></script>
+  <script src="js/books/eqBooks.js"></script>
+  <script src="js/books/philosophyBooks.js"></script>
+
+  <script>
+    // ✅ 通用渲染函数 (Render all categories automatically)
+    function displayBooks(bookArray, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      bookArray.forEach(book => {
+        const bookLink = document.createElement("a");
+        bookLink.href = book.link;
+        bookLink.className = "book";
+
+        const bookCover = document.createElement("img");
+        bookCover.src = book.cover;
+        bookCover.alt = book.title;
+
+        const bookInfo = document.createElement("div");
+        bookInfo.className = "book-info";
+
+        const bookTitle = document.createElement("div");
+        bookTitle.className = "book-title";
+        bookTitle.textContent = book.title;
+
+        const bookAuthor = document.createElement("div");
+        bookAuthor.className = "book-author";
+        bookAuthor.textContent = book.author;
+
+        bookInfo.appendChild(bookTitle);
+        bookInfo.appendChild(bookAuthor);
+        bookLink.appendChild(bookCover);
+        bookLink.appendChild(bookInfo);
+        container.appendChild(bookLink);
+      });
+    }
+
+    // ✅ Render all
+    displayBooks(iqBooks, "iqBooks");
+    displayBooks(eqBooks, "eqBooks");
+    displayBooks(philosophyBooks, "philosophyBooks");
+  </script>
+</body>
+</html>
