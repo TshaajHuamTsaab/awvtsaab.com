@@ -141,15 +141,25 @@
   <!-- 主要内容区域 -->
   <main class="pb-20">
     <!-- Hero Section -->
-    <header class="hero flex flex-col justify-center items-center text-center">
-      <h1 class="hero-title mb-4">
-        真相比现实更现实
-      </h1>
-      <p class="hero-subtitle mb-6 text-gray-200 text-base">欢迎来到 Awvtsaab's 知识图书馆</p>
+      <header class="hero flex flex-col justify-center items-center text-center">
+    <h1 class="hero-title mb-4">
+      真相比现实更现实
+    </h1>
+    <p class="hero-subtitle mb-6 text-gray-200 text-base">
+      欢迎来到 Awvtsaab's 知识图书馆
+    </p>
+    <div class="flex gap-4">
+      <!-- 主书库按钮 -->
       <a href="static/library.html" class="btn flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full text-base font-medium transition-all duration-300 shadow-lg">
-        <i class="fa-solid fa-book-open"></i> 进入书库
+        <i class="fa-solid fa-book-open"></i> 进入主书库
       </a>
-    </header>
+
+      <!-- 富书库按钮 -->
+      <a href="static2/library.html" class="btn flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white rounded-full text-base font-medium transition-all duration-300 shadow-lg">
+        <i class="fa-solid fa-book"></i> 进入富书库
+      </a>
+    </div>
+  </header>
 
     <!-- 网格按钮区域 -->
     <div class="grid-container">
@@ -211,14 +221,16 @@
       </a>
     </div>
 
-    <!-- 特色内容区域 -->
-    <section class="px-4 mt-8">
-      <h2 class="text-white text-xl font-bold mb-4 text-center">今日推荐</h2>
+      <!-- 🌟 特色内容区域 -->
+  <section class="px-4 mt-8">
+    <h2 class="text-white text-xl font-bold mb-4 text-center">今日推荐</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      
+      <!-- 📘 Book 1 -->
       <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
         <div class="flex items-center gap-3 mb-3">
-          <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-            <i class="fa-solid fa-star text-white"></i>
-          </div>
+          <img src="https://i.postimg.cc/rm6KyDm7/6.gif" alt="21世纪的21堂课" class="w-12 h-12 rounded-full object-cover border border-white/30">
           <div>
             <h3 class="text-white font-bold">《21世纪的21堂课》</h3>
             <p class="text-gray-300 text-sm">尤瓦尔·赫拉利</p>
@@ -229,7 +241,39 @@
           立即阅读
         </a>
       </div>
-    </section>
+
+      <!-- 📗 Book 2 -->
+      <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+        <div class="flex items-center gap-3 mb-3">
+          <img src="https://i.postimg.cc/N0DNhykd/book16-1.gif" alt="三略" class="w-12 h-12 rounded-full object-cover border border-white/30">
+          <div>
+            <h3 class="text-white font-bold">《三略》</h3>
+            <p class="text-gray-300 text-sm">黄石公</p>
+          </div>
+        </div>
+        <p class="text-gray-200 text-sm">中国古代兵家经典之一，讲述智谋、战略与政治的深刻智慧。</p>
+        <a href="static/reader2.html?book=book13&chapter=cover" class="block mt-3 text-center py-2 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-full text-sm font-medium">
+          立即阅读
+        </a>
+      </div>
+
+      <!-- 📙 Book 3 -->
+      <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+        <div class="flex items-center gap-3 mb-3">
+          <img src="https://i.postimg.cc/fLgjRfwR/100x100-B16-3.gif" alt="权力的48条法则" class="w-12 h-12 rounded-full object-cover border border-white/30">
+          <div>
+            <h3 class="text-white font-bold">《权力的48条法则》</h3>
+            <p class="text-gray-300 text-sm">Robert Greene（罗伯特·格林）</p>
+          </div>
+        </div>
+        <p class="text-gray-200 text-sm">一本揭示权力游戏与人性策略的现代经典，充满历史与心理洞察。</p>
+        <a href="static/reader3.html?book=dev11&chapter=cover" class="block mt-3 text-center py-2 bg-gradient-to-r from-pink-600 to-red-600 text-white rounded-full text-sm font-medium">
+          立即阅读
+        </a>
+      </div>
+
+    </div>
+</section>
   </main>
 
   <!-- 底部导航 -->
