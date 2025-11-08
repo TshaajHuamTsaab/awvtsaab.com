@@ -581,8 +581,8 @@
   height: 100%;
   object-fit: cover;
   z-index: -2;
-  opacity: 0.35; /* Adjust transparency (0.2–0.5 looks best) */
-  filter: blur(2px) brightness(0.9);
+  opacity: 0.55; /* 增加透明度让背景更清晰 */
+  filter: blur(1px) brightness(0.95) contrast(1.1); /* 减少模糊，增加亮度和对比度 */
 }
 
 /* Dark overlay to make text readable */
@@ -593,38 +593,79 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.3); /* 减少遮罩让背景更亮 */
   z-index: -1;
   pointer-events: none;
 }
 
-#bg-video {
+/* ====== 音频控制按钮 ====== */
+.audio-controls {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: -2;
-  opacity: 0.35;
-  filter: blur(2px) brightness(0.9);
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
 }
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: -1;
+
+.audio-toggle {
+  background: rgba(0, 255, 153, 0.8);
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(0, 255, 153, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audio-toggle:hover {
+  background: rgba(0, 255, 153, 1);
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(0, 255, 153, 0.8);
+}
+
+/* 移动端音频控制按钮调整 */
+@media (max-width: 768px) {
+  .audio-controls {
+    top: 15px;
+    right: 15px;
+  }
+  
+  .audio-toggle {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+}
+
+/* 隐藏的音频元素 */
+#bg-music {
+  display: none;
 }
   </style>
 </head>
 <body>
-<video autoplay muted loop playsinline id="bg-video">
-  <source src="https://res.cloudinary.com/dpw8l6gk2/video/upload/v1762596449/dragon_qlga4p.mp4" type="video/mp4" />
-</video>
+  <!-- 🎥 背景视频 -->
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="https://res.cloudinary.com/dpw8l6gk2/video/upload/v1762596449/dragon_qlga4p.mp4" type="video/mp4" />
+  </video>
+
+  <!-- 🎵 背景音乐 -->
+  <audio id="bg-music" loop>
+    <source src="https://res.cloudinary.com/dpw8l6gk2/video/upload/v1762597601/angel_pygqtw.mp4" type="audio/mp4">
+    <!-- 备用音乐源 -->
+    <source src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" type="audio/mp3">
+  </audio>
+
+  <!-- 🔊 音频控制 -->
+  <div class="audio-controls">
+    <button id="audioToggle" class="audio-toggle">🔇</button>
+  </div>
 
   <div class="app-logo">
     <img src="https://i.postimg.cc/3x3QzSGq/cropped-favicon-180x180.png" alt="App Logo">
@@ -673,24 +714,82 @@ body::before {
     <a href="profile.html"><i class="fa-solid fa-user"></i><span>我</span></a>
   </div>
 
-      <section class="category">
-        <a href="../static2/library.html" class="category-header">
-          <img src="https://i.postimg.cc/3Rdt3Ky5/icon.jpg" alt="Philosophy Icon">
-          <span>进入富书库</span>
-        </a>
-        <div class="book-grid" id="philosophyBooks"></div>
-      </section>
-  <script>
-  const video = document.getElementById("bg-video");
+  <section class="category">
+    <a href="../static2/library.html" class="category-header">
+      <img src="https://i.postimg.cc/3Rdt3Ky5/icon.jpg" alt="Philosophy Icon">
+      <span>进入富书库</span>
+    </a>
+    <div class="book-grid" id="philosophyBooks"></div>
+  </section>
 
-  // Wait for any click/touch to start video with sound
-  document.body.addEventListener("click", () => {
-    video.muted = false;
-    video.play();
-  }, { once: true });
-</script>
   <script>
-    // ================== 📚 已完成书籍数据 ==================
+    // ================== 🎵 音频控制功能 ==================
+    const bgMusic = document.getElementById('bg-music');
+    const audioToggle = document.getElementById('audioToggle');
+    let audioEnabled = false;
+    let userInteracted = false;
+
+    // 初始化音频
+    function initAudio() {
+      bgMusic.volume = 0.3; // 设置音量
+      bgMusic.muted = true; // 初始静音
+      
+      // 保存音频状态到本地存储
+      const savedAudioState = localStorage.getItem('audioEnabled');
+      if (savedAudioState === 'true') {
+        audioEnabled = true;
+        audioToggle.textContent = "🔊";
+        bgMusic.muted = false;
+      } else {
+        audioEnabled = false;
+        audioToggle.textContent = "🔇";
+        bgMusic.muted = true;
+      }
+    }
+
+    // 音频切换功能
+    audioToggle.addEventListener('click', () => {
+      if (!userInteracted) {
+        // 第一次点击时尝试播放音频
+        userInteracted = true;
+        bgMusic.play().catch(err => {
+          console.log("音频播放被阻止:", err);
+          showToast("请点击页面任意位置启用音频播放");
+        });
+      }
+      
+      audioEnabled = !audioEnabled;
+      bgMusic.muted = !audioEnabled;
+      audioToggle.textContent = audioEnabled ? "🔊" : "🔇";
+      
+      // 保存状态到本地存储
+      localStorage.setItem('audioEnabled', audioEnabled.toString());
+      
+      if (audioEnabled) {
+        showToast("🎵 背景音乐已开启");
+      } else {
+        showToast("🔇 背景音乐已关闭");
+      }
+    });
+
+    // 用户交互后启用音频
+    document.addEventListener('click', () => {
+      if (!userInteracted) {
+        userInteracted = true;
+        bgMusic.play().catch(err => {
+          console.log("音频自动播放被阻止:", err);
+        });
+      }
+    }, { once: false });
+
+    // 初始化视频
+    const video = document.getElementById("bg-video");
+    document.body.addEventListener("click", () => {
+      video.muted = false;
+      video.play();
+    }, { once: true });
+
+    // ================== 📚 书籍数据 ==================
     const completedBooks = [
       { title:"趋吉避凶-叔敖", author:"叶夫根尼·普里戈任", cover:"https://i.postimg.cc/x1jWMsn3/images.jpg", link:"wagner.html?book=book1", type:"completed" },
       { title:"21世纪21堂课", author:"Yuval Noah Harari", cover:"https://i.postimg.cc/rm6KyDm7/6.gif", link:"21century.html", type:"completed" },
@@ -709,49 +808,49 @@ body::before {
       { title:"黄石公三略", author:"黄石公", cover:"https://i.postimg.cc/N0DNhykd/book16-1.gif", link:"reader2.html?book=book13&chapter=cover", type:"completed" }
     ];
 
-const developingBooks = [
-  // First 4 books marked as upgrade required
-  { 
-    title: "创建思维", 
-    author: "璐瑶建议", 
-    cover: "../static/assets/books.logo/book (1).gif", 
-    link: "upgrade.html",  // Changed link to upgrade page
-    type: "upgrade",       // Changed type to upgrade
-    requireUpgrade: true   // Added upgrade flag
-  },
-  { 
-    title: "量子之门", 
-    author: "李雷", 
-    cover: "../static/assets/books.logo/book (2).gif", 
-    link: "upgrade.html",
-    type: "upgrade",
-    requireUpgrade: true
-  },
-  { 
-    title: "为人处世四", 
-    author: "叔敖", 
-    cover: "../static/assets/books.logo/book (3).gif", 
-    link: "upgrade.html",
-    type: "upgrade", 
-    requireUpgrade: true
-  },
-  { 
-    title: "三略完整版", 
-    author: "黄石公", 
-    cover: "../static/assets/books.logo/book (4).gif", 
-    link: "upgrade.html",
-    type: "upgrade",
-    requireUpgrade: true
-  },
-  // Rest of the developing books remain unchanged
-  {
-    title: "喜悦之皇",
-    author: "欧逊·渥恩（Ocean Vuong）",
-    cover: "../static/assets/books.logo/book (9).gif",
-    link: "reader3.html?book=dev5&chapter=cover",
-    description: "这是一部关于爱、痛苦与记忆的诗性小说。故事在家庭、移民与时代的裂隙中展开，一个儿子用文字寻找母亲与自我的意义。它温柔又残酷，像一封写给世界的告别信，也是一封给生命的情书。"
-  },
-  {
+    const developingBooks = [
+      // 前4本书需要升级会员
+      { 
+        title: "创建思维", 
+        author: "璐瑶建议", 
+        cover: "../static/assets/books.logo/book (1).gif", 
+        link: "upgrade.html",
+        type: "upgrade",
+        requireUpgrade: true
+      },
+      { 
+        title: "量子之门", 
+        author: "李雷", 
+        cover: "../static/assets/books.logo/book (2).gif", 
+        link: "upgrade.html",
+        type: "upgrade",
+        requireUpgrade: true
+      },
+      { 
+        title: "为人处世四", 
+        author: "叔敖", 
+        cover: "../static/assets/books.logo/book (3).gif", 
+        link: "upgrade.html",
+        type: "upgrade", 
+        requireUpgrade: true
+      },
+      { 
+        title: "三略完整版", 
+        author: "黄石公", 
+        cover: "../static/assets/books.logo/book (4).gif", 
+        link: "upgrade.html",
+        type: "upgrade",
+        requireUpgrade: true
+      },
+      // 其余开发中书籍
+      {
+        title: "喜悦之皇",
+        author: "欧逊·渥恩（Ocean Vuong）",
+        cover: "../static/assets/books.logo/book (9).gif",
+        link: "reader3.html?book=dev5&chapter=cover",
+        description: "这是一部关于爱、痛苦与记忆的诗性小说。"
+      },
+      {
     title: "心灯：短篇故事集",
     author: "巴努·穆什塔克（Banu Mushtaq）",
     cover: "../static/assets/books.logo/book (10).gif",
@@ -816,7 +915,8 @@ const developingBooks = [
   { title: "深空回忆录", author: "赵翔", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev48&chapter=cover" },
   { title: "量子梦境", author: "韩月", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev49&chapter=cover" },
   { title: "星际回声", author: "魏楠", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev50&chapter=cover" }
-];
+    ];
+
     // ================== 📢 Toast 提示 ==================
     function showToast(msg){
       const toast = document.createElement("div");
@@ -830,7 +930,7 @@ const developingBooks = [
       }, 2000);
     }
 
-    // ================== ⭐ 收藏/取消收藏 ==================
+    // ================== ⭐ 收藏功能 ==================
     function toggleFavorite(book, btn){
       let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
       const index = favorites.findIndex(f => f.link === book.link);
@@ -891,7 +991,6 @@ const developingBooks = [
       favBtn.className="favorite-btn";
       favBtn.title="收藏/取消收藏";
       
-      // 检查是否已收藏
       let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
       const isFavorite = favorites.some(fav => fav.link === book.link);
       favBtn.innerHTML = isFavorite ? '<i class="fa-solid fa-bookmark"></i>' : '<i class="fa-regular fa-bookmark"></i>';
@@ -920,11 +1019,10 @@ const developingBooks = [
         badge.textContent = "升级会员";
         card.appendChild(badge);
         
-        // Change the card click behavior for upgrade-required books
         card.onclick = (e) => {
           e.preventDefault();
           showToast("此书籍需要升级会员才能阅读");
-          window.location.href = "upgrade.html"; // Redirect to upgrade page
+          window.location.href = "upgrade.html";
         };
       }
 
@@ -939,15 +1037,12 @@ const developingBooks = [
       const searchBtn = document.getElementById('search-btn');
       const filterBtns = document.querySelectorAll('.filter-btn');
       
-      // 搜索功能
       function performSearch() {
         const searchTerm = searchInput.value.toLowerCase().trim();
         const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
         
-        // Get all books
         let filteredBooks = [];
         
-        // Apply initial filter
         switch(activeFilter) {
           case 'completed':
             filteredBooks = completedBooks.map(book => ({...book, type: 'completed'}));
@@ -958,14 +1053,13 @@ const developingBooks = [
           case 'favorites':
             filteredBooks = JSON.parse(localStorage.getItem("favorites") || "[]");
             break;
-          default: // 'all'
+          default:
             filteredBooks = [
               ...completedBooks.map(book => ({...book, type: 'completed'})),
               ...developingBooks.map(book => ({...book, type: 'developing'}))
             ];
         }
         
-        // Apply search filter
         if (searchTerm) {
           filteredBooks = filteredBooks.filter(book => 
             book.title.toLowerCase().includes(searchTerm) || 
@@ -973,12 +1067,10 @@ const developingBooks = [
           );
         }
         
-        // Reset sections display
         document.getElementById('completed-section').style.display = 'none';
         document.getElementById('developing-section').style.display = 'none';
         document.getElementById('favorites-section').style.display = 'none';
         
-        // Display completed books
         if (activeFilter === 'all' || activeFilter === 'completed' || searchTerm) {
           const completedContainer = document.getElementById('completed-books');
           const completedResults = filteredBooks.filter(book => book.type === 'completed');
@@ -997,7 +1089,6 @@ const developingBooks = [
           }
         }
         
-        // Display developing books
         if (activeFilter === 'all' || activeFilter === 'developing' || searchTerm) {
           const developingContainer = document.getElementById('developing-books');
           const developingResults = filteredBooks.filter(book => book.type === 'developing');
@@ -1016,7 +1107,6 @@ const developingBooks = [
           }
         }
         
-        // Display favorites
         if (activeFilter === 'favorites') {
           const favoritesContainer = document.getElementById('favorites-books');
           favoritesContainer.innerHTML = '';
@@ -1035,17 +1125,13 @@ const developingBooks = [
         }
       }
       
-      // 搜索按钮点击事件
       searchBtn.addEventListener('click', performSearch);
-      
-      // 搜索输入框回车事件
       searchInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') {
           performSearch();
         }
       });
       
-      // 筛选按钮点击事件
       filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
           filterBtns.forEach(b => b.classList.remove('active'));
@@ -1057,20 +1143,20 @@ const developingBooks = [
 
     // ================== 🎯 初始化函数 ==================
     function initLibrary() {
-      // 渲染已完成书籍
+      // 初始化音频
+      initAudio();
+      
+      // 渲染书籍
       const completedContainer = document.getElementById('completed-books');
       completedBooks.forEach(book => renderBook(completedContainer, book));
       
-      // 渲染开发中书籍
       const developingContainer = document.getElementById('developing-books');
       developingBooks.forEach(book => renderBook(developingContainer, book));
       
-      // 初始化搜索和筛选功能
+      // 初始化搜索和筛选
       initSearchAndFilter();
       
       console.log('📚 图书馆初始化完成');
-      console.log('已完成书籍:', completedBooks.length);
-      console.log('开发中书籍:', developingBooks.length);
     }
 
     // ================== 🚀 启动应用 ==================
