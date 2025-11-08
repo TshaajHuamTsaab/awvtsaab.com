@@ -1,215 +1,436 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Awv 智慧阅读器</title>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📖 Awv Reader</title>
+  <link rel="stylesheet" href="css/reader4.css" />
   <style>
+    :root {
+      --bg-primary: #000;
+      --bg-secondary: #111;
+      --text-primary: #eee;
+      --accent-color: #9dfaff;
+      --accent-secondary: #90e0ff;
+      --button-bg: #00bcd4;
+      --button-hover: #00acc1;
+      --shadow-color: rgba(0,255,255,0.2);
+    }
+
     body {
-      background: radial-gradient(circle at center, #0a0018, #000);
-      color: #fff;
+      margin: 0;
       font-family: "Poppins", "Noto Sans SC", sans-serif;
+      background: linear-gradient(180deg, var(--bg-primary), var(--bg-secondary));
+      color: var(--text-primary);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
+      min-height: 100vh;
+      transition: all 0.5s ease;
+    }
+
+    header {
+      background: var(--bg-secondary);
+      padding: 15px;
       text-align: center;
-      overflow: hidden;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--accent-color);
+      box-shadow: 0 2px 10px var(--shadow-color);
+      position: relative;
     }
 
-    h2 {
-      margin-bottom: 8px;
-      font-size: 1.4rem;
+    .theme-selector {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
-    h4 {
-      margin-top: 0;
-      color: #aaa;
-      font-size: 0.9rem;
-    }
-
-    img#bookCover {
-      width: 180px;
-      height: 180px;
-      border-radius: 16px;
-      box-shadow: 0 0 25px #7b47ff;
-      margin-bottom: 20px;
-      transition: transform 0.5s ease;
-    }
-
-    img#bookCover.playing {
-      transform: rotate(6deg) scale(1.08);
-      box-shadow: 0 0 35px #b875ff;
-    }
-
-    .controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 15px;
-    }
-
-    .play-btn {
-      width: 90px;
-      height: 90px;
-      background: linear-gradient(135deg, #7a3ff2, #b462ff);
-      border: none;
-      border-radius: 50%;
-      color: #fff;
-      font-size: 2rem;
+    .theme-btn {
+      background: transparent;
+      border: 2px solid var(--accent-color);
+      color: var(--accent-color);
+      padding: 5px 10px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: transform 0.25s, box-shadow 0.25s;
-      box-shadow: 0 0 20px #8a2be2;
-    }
-
-    .play-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 40px #b085ff;
-    }
-
-    .progress-container {
-      width: 80%;
-      height: 6px;
-      background: #333;
-      border-radius: 4px;
-      margin-top: 20px;
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .progress {
-      height: 100%;
-      width: 0;
-      background: linear-gradient(90deg, #8a2be2, #b462ff);
-      transition: width 0.2s;
-    }
-
-    .time {
-      display: flex;
-      justify-content: space-between;
-      width: 80%;
-      font-size: 0.9rem;
-      color: #aaa;
-      margin-top: 8px;
-    }
-
-    .back-btn {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: none;
-      border: 2px solid #6f3fd3;
-      color: #fff;
-      border-radius: 50%;
-      width: 42px;
-      height: 42px;
-      cursor: pointer;
-      font-size: 1.4rem;
+      font-size: 0.8rem;
       transition: all 0.3s ease;
     }
 
-    .back-btn:hover {
-      background: #6f3fd3;
+    .theme-btn:hover {
+      background: var(--accent-color);
+      color: var(--bg-secondary);
     }
 
-    @media (max-width: 500px) {
-      img#bookCover { width: 140px; height: 140px; }
-      .play-btn { width: 70px; height: 70px; font-size: 1.6rem; }
+    .theme-panel {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--bg-secondary);
+      border: 1px solid var(--accent-color);
+      border-radius: 10px;
+      padding: 15px;
+      display: none;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+      z-index: 1000;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .theme-panel.active {
+      display: grid;
+    }
+
+    .theme-option {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .theme-option:hover {
+      transform: scale(1.1);
+      border-color: white;
+    }
+
+    .theme-option.active {
+      border-color: white;
+      box-shadow: 0 0 10px white;
+    }
+
+    #chapterTitle {
+      text-align: center;
+      margin: 20px 0;
+      color: var(--accent-secondary);
+      font-size: 1.4rem;
+    }
+
+    .reader-text {
+      flex: 1;
+      padding: 20px;
+      line-height: 1.8;
+      font-size: 1.05rem;
+      overflow-y: auto;
+      transition: color 0.5s ease;
+    }
+
+    .audio-section, .chapter-nav {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    button {
+      background: var(--button-bg);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s;
+      margin: 0 5px;
+    }
+
+    button:hover {
+      background: var(--button-hover);
+    }
+
+    audio {
+      width: 70%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    footer {
+      text-align: center;
+      background: #0a0a0a;
+      padding: 15px;
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    /* 主题颜色定义 */
+    .theme-default {
+      --bg-primary: #000;
+      --bg-secondary: #111;
+      --text-primary: #eee;
+      --accent-color: #9dfaff;
+      --accent-secondary: #90e0ff;
+      --button-bg: #00bcd4;
+      --button-hover: #00acc1;
+      --shadow-color: rgba(0,255,255,0.2);
+    }
+
+    .theme-emerald {
+      --bg-primary: #001f0f;
+      --bg-secondary: #003320;
+      --text-primary: #e8fff3;
+      --accent-color: #4dffb8;
+      --accent-secondary: #80ffcc;
+      --button-bg: #00c853;
+      --button-hover: #00a844;
+      --shadow-color: rgba(77,255,184,0.3);
+    }
+
+    .theme-sunset {
+      --bg-primary: #1a0f00;
+      --bg-secondary: #332100;
+      --text-primary: #fff4e6;
+      --accent-color: #ffb74d;
+      --accent-secondary: #ffcc80;
+      --button-bg: #ff9800;
+      --button-hover: #e68900;
+      --shadow-color: rgba(255,183,77,0.3);
+    }
+
+    .theme-rose {
+      --bg-primary: #1f000f;
+      --bg-secondary: #33001a;
+      --text-primary: #ffe6f2;
+      --accent-color: #ff4d94;
+      --accent-secondary: #ff80b3;
+      --button-bg: #e91e63;
+      --button-hover: #d81b60;
+      --shadow-color: rgba(255,77,148,0.3);
+    }
+
+    .theme-purple {
+      --bg-primary: #0f001f;
+      --bg-secondary: #1a0033;
+      --text-primary: #f2e6ff;
+      --accent-color: #b74dff;
+      --accent-secondary: #cc80ff;
+      --button-bg: #9c27b0;
+      --button-hover: #8e24aa;
+      --shadow-color: rgba(183,77,255,0.3);
+    }
+
+    .theme-gold {
+      --bg-primary: #1f1a00;
+      --bg-secondary: #332e00;
+      --text-primary: #fffce6;
+      --accent-color: #ffeb3b;
+      --accent-secondary: #fff176;
+      --button-bg: #ffc107;
+      --button-hover: #ffb300;
+      --shadow-color: rgba(255,235,59,0.3);
+    }
+
+    .theme-ocean {
+      --bg-primary: #00101f;
+      --bg-secondary: #001f33;
+      --text-primary: #e6f7ff;
+      --accent-color: #4dccff;
+      --accent-secondary: #80deff;
+      --button-bg: #2196f3;
+      --button-hover: #1e88e5;
+      --shadow-color: rgba(77,204,255,0.3);
     }
   </style>
 </head>
-<body>
+<body class="theme-default">
+  <header>
+    <h1>📖 Awv's 奇书阅读机</h1>
+    <div class="theme-selector">
+      <button class="theme-btn">🎨 主题</button>
+      <div class="theme-panel">
+        <div class="theme-option theme-default active" data-theme="default" style="background: linear-gradient(45deg, #000, #111);"></div>
+        <div class="theme-option theme-emerald" data-theme="emerald" style="background: linear-gradient(45deg, #001f0f, #003320);"></div>
+        <div class="theme-option theme-sunset" data-theme="sunset" style="background: linear-gradient(45deg, #1a0f00, #332100);"></div>
+        <div class="theme-option theme-rose" data-theme="rose" style="background: linear-gradient(45deg, #1f000f, #33001a);"></div>
+        <div class="theme-option theme-purple" data-theme="purple" style="background: linear-gradient(45deg, #0f001f, #1a0033);"></div>
+        <div class="theme-option theme-gold" data-theme="gold" style="background: linear-gradient(45deg, #1f1a00, #332e00);"></div>
+        <div class="theme-option theme-ocean" data-theme="ocean" style="background: linear-gradient(45deg, #00101f, #001f33);"></div>
+      </div>
+    </div>
+  </header>
 
-  <button class="back-btn" onclick="history.back()">⟵</button>
-  <img id="bookCover" src="" alt="封面">
-  <h2 id="bookTitle">加载中...</h2>
-  <h4 id="bookAuthor"></h4>
+  <h2 id="chapterTitle"></h2>
 
-  <div class="controls">
-    <button id="playBtn" class="play-btn">▶</button>
+  <div class="reader-text"></div>
+
+  <div class="audio-section">
+    <button id="playBtn" class="play-btn">▶️ 播放</button><br />
+    <audio id="bookAudio" controls></audio>
   </div>
 
-  <div class="progress-container" id="progressContainer">
-    <div class="progress" id="progress"></div>
-  </div>
-  <div class="time">
-    <span id="currentTime">0:00</span>
-    <span id="duration">0:00</span>
+  <div class="chapter-nav">
+    <button id="prevBtn">上一章</button>
+    <button id="nextBtn">下一章</button>
   </div>
 
-  <audio id="audio"></audio>
+  <footer>© 2025 Awv's Reading System</footer>
 
-  <script type="module">
-    import { categories } from "./js/categories.js";
+<script>
+  // --- 解析 URL 参数 ---
+  const params = new URLSearchParams(window.location.search);
+  const category = params.get("category");
+  const book = params.get("book");
+  let chapter = params.get("chapter") || "cover";
 
-    const params = new URLSearchParams(location.search);
-    const catId = params.get("cat");
-    const bookId = parseInt(params.get("id"), 10);
+  const maxChapter = 3; // ✅ your book has 3 chapters
+  const titleEl = document.getElementById("chapterTitle");
+  const contentEl = document.querySelector(".reader-text");
+  const audioEl = document.getElementById("bookAudio");
+  const playBtn = document.getElementById("playBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
 
-    const cat = categories.find(c => c.id === catId);
-    const book = cat ? cat.books.find(b => b.id === bookId) : null;
+  // --- 主题切换功能 ---
+  const themeBtn = document.querySelector('.theme-btn');
+  const themePanel = document.querySelector('.theme-panel');
+  const themeOptions = document.querySelectorAll('.theme-option');
 
-    const audio = document.getElementById("audio");
-    const playBtn = document.getElementById("playBtn");
-    const bookCover = document.getElementById("bookCover");
-    const progress = document.getElementById("progress");
-    const progressContainer = document.getElementById("progressContainer");
-    const currentTimeEl = document.getElementById("currentTime");
-    const durationEl = document.getElementById("duration");
+  themeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    themePanel.classList.toggle('active');
+  });
 
-    if (book) {
-      document.getElementById("bookTitle").textContent = book.title;
-      document.getElementById("bookAuthor").textContent = book.author;
-      bookCover.src = book.cover;
-      audio.src = book.audio;
+  themeOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      const theme = this.getAttribute('data-theme');
+      
+      // 移除所有主题类
+      document.body.className = '';
+      // 添加新主题类
+      document.body.classList.add(`theme-${theme}`);
+      
+      // 更新激活状态
+      themeOptions.forEach(opt => opt.classList.remove('active'));
+      this.classList.add('active');
+      
+      // 关闭面板
+      themePanel.classList.remove('active');
+      
+      // 保存主题到本地存储
+      localStorage.setItem('reader-theme', theme);
+    });
+  });
+
+  // 点击页面其他地方关闭主题面板
+  document.addEventListener('click', () => {
+    themePanel.classList.remove('active');
+  });
+
+  // 加载保存的主题
+  const savedTheme = localStorage.getItem('reader-theme') || 'default';
+  document.body.classList.add(`theme-${savedTheme}`);
+  themeOptions.forEach(opt => {
+    if (opt.getAttribute('data-theme') === savedTheme) {
+      opt.classList.add('active');
+    }
+  });
+
+  // --- 加载章节内容 ---
+  async function loadChapter(autoPlay = false) {
+    const htmlPath = `assets/${category}/${book}/${chapter}.html`;
+    const audioPath = `assets/${category}/${book}/audio/${chapter}.mp3`;
+
+    try {
+      const res = await fetch(htmlPath);
+      if (!res.ok) throw new Error("内容加载失败");
+      const text = await res.text();
+      contentEl.innerHTML = text;
+    } catch {
+      contentEl.innerHTML = `<p style="color:#f88;">❌ 未找到章节内容。</p>`;
+    }
+
+    // --- 设置章节标题 ---
+    if (chapter === "cover") {
+      titleEl.textContent = "封面";
     } else {
-      document.getElementById("bookTitle").textContent = "找不到书籍";
+      const num = parseInt(chapter.replace("chapter", ""));
+      titleEl.textContent = `第${num}章`;
     }
 
-    // Play / Pause
-    playBtn.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play();
-        playBtn.textContent = "⏸";
-        bookCover.classList.add("playing");
-      } else {
-        audio.pause();
-        playBtn.textContent = "▶";
-        bookCover.classList.remove("playing");
-      }
-    });
+    // --- 控制按钮状态 ---
+    const currentNum = chapter === "cover" ? 0 : parseInt(chapter.replace("chapter", ""));
+    prevBtn.disabled = currentNum <= 0;
+    nextBtn.disabled = currentNum >= maxChapter;
 
-    // Progress bar update
-    audio.addEventListener("timeupdate", () => {
-      const { currentTime, duration } = audio;
-      const progressPercent = (currentTime / duration) * 100;
-      progress.style.width = `${progressPercent}%`;
-      currentTimeEl.textContent = formatTime(currentTime);
-      durationEl.textContent = isNaN(duration) ? "0:00" : formatTime(duration);
-    });
+    prevBtn.style.opacity = prevBtn.disabled ? 0.5 : 1;
+    nextBtn.style.opacity = nextBtn.disabled ? 0.5 : 1;
+    prevBtn.style.cursor = prevBtn.disabled ? "not-allowed" : "pointer";
+    nextBtn.style.cursor = nextBtn.disabled ? "not-allowed" : "pointer";
 
-    // Click to seek
-    progressContainer.addEventListener("click", (e) => {
-      const width = progressContainer.clientWidth;
-      const clickX = e.offsetX;
-      const duration = audio.duration;
-      audio.currentTime = (clickX / width) * duration;
-    });
+    // --- 设置音频 ---
+    audioEl.src = audioPath;
+    audioEl.load();
 
-    // When audio ends
-    audio.addEventListener("ended", () => {
-      playBtn.textContent = "▶";
-      bookCover.classList.remove("playing");
-    });
+    // 检查音频文件是否存在
+    fetch(audioPath, { method: "HEAD" })
+      .then(res => {
+        if (res.ok) {
+          playBtn.style.display = "inline-block";
+          audioEl.style.display = "inline";
+          playBtn.textContent = "▶️ 播放";
+          if (autoPlay) {
+            audioEl.play().catch(()=>{});
+            playBtn.textContent = "⏸️ 暂停";
+          }
+        } else {
+          playBtn.style.display = "none";
+          audioEl.style.display = "none";
+        }
+      })
+      .catch(() => {
+        playBtn.style.display = "none";
+        audioEl.style.display = "none";
+      });
+  }
 
-    function formatTime(sec) {
-      const minutes = Math.floor(sec / 60);
-      const seconds = Math.floor(sec % 60);
-      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  loadChapter();
+
+  // --- 播放 / 暂停 ---
+  playBtn.addEventListener("click", async () => {
+    if (audioEl.paused) {
+      await audioEl.play().catch(()=>{});
+      playBtn.textContent = "⏸️ 暂停";
+    } else {
+      audioEl.pause();
+      playBtn.textContent = "▶️ 播放";
     }
-  </script>
+  });
+
+  // --- 音频播放结束：自动跳下一章 ---
+  audioEl.addEventListener("ended", () => {
+    let num = chapter === "cover" ? 0 : parseInt(chapter.replace("chapter", ""));
+    if (num < maxChapter) {
+      changeChapter(1, true); // autoplay next
+    } else {
+      playBtn.textContent = "▶️ 播放"; // stop at end
+    }
+  });
+
+  // --- 切换章节（限制范围 + 自动播放选项）---
+  function changeChapter(step, autoPlayNext = false) {
+    let num = chapter === "cover" ? 0 : parseInt(chapter.replace("chapter", ""));
+    num += step;
+
+    // 限制范围
+    if (num <= 0) {
+      chapter = "cover";
+    } else if (num > maxChapter) {
+      num = maxChapter;
+      chapter = `chapter${maxChapter}`;
+    } else {
+      chapter = `chapter${num}`;
+    }
+
+    window.history.replaceState({}, "", `?category=${category}&book=${book}&chapter=${chapter}`);
+    loadChapter(autoPlayNext);
+  }
+
+  prevBtn.addEventListener("click", () => {
+    if (!prevBtn.disabled) changeChapter(-1);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (!nextBtn.disabled) changeChapter(1);
+  });
+</script>
 </body>
 </html>
