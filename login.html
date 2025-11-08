@@ -11,116 +11,128 @@
 
   <style>
     /* ---------- 视觉样式（简洁版，保留动感背景） ---------- */
-*{box-sizing:border-box}
-body{
-  margin:0;
-  min-height:100vh;
-  font-family: "Share Tech Mono", monospace, Arial;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#000;
-  overflow:hidden;
-}
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: "Share Tech Mono", monospace, Arial;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#000;
+      overflow:hidden;
+    }
 
-/* 背景 GIF / 视频 占位 */
-body::before{
-  content:"";
-  position:fixed; inset:0;
-  background:url('static/assets/bg.gif') center/cover no-repeat;
-  filter:brightness(.45) blur(3px);
-  z-index:-2;
-}
-body::after{
-  content:"";
-  position:fixed; inset:0;
-  background: linear-gradient(135deg, rgba(0,255,200,0.03), rgba(0,100,255,0.03));
-  z-index:-1;
-}
+    /* 背景视频 */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+      opacity: 0.9;
+      filter: brightness(.45) blur(3px);
+    }
 
-/* 登录卡片 */
-.card{
-  width:420px;        /* 之前380px -> 调大一点 */
-  max-width:95vw;
-  padding:32px;       /* 稍微加大内边距 */
-  border-radius:16px;
-  background:rgba(10,10,12,0.4);
-  backdrop-filter: blur(10px);
-  box-shadow:0 10px 50px rgba(0,0,0,0.6);
-  border: 2px solid rgba(0,200,255,0.3); /* 更新边框颜色，更明显 */
-}
+    /* 背景遮罩 */
+    body::after{
+      content:"";
+      position:fixed; inset:0;
+      background: linear-gradient(135deg, rgba(0,255,200,0.03), rgba(0,100,255,0.03));
+      z-index:-1;
+    }
 
-/* logo */
-.logo{
-  display:flex;
-  justify-content:center;
-  margin-bottom:16px;
-}
-.logo img{ width:96px; filter: drop-shadow(0 4px 16px rgba(0,180,255,0.15)); }
+    /* 登录卡片 */
+    .card{
+      width:420px;
+      max-width:95vw;
+      padding:32px;
+      border-radius:16px;
+      background:rgba(10,10,12,0.4);
+      backdrop-filter: blur(10px);
+      box-shadow:0 10px 50px rgba(0,0,0,0.6);
+      border: 2px solid rgba(0,200,255,0.3);
+    }
 
-h1{ text-align:center; margin:8px 0 20px; font-size:22px; letter-spacing:1px; }
+    /* logo */
+    .logo{
+      display:flex;
+      justify-content:center;
+      margin-bottom:16px;
+    }
+    .logo img{ width:96px; filter: drop-shadow(0 4px 16px rgba(0,180,255,0.15)); }
 
-.field{margin-bottom:12px;}
-input, select {
-  width:100%; padding:13px 14px; border-radius:10px; border:none;
-  background: rgba(255,255,255,0.08); /* 不同于 card 背景 */
-  color:#fff; outline:none;
-  font-size:15px;
-}
-input::placeholder{ color: rgba(255,255,255,0.6); font-size:14px; }
+    h1{ text-align:center; margin:8px 0 20px; font-size:22px; letter-spacing:1px; }
 
-/* select 单独设置 */
-select { 
-  background: rgba(0,150,255,0.15); /* 区分 card 背景 */
-  color: #fff;
-}
+    .field{margin-bottom:12px;}
+    input, select {
+      width:100%; padding:13px 14px; border-radius:10px; border:none;
+      background: rgba(255,255,255,0.08);
+      color:#fff; outline:none;
+      font-size:15px;
+    }
+    input::placeholder{ color: rgba(255,255,255,0.6); font-size:14px; }
 
-/* 按钮 */
-.row{display:flex; gap:10px;}
-.btn{
-  display:inline-flex; align-items:center; gap:8px;
-  justify-content:center;
-  width:100%; padding:13px; border-radius:12px; border:none;
-  cursor:pointer; font-weight:600; letter-spacing:0.6px;
-  background: linear-gradient(90deg,#00e0ff,#0078ff);
-  transition:transform .18s, box-shadow .18s;
-  color:#031018;
-}
-.btn:hover{ transform: translateY(-2px); box-shadow:0 10px 32px rgba(0,200,255,0.15); }
+    /* select 单独设置 */
+    select { 
+      background: rgba(0,150,255,0.15);
+      color: #fff;
+    }
 
-.link-btn{
-  width:100%; margin-top:10px; padding:12px; border-radius:12px;
-  background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.08);
-  cursor:pointer;
-}
+    /* 按钮 */
+    .row{display:flex; gap:10px;}
+    .btn{
+      display:inline-flex; align-items:center; gap:8px;
+      justify-content:center;
+      width:100%; padding:13px; border-radius:12px; border:none;
+      cursor:pointer; font-weight:600; letter-spacing:0.6px;
+      background: linear-gradient(90deg,#00e0ff,#0078ff);
+      transition:transform .18s, box-shadow .18s;
+      color:#031018;
+    }
+    .btn:hover{ transform: translateY(-2px); box-shadow:0 10px 32px rgba(0,200,255,0.15); }
 
-/* 提示/状态信息 */
-.status {
-  margin-top:14px; padding:12px; border-radius:10px;
-  background: rgba(0,0,0,0.5);  /* 背景区别于 card */
-  font-size:14px; min-height:38px;
-}
-.status.success{ border-left:4px solid #3be37a; }
-.status.error{ border-left:4px solid #ff6b6b; }
+    .link-btn{
+      width:100%; margin-top:10px; padding:12px; border-radius:12px;
+      background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.08);
+      cursor:pointer;
+    }
 
-.hidden{ display:none; }
+    /* 提示/状态信息 */
+    .status {
+      margin-top:14px; padding:12px; border-radius:10px;
+      background: rgba(0,0,0,0.5);
+      font-size:14px; min-height:38px;
+    }
+    .status.success{ border-left:4px solid #3be37a; }
+    .status.error{ border-left:4px solid #ff6b6b; }
 
-/* small / muted */
-.small{ font-size:14px; color:rgba(255,255,255,0.8); text-align:center; margin-top:12px; }
-.muted{ color:rgba(255,255,255,0.65); font-size:13px; }
+    .hidden{ display:none; }
 
-/* responsive */
-@media (max-width:420px){
-  .card{ padding:24px; width:90vw; }
-  h1{ font-size:20px; }
-  input, select{ padding:11px; font-size:14px; }
-  .btn{ padding:11px; font-size:14px; }
-}
+    /* small / muted */
+    .small{ font-size:14px; color:rgba(255,255,255,0.8); text-align:center; margin-top:12px; }
+    .muted{ color:rgba(255,255,255,0.65); font-size:13px; }
+
+    /* responsive */
+    @media (max-width:420px){
+      .card{ padding:24px; width:90vw; }
+      h1{ font-size:20px; }
+      input, select{ padding:11px; font-size:14px; }
+      .btn{ padding:11px; font-size:14px; }
+    }
 
   </style>
 </head>
 <body>
+  <!-- 背景视频 -->
+  <video id="bg-video" autoplay loop playsinline muted>
+    <source src="https://res.cloudinary.com/dpw8l6gk2/video/upload/v1762604942/%E5%A4%A9%E4%BD%BF_gqfffi.mp4" type="video/mp4">
+    您的浏览器不支持视频播放。
+  </video>
+
   <div class="card" role="region" aria-label="登录卡片">
     <div class="logo"><img src="static/assets/logo.gif" alt="logo"></div>
 
@@ -207,6 +219,36 @@ select {
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.database();
+
+  // ---------- 背景视频和音频控制 ----------
+  const bgVideo = document.getElementById('bg-video');
+
+  // 初始化视频播放
+  function initVideo() {
+    bgVideo.muted = false; // 直接启用声音
+    bgVideo.volume = 0.3; // 设置适当音量
+    
+    // 尝试播放视频和音频
+    bgVideo.play().catch(err => {
+      console.log("视频自动播放被阻止:", err);
+      // 如果自动播放被阻止，等待用户交互
+      document.body.addEventListener('click', () => {
+        bgVideo.play().catch(e => console.log("用户交互后播放失败:", e));
+      }, { once: true });
+    });
+  }
+
+  // 页面加载完成后初始化视频
+  window.addEventListener('load', initVideo);
+
+  // 处理页面可见性变化
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      bgVideo.pause();
+    } else {
+      bgVideo.play().catch(err => console.log("恢复播放失败:", err));
+    }
+  });
 
   // ---------- UI helpers ----------
   const statusBox = document.getElementById('statusBox');
