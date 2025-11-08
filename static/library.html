@@ -572,9 +572,59 @@
   }
 }
 
+/* ====== 背景视频 ====== */
+#bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  opacity: 0.35; /* Adjust transparency (0.2–0.5 looks best) */
+  filter: blur(2px) brightness(0.9);
+}
+
+/* Dark overlay to make text readable */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: -1;
+  pointer-events: none;
+}
+
+#bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  opacity: 0.35;
+  filter: blur(2px) brightness(0.9);
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: -1;
+}
   </style>
 </head>
 <body>
+<video autoplay muted loop playsinline id="bg-video">
+  <source src="https://res.cloudinary.com/dpw8l6gk2/video/upload/v1762596449/dragon_qlga4p.mp4" type="video/mp4" />
+</video>
 
   <div class="app-logo">
     <img src="https://i.postimg.cc/3x3QzSGq/cropped-favicon-180x180.png" alt="App Logo">
@@ -630,7 +680,15 @@
         </a>
         <div class="book-grid" id="philosophyBooks"></div>
       </section>
+  <script>
+  const video = document.getElementById("bg-video");
 
+  // Wait for any click/touch to start video with sound
+  document.body.addEventListener("click", () => {
+    video.muted = false;
+    video.play();
+  }, { once: true });
+</script>
   <script>
     // ================== 📚 已完成书籍数据 ==================
     const completedBooks = [
@@ -746,18 +804,18 @@ const developingBooks = [
   { title: "星图秘录", author: "李博", cover: "../static/assets/books.logo/book16 (21).gif", link: "reader3.html?book=dev36&chapter=cover" },
   { title: "智能陷阱", author: "周伟", cover: "../static/assets/books.logo/book16 (22).gif", link: "reader3.html?book=dev37&chapter=cover" },
   { title: "未来探针", author: "赵洁", cover: "../static/assets/books.logo/book16 (23).gif", link: "reader3.html?book=dev38&chapter=cover" },
-  { title: "银河之心", author: "王凯", cover: "../static/assets/books.logo/book16 (24).gif", link: "reader3.html?book=dev39&chapter=cover" },
-  { title: "异星旅人", author: "刘婷", cover: "../static/assets/books.logo/book16 (25).gif", link: "reader3.html?book=dev40&chapter=cover" },
-  { title: "机器黎明", author: "何斌", cover: "../static/assets/books.logo/book16 (26).gif", link: "reader3.html?book=dev41&chapter=cover" },
-  { title: "未来终端", author: "陈冰", cover: "../static/assets/books.logo/book16 (27).gif", link: "reader3.html?book=dev42&chapter=cover" },
-  { title: "时间机器", author: "张亮", cover: "../static/assets/books.logo/book16 (28).gif", link: "reader3.html?book=dev43&chapter=cover" },
-  { title: "虚拟帝国", author: "孙浩", cover: "../static/assets/books.logo/book16 (29).gif", link: "reader3.html?book=dev44&chapter=cover" },
-  { title: "人类重启", author: "林婕", cover: "../static/assets/books.logo/book16 (30).gif", link: "reader3.html?book=dev45&chapter=cover" },
-  { title: "AI战争", author: "周超", cover: "../static/assets/books.logo/book16 (31).gif", link: "reader3.html?book=dev46&chapter=cover" },
-  { title: "数字灵魂", author: "李梦", cover: "../static/assets/books.logo/book16 (32).gif", link: "reader3.html?book=dev47&chapter=cover" },
-  { title: "深空回忆录", author: "赵翔", cover: "../static/assets/books.logo/book16 (33).gif", link: "reader3.html?book=dev48&chapter=cover" },
-  { title: "量子梦境", author: "韩月", cover: "../static/assets/books.logo/book16 (34).gif", link: "reader3.html?book=dev49&chapter=cover" },
-  { title: "星际回声", author: "魏楠", cover: "../static/assets/books.logo/book16 (35).gif", link: "reader3.html?book=dev50&chapter=cover" }
+  { title: "银河之心", author: "王凯", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev39&chapter=cover" },
+  { title: "异星旅人", author: "刘婷", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev40&chapter=cover" },
+  { title: "机器黎明", author: "何斌", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev41&chapter=cover" },
+  { title: "未来终端", author: "陈冰", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev42&chapter=cover" },
+  { title: "时间机器", author: "张亮", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev43&chapter=cover" },
+  { title: "虚拟帝国", author: "孙浩", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev44&chapter=cover" },
+  { title: "人类重启", author: "林婕", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev45&chapter=cover" },
+  { title: "AI战争", author: "周超", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev46&chapter=cover" },
+  { title: "数字灵魂", author: "李梦", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev47&chapter=cover" },
+  { title: "深空回忆录", author: "赵翔", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev48&chapter=cover" },
+  { title: "量子梦境", author: "韩月", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev49&chapter=cover" },
+  { title: "星际回声", author: "魏楠", cover: "https://i.postimg.cc/DyBmvSt6/100x100-B16-8.gif", link: "reader3.html?book=dev50&chapter=cover" }
 ];
     // ================== 📢 Toast 提示 ==================
     function showToast(msg){
