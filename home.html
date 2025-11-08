@@ -1,425 +1,337 @@
-<!-- save as login_realtime.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Awvtsaab's 漆书 — Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Awvtsaab's 漆书</title>
 
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Swift Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swift-icons@1.0.0/css/swift-icons.min.css">
 
   <style>
-    /* ---------- 视觉样式（简洁版，保留动感背景） ---------- */
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      min-height:100vh;
-      font-family: "Share Tech Mono", monospace, Arial;
-      color:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#000;
-      overflow:hidden;
+    /* 自定义样式 */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 16px;
     }
-
-    /* 背景视频 */
-    #bg-video {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -2;
-      opacity: 0.9;
-      filter: brightness(.45) blur(3px);
-    }
-
-    /* 背景遮罩 */
-    body::after{
-      content:"";
-      position:fixed; inset:0;
-      background: linear-gradient(135deg, rgba(0,255,200,0.03), rgba(0,100,255,0.03));
-      z-index:-1;
-    }
-
-    /* 登录卡片 */
-    .card{
-      width:420px;
-      max-width:95vw;
-      padding:32px;
-      border-radius:16px;
-      background:rgba(10,10,12,0.4);
+    
+    .grid-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 12px;
+      background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
-      box-shadow:0 10px 50px rgba(0,0,0,0.6);
-      border: 2px solid rgba(0,200,255,0.3);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      text-align: center;
+      min-height: 100px;
     }
-
-    /* logo */
-    .logo{
-      display:flex;
-      justify-content:center;
-      margin-bottom:16px;
+    
+    .grid-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     }
-    .logo img{ width:96px; filter: drop-shadow(0 4px 16px rgba(0,180,255,0.15)); }
-
-    h1{ text-align:center; margin:8px 0 20px; font-size:22px; letter-spacing:1px; }
-
-    .field{margin-bottom:12px;}
-    input, select {
-      width:100%; padding:13px 14px; border-radius:10px; border:none;
-      background: rgba(255,255,255,0.08);
-      color:#fff; outline:none;
-      font-size:15px;
+    
+    .grid-btn i {
+      font-size: 24px;
+      margin-bottom: 8px;
     }
-    input::placeholder{ color: rgba(255,255,255,0.6); font-size:14px; }
-
-    /* select 单独设置 */
-    select { 
-      background: rgba(0,150,255,0.15);
-      color: #fff;
+    
+    .swift-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
     }
-
-    /* 按钮 */
-    .row{display:flex; gap:10px;}
-    .btn{
-      display:inline-flex; align-items:center; gap:8px;
-      justify-content:center;
-      width:100%; padding:13px; border-radius:12px; border:none;
-      cursor:pointer; font-weight:600; letter-spacing:0.6px;
-      background: linear-gradient(90deg,#00e0ff,#0078ff);
-      transition:transform .18s, box-shadow .18s;
-      color:#031018;
+    
+    .navbar {
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(15px);
+      padding: 12px 16px;
     }
-    .btn:hover{ transform: translateY(-2px); box-shadow:0 10px 32px rgba(0,200,255,0.15); }
-
-    .link-btn{
-      width:100%; margin-top:10px; padding:12px; border-radius:12px;
-      background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.08);
-      cursor:pointer;
+    
+    .hero {
+      padding: 40px 16px;
     }
-
-    /* 提示/状态信息 */
-    .status {
-      margin-top:14px; padding:12px; border-radius:10px;
-      background: rgba(0,0,0,0.5);
-      font-size:14px; min-height:38px;
+    
+    .hero-title {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #fbbf24, #ec4899, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    .status.success{ border-left:4px solid #3be37a; }
-    .status.error{ border-left:4px solid #ff6b6b; }
-
-    .hidden{ display:none; }
-
-    /* small / muted */
-    .small{ font-size:14px; color:rgba(255,255,255,0.8); text-align:center; margin-top:12px; }
-    .muted{ color:rgba(255,255,255,0.65); font-size:13px; }
-
-    /* responsive */
-    @media (max-width:420px){
-      .card{ padding:24px; width:90vw; }
-      h1{ font-size:20px; }
-      input, select{ padding:11px; font-size:14px; }
-      .btn{ padding:11px; font-size:14px; }
+    
+    /* 响应式调整 */
+    @media (min-width: 768px) {
+      .grid-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      
+      .grid-btn {
+        padding: 24px 16px;
+        min-height: 120px;
+      }
+      
+      .grid-btn i, .swift-icon {
+        font-size: 28px;
+      }
     }
-
+    
+    @media (min-width: 1024px) {
+      .grid-container {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 1000px;
+      }
+    }
+    
+    /* 动画效果 */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .delay-1 { animation-delay: 0.1s; opacity: 0; }
+    .delay-2 { animation-delay: 0.2s; opacity: 0; }
+    .delay-3 { animation-delay: 0.3s; opacity: 0; }
+    .delay-4 { animation-delay: 0.4s; opacity: 0; }
+    .delay-5 { animation-delay: 0.5s; opacity: 0; }
+    .delay-6 { animation-delay: 0.6s; opacity: 0; }
+    .delay-7 { animation-delay: 0.7s; opacity: 0; }
   </style>
 </head>
-<body>
-  <!-- 背景视频 -->
-  <video id="bg-video" autoplay loop playsinline muted>
-    <source src="https://res.cloudinary.com/dpw8l6gk2/video/upload/v1762604942/%E5%A4%A9%E4%BD%BF_gqfffi.mp4" type="video/mp4">
-    您的浏览器不支持视频播放。
-  </video>
+<body class="bg-gradient-to-r from-blue-900 via-purple-800 to-pink-700 min-h-screen font-sans">
 
-  <div class="card" role="region" aria-label="登录卡片">
-    <div class="logo"><img src="static/assets/logo.gif" alt="logo"></div>
+  <!-- 导航栏 -->
+  <nav class="navbar flex justify-between items-center sticky top-0 z-50">
+    <a href="home.html">
+      <img src="https://i.postimg.cc/DZycz30x/100x100.gif" alt="Hmoobtsaab's漆书" class="h-12 w-12 rounded-full border-2 border-white/30">
+    </a>
+    <div class="text-white font-bold text-lg">漆书</div>
+    <a href="profile.html" class="text-white text-xl">
+      <i class="fa-solid fa-user"></i>
+    </a>
+  </nav>
 
-    <div id="authViews">
-      <!-- ===== LOGIN VIEW ===== -->
-      <div id="loginView">
-        <h1 id="loginTitle">Login</h1>
+  <!-- 主要内容区域 -->
+  <main class="pb-20">
+    <!-- Hero Section -->
+      <header class="hero flex flex-col justify-center items-center text-center">
+    <h1 class="hero-title mb-4">
+      真相比现实更现实
+    </h1>
+    <p class="hero-subtitle mb-6 text-gray-200 text-base">
+      欢迎来到 Awvtsaab's 知识图书馆
+    </p>
+    <div class="flex gap-4">
+      <!-- 主书库按钮 -->
+      <a href="static/library.html" class="btn flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full text-base font-medium transition-all duration-300 shadow-lg">
+        <i class="fa-solid fa-book-open"></i> 进入主书库
+      </a>
 
-        <div class="field"><input id="loginEmail" type="email" placeholder="Email"></div>
-        <div class="field"><input id="loginPassword" type="password" placeholder="Password"></div>
+      <!-- 富书库按钮 -->
+      <a href="static2/library.html" class="btn flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white rounded-full text-base font-medium transition-all duration-300 shadow-lg">
+        <i class="fa-solid fa-book"></i> 进入富书库
+      </a>
+    </div>
+  </header>
 
-        <button class="btn" id="btnLogin" onclick="login()" aria-live="polite">
-          <i class="fa-solid fa-right-to-bracket"></i><span id="btnLoginText">Login</span>
-        </button>
-
-        <button class="link-btn" onclick="showSignup()">
-          <i class="fa-solid fa-user-plus"></i> Create account
-        </button>
-
-        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;justify-content:center;">
-          <i class="fa-solid fa-globe muted"></i>
-          <select id="langSelect" onchange="changeLanguage(this.value)">
-            <option value="en">English</option>
-            <option value="zh">中文</option>
-            <option value="mm">မြန်မာ</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- ===== SIGNUP VIEW ===== -->
-      <div id="signupView" class="hidden">
-        <h1 id="signupTitle">Create Account</h1>
-
-        <div class="field"><input id="signupName" type="text" placeholder="Name"></div>
-        <div class="field"><input id="signupEmail" type="email" placeholder="Email"></div>
-        <div class="field"><input id="signupPassword" type="password" placeholder="Password (min 6)"></div>
-        <div class="field"><input id="signupAge" type="number" min="1" placeholder="Age"></div>
-        <div class="field">
-          <select id="signupGender">
-            <option value="">Select Gender</option>
-            <option value="male">Male</option><option value="female">Female</option><option value="other">Other</option>
-          </select>
-        </div>
-        <div class="field"><input id="signupPhone" type="tel" placeholder="Phone (optional)"></div>
-
-        <button class="btn" id="btnSignup" onclick="signup()"><i class="fa-solid fa-check"></i> <span>Confirm</span></button>
-        <button class="link-btn" onclick="showLogin()"><i class="fa-solid fa-arrow-left"></i> Back to login</button>
-      </div>
+    <!-- 网格按钮区域 -->
+    <div class="grid-container">
+      <a href="home.html" class="grid-btn fade-in-up delay-1">
+        <i class="fa-solid fa-house"></i>
+        <span>首页</span>
+      </a>
+      
+      <a href="static/library.html" class="grid-btn fade-in-up delay-2">
+        <i class="fa-solid fa-book-open"></i>
+        <span>开发中</span>
+        <small class="text-xs mt-1 text-yellow-300">即将上线</small>
+      </a>
+      
+      <a href="static/books.html" class="grid-btn fade-in-up delay-3">
+        <i class="fa-solid fa-book"></i>
+        <span>完整书版</span>
+      </a>
+      
+      <a href="static/family.html" class="grid-btn fade-in-up delay-4">
+        <i class="fa-solid fa-users"></i>
+        <span>家族之书</span>
+      </a>
+      
+      <a href="profile.html" class="grid-btn fade-in-up delay-5">
+        <i class="fa-solid fa-user"></i>
+        <span>我的资料</span>
+      </a>
+      
+      <a href="static/about.html" class="grid-btn fade-in-up delay-6">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>关于</span>
+      </a>
+      
+      <a href="settings.html" class="grid-btn fade-in-up delay-7">
+        <i class="fa-solid fa-gear"></i>
+        <span>设置</span>
+      </a>
+      
+      <!-- 额外功能按钮 -->
+      <a href="static/search.html" class="grid-btn fade-in-up delay-1">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span>搜索</span>
+      </a>
+      
+      <a href="static/favorites.html" class="grid-btn fade-in-up delay-2">
+        <i class="fa-solid fa-heart"></i>
+        <span>收藏</span>
+      </a>
+      
+      <a href="static/history.html" class="grid-btn fade-in-up delay-3">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <span>历史</span>
+      </a>
+      
+      <a href="database/download.html" class="grid-btn fade-in-up delay-4">
+        <i class="fa-solid fa-download"></i>
+        <span>下载</span>
+      </a>
     </div>
 
-    <!-- ===== Logged-in Panel ===== -->
-    <div id="userView" class="hidden">
-      <h1 id="welcomeTitle">Welcome</h1>
-      <div class="muted" id="userInfo">Loading user...</div>
+      <!-- 🌟 特色内容区域 -->
+  <section class="px-4 mt-8">
+    <h2 class="text-white text-xl font-bold mb-4 text-center">今日推荐</h2>
 
-      <div style="margin-top:12px;" class="row">
-        <button class="btn" onclick="signout()"><i class="fa-solid fa-right-from-bracket"></i> Sign out</button>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      
+      <!-- 📘 Book 1 -->
+      <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+        <div class="flex items-center gap-3 mb-3">
+          <img src="https://i.postimg.cc/rm6KyDm7/6.gif" alt="21世纪的21堂课" class="w-12 h-12 rounded-full object-cover border border-white/30">
+          <div>
+            <h3 class="text-white font-bold">《21世纪的21堂课》</h3>
+            <p class="text-gray-300 text-sm">尤瓦尔·赫拉利</p>
+          </div>
+        </div>
+        <p class="text-gray-200 text-sm">探索现代社会面临的重大挑战，从技术颠覆到政治动荡，从真相危机到生存威胁。</p>
+        <a href="static/21century.html" class="block mt-3 text-center py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full text-sm font-medium">
+          立即阅读
+        </a>
       </div>
-      <div style="margin-top:8px;" class="small">Presence: <strong id="presenceText">—</strong></div>
+
+      <!-- 📗 Book 2 -->
+      <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+        <div class="flex items-center gap-3 mb-3">
+          <img src="https://i.postimg.cc/N0DNhykd/book16-1.gif" alt="三略" class="w-12 h-12 rounded-full object-cover border border-white/30">
+          <div>
+            <h3 class="text-white font-bold">《三略》</h3>
+            <p class="text-gray-300 text-sm">黄石公</p>
+          </div>
+        </div>
+        <p class="text-gray-200 text-sm">中国古代兵家经典之一，讲述智谋、战略与政治的深刻智慧。</p>
+        <a href="static/reader2.html?book=book13&chapter=cover" class="block mt-3 text-center py-2 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-full text-sm font-medium">
+          立即阅读
+        </a>
+      </div>
+
+      <!-- 📙 Book 3 -->
+      <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+        <div class="flex items-center gap-3 mb-3">
+          <img src="https://i.postimg.cc/fLgjRfwR/100x100-B16-3.gif" alt="权力的48条法则" class="w-12 h-12 rounded-full object-cover border border-white/30">
+          <div>
+            <h3 class="text-white font-bold">《权力的48条法则》</h3>
+            <p class="text-gray-300 text-sm">Robert Greene（罗伯特·格林）</p>
+          </div>
+        </div>
+        <p class="text-gray-200 text-sm">一本揭示权力游戏与人性策略的现代经典，充满历史与心理洞察。</p>
+        <a href="static/reader3.html?book=dev11&chapter=cover" class="block mt-3 text-center py-2 bg-gradient-to-r from-pink-600 to-red-600 text-white rounded-full text-sm font-medium">
+          立即阅读
+        </a>
+      </div>
+
     </div>
+</section>
+  </main>
 
-    <div id="statusBox" class="status muted">Ready</div>
-  </div>
-
-  <!-- Firebase compat libs (easy to integrate with existing code) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <!-- 底部导航 -->
+  <footer class="fixed bottom-0 left-0 right-0 bg-black/70 backdrop-blur-lg border-t border-white/10 py-3 px-6">
+    <div class="flex justify-between items-center">
+      <a href="home.html" class="flex flex-col items-center text-white text-xs">
+        <i class="fa-solid fa-house text-lg mb-1"></i>
+        <span>首页</span>
+      </a>
+      <a href="static/library.html" class="flex flex-col items-center text-white text-xs">
+        <i class="fa-solid fa-book-open text-lg mb-1"></i>
+        <span>书库</span>
+      </a>
+      <a href="static/search.html" class="flex flex-col items-center text-white text-xs">
+        <i class="fa-solid fa-search text-lg mb-1"></i>
+        <span>搜索</span>
+      </a>
+      <a href="profile.html" class="flex flex-col items-center text-white text-xs">
+        <i class="fa-solid fa-user text-lg mb-1"></i>
+        <span>我的</span>
+      </a>
+    </div>
+  </footer>
 
   <script>
-  /*********************** REPLACE THIS WITH YOUR FIREBASE CONFIG ***********************/
-      const firebaseConfig = {
-      apiKey: "AIzaSyBCIVYd8e5vBeGRz-H12Nj9hd5dyqnZCDI",
-      authDomain: "guardiangate-7xkgi.firebaseapp.com",
-      databaseURL: "https://guardiangate-7xkgi-default-rtdb.firebaseio.com",
-      projectId: "guardiangate-7xkgi",
-      storageBucket: "guardiangate-7xkgi.firebasestorage.appspot.com",
-      messagingSenderId: "133766737758",
-      appId: "1:133766737758:web:38de135254fef4664769cf"
-    };
-  /***************************************************************************************/
-
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.database();
-
-  // ---------- 背景视频和音频控制 ----------
-  const bgVideo = document.getElementById('bg-video');
-
-  // 初始化视频播放
-  function initVideo() {
-    bgVideo.muted = false; // 直接启用声音
-    bgVideo.volume = 0.3; // 设置适当音量
-    
-    // 尝试播放视频和音频
-    bgVideo.play().catch(err => {
-      console.log("视频自动播放被阻止:", err);
-      // 如果自动播放被阻止，等待用户交互
-      document.body.addEventListener('click', () => {
-        bgVideo.play().catch(e => console.log("用户交互后播放失败:", e));
-      }, { once: true });
-    });
-  }
-
-  // 页面加载完成后初始化视频
-  window.addEventListener('load', initVideo);
-
-  // 处理页面可见性变化
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      bgVideo.pause();
-    } else {
-      bgVideo.play().catch(err => console.log("恢复播放失败:", err));
-    }
-  });
-
-  // ---------- UI helpers ----------
-  const statusBox = document.getElementById('statusBox');
-  function setStatus(msg, type) {
-    statusBox.className = 'status';
-    if (type === 'success') { statusBox.classList.add('success'); }
-    else if (type === 'error') { statusBox.classList.add('error'); }
-    else { /* neutral */ }
-    statusBox.textContent = msg;
-  }
-
-  function showSignup(){ document.getElementById('loginView').classList.add('hidden'); document.getElementById('signupView').classList.remove('hidden'); }
-  function showLogin() { document.getElementById('signupView').classList.add('hidden'); document.getElementById('loginView').classList.remove('hidden'); }
-
-  // Translate (minimal)
-  const translations = {
-    en: { loginTitle:"Login", signupTitle:"Create Account", btnLoginText:"Login" },
-    zh: { loginTitle:"登录", signupTitle:"创建账户", btnLoginText:"登录" },
-    mm: { loginTitle:"လော့ဂ်အင်", signupTitle:"အကောင့်ဖန်တီးရန်", btnLoginText:"လော့ဂ်အင်" }
-  };
-  function changeLanguage(lang){
-    const t = translations[lang] || translations.en;
-    document.getElementById('loginTitle').textContent = t.loginTitle;
-    document.getElementById('signupTitle').textContent = t.signupTitle;
-    document.getElementById('btnLoginText').textContent = t.btnLoginText;
-  }
-  changeLanguage('en');
-
-  // ---------- Auth logic ----------
-  async function signup(){
-    const name = document.getElementById('signupName').value.trim();
-    const email = document.getElementById('signupEmail').value.trim();
-    const password = document.getElementById('signupPassword').value;
-    const age = document.getElementById('signupAge').value;
-    const gender = document.getElementById('signupGender').value;
-    const phone = document.getElementById('signupPhone').value.trim();
-
-    if (!name || !email || password.length < 6) {
-      setStatus('Please fill name, email and password (min 6).', 'error'); return;
-    }
-
-    setStatus('Creating account...', null);
-    try {
-      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-      const uid = userCredential.user.uid;
-
-      // Save profile to Realtime Database
-      const profile = {
-        name,
-        email,
-        age: age? Number(age) : null,
-        gender: gender || null,
-        phone: phone || null,
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-      };
-
-      await db.ref('users/' + uid).set(profile);
-
-      setStatus('Account created. Logged in!', 'success');
-
-      // Optionally send email verification
-      // await userCredential.user.sendEmailVerification();
-    } catch (err) {
-      console.error(err);
-      setStatus('Signup error: ' + (err.message || err), 'error');
-    }
-  }
-
-  async function login() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  if (!email || !password) { 
-    setStatus('Enter email and password.', 'error'); 
-    return; 
-  }
-
-  setStatus('Logging in...', null);
-  try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    setStatus('Login successful.', 'success');
-
-    // 🔑 Redirect to home.html after login
-    window.location.href = 'home.html';
-  } catch (err) {
-    console.error(err);
-    setStatus('Login failed: ' + (err.message || err), 'error');
-  }
-}
-
-  function signout(){
-    setStatus('Signing out...', null);
-    auth.signOut().then(()=>{ setStatus('Signed out.', null); }).catch(err=>{
-      setStatus('Sign out error: ' + err.message, 'error');
-    });
-  }
-
-  // ---------- Presence (Realtime) ----------
-  // We'll write to /status/{uid}:
-  // { state: 'online'|'offline', last_changed: TIMESTAMP }
-  function setUserPresence(user) {
-    if (!user) return;
-    const uid = user.uid;
-    const userStatusRef = db.ref('/status/' + uid);
-
-    // Prepare presence objects
-    const isOfflineForDatabase = {
-      state: 'offline',
-      last_changed: firebase.database.ServerValue.TIMESTAMP
-    };
-    const isOnlineForDatabase = {
-      state: 'online',
-      last_changed: firebase.database.ServerValue.TIMESTAMP
-    };
-
-    // Use Realtime Database's .info/connected to detect connection state
-    const connectedRef = db.ref('.info/connected');
-    connectedRef.on('value', snap => {
-      if (snap.val() === true) {
-        // when connected set online and set onDisconnect to offline
-        userStatusRef.onDisconnect().set(isOfflineForDatabase).then(() => {
-          userStatusRef.set(isOnlineForDatabase);
+    // 添加简单的交互效果
+    document.addEventListener('DOMContentLoaded', function() {
+      // 为网格按钮添加点击效果
+      const gridButtons = document.querySelectorAll('.grid-btn');
+      gridButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          this.style.transform = 'scale(0.95)';
+          setTimeout(() => {
+            this.style.transform = '';
+          }, 200);
         });
-      } else {
-        // not connected
-        // nothing to do here — onDisconnect will handle last state
-      }
-    });
-  }
-
-  // ---------- Auth state listener ----------
-  auth.onAuthStateChanged(async user => {
-    if (user) {
-      // Show user view
-      document.getElementById('loginView').classList.add('hidden');
-      document.getElementById('signupView').classList.add('hidden');
-      document.getElementById('userView').classList.remove('hidden');
-
-      setStatus('Authenticated. Loading profile...', null);
-
-      // load profile from DB
-      const profileSnap = await db.ref('users/' + user.uid).once('value');
-      const profile = profileSnap.val() || {};
-      document.getElementById('welcomeTitle').textContent = `Welcome, ${profile.name || (user.email || 'User')}`;
-      document.getElementById('userInfo').textContent = `Email: ${user.email}  ·  Age: ${profile.age || '—'}  ·  Gender: ${profile.gender || '—'}`;
-
-      // Set presence
-      setUserPresence(user);
-
-      // Listen to presence changes for this user and show them
-      const presRef = db.ref('status/' + user.uid);
-      presRef.on('value', snap => {
-        const v = snap.val();
-        document.getElementById('presenceText').textContent = v ? v.state + ' (updated ' + (v.last_changed ? new Date(v.last_changed).toLocaleString() : '—') + ')' : '—';
       });
-
-      setStatus('Ready.', 'success');
-    } else {
-      // Not logged in: show login
-      document.getElementById('userView').classList.add('hidden');
-      document.getElementById('signupView').classList.add('hidden');
-      document.getElementById('loginView').classList.remove('hidden');
-
-      setStatus('Please login or create an account.', null);
-      document.getElementById('presenceText').textContent = '—';
-    }
-  });
-
-  // ---------- OPTIONAL: real-time monitor for a specific user's presence ----------
-  // Example: show if user with uid 'abc' is online:
-  // db.ref('status/abc').on('value', snap => console.log('abc presence', snap.val()));
-
+      
+      // 添加滚动动画
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+      
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, observerOptions);
+      
+      // 观察所有需要动画的元素
+      document.querySelectorAll('.fade-in-up').forEach(el => {
+        observer.observe(el);
+      });
+    });
   </script>
 </body>
 </html>
