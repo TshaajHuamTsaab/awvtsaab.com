@@ -3,37 +3,71 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>书籍图书馆 | Awv's Books</title>
+  <title>📚 Awv's 智慧书库</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
   <style>
-    body {
-      margin: 0;
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(180deg, #050505, #111);
-      color: white;
-      padding-bottom: 60px;
+    /* ===== 🎥 Background video ===== */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+      opacity: 0.85;
+      filter: blur(3px) brightness(0.9);
+      transform: scaleX(-1); /* ✅ Mirror effect */
     }
 
+    /* ===== 🌫 Overlay ===== */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: -1;
+      backdrop-filter: blur(4px);
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", "Noto Sans SC", sans-serif;
+      color: white;
+      padding-bottom: 60px;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ===== 🪞 Header ===== */
     header {
       text-align: center;
       padding: 25px 10px;
-      background: #0a0a0a;
-      box-shadow: 0 2px 10px rgba(255,255,255,0.05);
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      position: relative;
+      z-index: 1;
     }
 
     header h1 {
       margin: 0;
       font-size: 1.8rem;
-      background: linear-gradient(to right, #9d72ff, #7cfaff);
+      background: linear-gradient(to right, #b58cff, #7cfaff, #f9f871);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       font-weight: 600;
       letter-spacing: 1px;
     }
 
+    /* ===== 📚 Category ===== */
     .category {
       margin: 40px 0;
+      position: relative;
+      z-index: 1;
     }
 
     .category-header {
@@ -44,7 +78,7 @@
       font-size: 1.5rem;
       color: #fff;
       margin-bottom: 10px;
-      text-decoration: none;
+      text-shadow: 0 0 8px rgba(255,255,255,0.4);
     }
 
     .category-header img {
@@ -54,6 +88,7 @@
       object-fit: cover;
     }
 
+    /* ===== 🔲 Book Grid ===== */
     .book-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -62,18 +97,20 @@
     }
 
     .book {
-      background: #1a1a1a;
+      background: rgba(255, 255, 255, 0.08);
       border-radius: 16px;
       overflow: hidden;
       transition: transform 0.2s, box-shadow 0.2s;
       cursor: pointer;
       text-decoration: none;
       color: inherit;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
     .book:hover {
       transform: translateY(-6px);
-      box-shadow: 0 0 15px #7d5fff;
+      box-shadow: 0 0 15px rgba(125, 95, 255, 0.6);
     }
 
     .book img {
@@ -84,27 +121,135 @@
 
     .book-info {
       padding: 10px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
     }
 
-    .book-title {
+    /* ===== 🌈 Animated Gradient Titles ===== */
+    .book-title, .book-author {
       font-weight: bold;
-      font-size: 1rem;
+      background: linear-gradient(90deg, #ff6ec4, #7873f5, #4ade80, #facc15);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientAnimation 4s ease infinite;
     }
 
     .book-author {
+      font-weight: normal;
       font-size: 0.9rem;
-      color: #aaa;
+      animation-duration: 5s;
     }
 
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ===== ⚡ Footer ===== */
     footer {
       text-align: center;
       font-size: 0.85rem;
-      color: #777;
+      color: #ccc;
       padding: 25px 0;
+      backdrop-filter: blur(8px);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== 🔊 Audio Controls ===== */
+    .audio-controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .audio-toggle {
+      background: rgba(125, 95, 255, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px rgba(125, 95, 255, 0.5);
+    }
+
+    .audio-toggle:hover {
+      background: rgba(125, 95, 255, 1);
+      transform: scale(1.1);
+    }
+
+    /* ===== 📱 Mobile Responsive ===== */
+    @media (max-width: 768px) {
+      .book-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 15px;
+        padding: 0 15px;
+      }
+      
+      .category-header {
+        font-size: 1.3rem;
+      }
+      
+      header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .audio-toggle {
+        width: 45px;
+        height: 45px;
+        bottom: 15px;
+        right: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .book-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+        padding: 0 10px;
+      }
+      
+      .book img {
+        height: 180px;
+      }
+    }
+
+    /* = Fix for iOS Safari video playback */
+    .video-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      overflow: hidden;
     }
   </style>
 </head>
 <body>
+  <!-- 🎥 Background video container -->
+  <div class="video-container">
+    <video id="bg-video" autoplay loop playsinline muted>
+      <source src="https://res.cloudinary.com/dpw8l6gk2/video/upload/v1762597601/angel_pygqtw.mp4" type="video/mp4">
+      <source src="https://res.cloudinary.com/dpw8l6gk2/video/upload/v1762597601/angel_pygqtw.webm" type="video/webm">
+      您的浏览器不支持视频播放。
+    </video>
+  </div>
+
+  <!-- 🔊 Audio Controls -->
+  <div class="audio-controls">
+    <button id="audioToggle" class="audio-toggle">🔇</button>
+  </div>
+
   <header>
     <h1>📚 Awv's 智慧书库</h1>
   </header>
@@ -112,8 +257,8 @@
   <!-- IQ Category -->
   <section class="category">
     <div class="category-header">
-      <img src="https://i.postimg.cc/PxFz5QtN/100x100-B16-7.gif" alt="IQ Icon">
-      <span>智商书籍 (iQ Intelligence)</span>
+      <img src="https://i.postimg.cc/tThLXVvB/100x100-B16-7.gif" alt="IQ Icon">
+      <span>智商书籍 (IQ Intelligence)</span>
     </div>
     <div class="book-grid" id="iqBooks"></div>
   </section>
@@ -121,7 +266,7 @@
   <!-- EQ Category -->
   <section class="category">
     <div class="category-header">
-      <img src="https://i.postimg.cc/fLgjRfwR/100x100-B16-3.gif" alt="EQ Icon">
+      <img src="https://i.postimg.cc/k4r03ysb/100x100-B16-1.gif" alt="EQ Icon">
       <span>情商书籍 (EQ Emotion)</span>
     </div>
     <div class="book-grid" id="eqBooks"></div>
@@ -130,7 +275,7 @@
   <!-- Philosophy Category -->
   <section class="category">
     <div class="category-header">
-      <img src="https://i.postimg.cc/1tzrSj1T/100x100-B16-1.gif" alt="Philosophy Icon">
+      <img src="https://i.postimg.cc/gJvfY6t4/100x100-B16-3.gif" alt="Philosophy Icon">
       <span>哲学书籍 (Philosophy)</span>
     </div>
     <div class="book-grid" id="philosophyBooks"></div>
@@ -140,49 +285,142 @@
     © 2025 Awv's Books — 无限智慧书架
   </footer>
 
-  <!-- JavaScript -->
-  <script src="js/books/iqBooks.js"></script>
-  <script src="js/books/eqBooks.js"></script>
-  <script src="js/books/philosophyBooks.js"></script>
-
   <script>
-    // ✅ 通用渲染函数 (Render all categories automatically)
-    function displayBooks(bookArray, containerId) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
+    // 书籍数据
+    const iqBooks = [
+      { id: "iq1", title: "思维的艺术", author: "阿图·舒尔曼", cover: "https://i.postimg.cc/9ftGNTVf/book14.gif", link: "reader4.html?category=iq&book=dev1&chapter=cover" },
+      { id: "iq2", title: "逻辑的力量", author: "卡尔·波普尔", cover: "https://i.postimg.cc/9ftGNTVf/book14.gif", link: "reader4.html?category=iq&book=dev2&chapter=cover" },
+      { id: "iq3", title: "思考快与慢", author: "丹尼尔·卡尼曼", cover: "https://i.postimg.cc/9ftGNTVf/book14.gif", link: "reader4.html?category=iq&book=dev3&chapter=cover" },
+      { id: "iq4", title: "如何有效学习", author: "斯科特·杨", cover: "https://i.postimg.cc/9ftGNTVf/book14.gif", link: "reader4.html?category=iq&book=dev4&chapter=cover" },
+      { id: "iq5", title: "思维导图革命", author: "托尼·博赞", cover: "https://i.postimg.cc/9ftGNTVf/book14.gif", link: "reader4.html?category=iq&book=dev5&chapter=cover" },
+      { id: "iq6", title: "批判性思维", author: "理查德·保罗", cover: "https://i.postimg.cc/9ftGNTVf/book14.gif", link: "reader4.html?category=iq&book=dev6&chapter=cover" },
+      { id: "iq7", title: "聪明的投资者", author: "本杰明·格雷厄姆", cover: "https://i.postimg.cc/9ftGNTVf/book14.gif", link: "reader4.html?category=iq&book=dev7&chapter=cover" },
+      { id: "iq8", title: "战略思维", author: "阿维纳什·迪克西特", cover: "https://i.postimg.cc/9ftGNTVf/book14.gif", link: "reader4.html?category=iq&book=dev8&chapter=cover" },
+      { id: "iq9", title: "数学思维之美", author: "乔丹·艾伦伯格", cover: "https://i.postimg.cc/9ftGNTVf/book14.gif", link: "reader4.html?category=iq&book=dev9&chapter=cover" },
+      { id: "iq10", title: "创新者的窘境", author: "克莱顿·克里斯坦森", cover: "https://i.postimg.cc/9ftGNTVf/book14.gif", link: "reader4.html?category=iq&book=dev10&chapter=cover" },
+      { id: "iq11", title: "像数学家一样思考", author: "芭芭拉·奥克利", cover: "https://i.postimg.cc/9ftGNTVf/book14.gif", link: "reader4.html?category=iq&book=dev11&chapter=cover" },
+      { id: "iq12", title: "复杂思维", author: "梅拉妮·米切尔", cover: "https://i.postimg.cc/9ftGNTVf/book14.gif", link: "reader4.html?category=iq&book=dev12&chapter=cover" }
+    ];
 
-      bookArray.forEach(book => {
-        const bookLink = document.createElement("a");
-        bookLink.href = book.link;
-        bookLink.className = "book";
+    const eqBooks = [
+      { id: "eq1", title: "情商：为什么情商比智商更重要", author: "丹尼尔·戈尔曼", cover: "https://i.postimg.cc/GmvYHY47/book16.gif", link: "reader4.html?category=eq&book=dev1&chapter=cover" },
+      { id: "eq2", title: "非暴力沟通", author: "马歇尔·卢森堡", cover: "https://i.postimg.cc/GmvYHY47/book16.gif", link: "reader4.html?category=eq&book=dev2&chapter=cover" },
+      { id: "eq3", title: "自控力", author: "凯利·麦格尼格尔", cover: "https://i.postimg.cc/GmvYHY47/book16.gif", link: "reader4.html?category=eq&book=dev3&chapter=cover" },
+      { id: "eq4", title: "脆弱的力量", author: "布琳·布朗", cover: "https://i.postimg.cc/GmvYHY47/book16.gif", link: "reader4.html?category=eq&book=dev4&chapter=cover" },
+      { id: "eq5", title: "当下的力量", author: "埃克哈特·托利", cover: "https://i.postimg.cc/GmvYHY47/book16.gif", link: "reader4.html?category=eq&book=dev5&chapter=cover" },
+      { id: "eq6", title: "幸福的陷阱", author: "拉斯·哈里斯", cover: "https://i.postimg.cc/GmvYHY47/book16.gif", link: "reader4.html?category=eq&book=dev6&chapter=cover" },
+      { id: "eq7", title: "人生的智慧", author: "阿图·叔本华", cover: "https://i.postimg.cc/GmvYHY47/book16.gif", link: "reader4.html?category=eq&book=dev7&chapter=cover" },
+      { id: "eq8", title: "安静：内向性格的力量", author: "苏珊·凯恩", cover: "https://i.postimg.cc/GmvYHY47/book16.gif", link: "reader4.html?category=eq&book=dev8&chapter=cover" },
+      { id: "eq9", title: "被讨厌的勇气", author: "岸见一郎", cover: "https://i.postimg.cc/GmvYHY47/book16.gif", link: "reader4.html?category=eq&book=dev9&chapter=cover" },
+      { id: "eq10", title: "掌控情绪", author: "哈丽特·勒纳", cover: "https://i.postimg.cc/GmvYHY47/book16.gif", link: "reader4.html?category=eq&book=dev10&chapter=cover" },
+      { id: "eq11", title: "沟通的艺术", author: "一行禅师", cover: "https://i.postimg.cc/GmvYHY47/book16.gif", link: "reader4.html?category=eq&book=dev11&chapter=cover" },
+      { id: "eq12", title: "情绪的语言", author: "卡拉·麦克拉伦", cover: "https://i.postimg.cc/GmvYHY47/book16.gif", link: "reader4.html?category=eq&book=dev12&chapter=cover" }
+    ];
 
-        const bookCover = document.createElement("img");
-        bookCover.src = book.cover;
-        bookCover.alt = book.title;
+    const philosophyBooks = [
+      { id: "philo1", title: "《道德经》", author: "老子", cover: "https://i.postimg.cc/9QyTrTDy/book15.gif", link: "reader4.html?category=philosophy&book=dev1&chapter=cover" },
+      { id: "philo2", title: "《论语》", author: "孔子", cover: "https://i.postimg.cc/9QyTrTDy/book15.gif", link: "reader4.html?category=philosophy&book=dev2&chapter=cover" },
+      { id: "philo3", title: "沉思录", author: "马可·奥勒留", cover: "https://i.postimg.cc/9QyTrTDy/book15.gif", link: "reader4.html?category=philosophy&book=dev3&chapter=cover" },
+      { id: "philo4", title: "查拉图斯特拉如是说", author: "尼采", cover: "https://i.postimg.cc/9QyTrTDy/book15.gif", link: "reader4.html?category=philosophy&book=dev4&chapter=cover" },
+      { id: "philo5", title: "存在与时间", author: "海德格尔", cover: "https://i.postimg.cc/9QyTrTDy/book15.gif", link: "reader4.html?category=philosophy&book=dev5&chapter=cover" },
+      { id: "philo6", title: "道德经", author: "老子", cover: "https://i.postimg.cc/9QyTrTDy/book15.gif", link: "reader4.html?category=philosophy&book=dev6&chapter=cover" },
+      { id: "philo7", title: "庄子", author: "庄周", cover: "https://i.postimg.cc/9QyTrTDy/book15.gif", link: "reader4.html?category=philosophy&book=dev7&chapter=cover" },
+      { id: "philo8", title: "论语", author: "孔子", cover: "https://i.postimg.cc/9QyTrTDy/book15.gif", link: "reader4.html?category=philosophy&book=dev8&chapter=cover" },
+      { id: "philo9", title: "纯粹理性批判", author: "康德", cover: "https://i.postimg.cc/9QyTrTDy/book15.gif", link: "reader4.html?category=philosophy&book=dev9&chapter=cover" },
+      { id: "philo10", title: "伦理学", author: "斯宾诺莎", cover: "https://i.postimg.cc/9QyTrTDy/book15.gif", link: "reader4.html?category=philosophy&book=dev10&chapter=cover" },
+      { id: "philo11", title: "论自由", author: "约翰·密尔", cover: "https://i.postimg.cc/9QyTrTDy/book15.gif", link: "reader4.html?category=philosophy&book=dev11&chapter=cover" },
+      { id: "philo12", title: "存在主义是一种人道主义", author: "让-保罗·萨特", cover: "https://i.postimg.cc/9QyTrTDy/book15.gif", link: "reader4.html?category=philosophy&book=dev12&chapter=cover" }
+    ];
 
-        const bookInfo = document.createElement("div");
-        bookInfo.className = "book-info";
+    // 视频和音频控制
+    const video = document.getElementById('bg-video');
+    const audioToggle = document.getElementById('audioToggle');
+    let audioEnabled = false;
 
-        const bookTitle = document.createElement("div");
-        bookTitle.className = "book-title";
-        bookTitle.textContent = book.title;
-
-        const bookAuthor = document.createElement("div");
-        bookAuthor.className = "book-author";
-        bookAuthor.textContent = book.author;
-
-        bookInfo.appendChild(bookTitle);
-        bookInfo.appendChild(bookAuthor);
-        bookLink.appendChild(bookCover);
-        bookLink.appendChild(bookInfo);
-        container.appendChild(bookLink);
+    // 初始化视频播放
+    function initVideo() {
+      video.muted = true; // 初始静音以符合浏览器策略
+      video.play().catch(err => {
+        console.log("视频自动播放被阻止:", err);
       });
     }
 
-    // ✅ Render all
-    displayBooks(iqBooks, "iqBooks");
-    displayBooks(eqBooks, "eqBooks");
-    displayBooks(philosophyBooks, "philosophyBooks");
+    // 音频切换功能
+    audioToggle.addEventListener('click', () => {
+      audioEnabled = !audioEnabled;
+      video.muted = !audioEnabled;
+      audioToggle.textContent = audioEnabled ? "🔊" : "🔇";
+      
+      if (audioEnabled) {
+        // 尝试播放音频
+        video.play().catch(err => {
+          console.log("音频播放被阻止:", err);
+          // 如果播放失败，显示提示
+          alert("请点击页面任意位置启用音频播放");
+        });
+      }
+    });
+
+    // 用户交互后启用音频
+    document.addEventListener('click', () => {
+      if (!audioEnabled) return;
+      
+      video.play().catch(err => {
+        console.log("音频播放错误:", err);
+      });
+    }, { once: false });
+
+    // 显示书籍函数
+    function displayBooks(bookArray, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = "";
+
+      bookArray.forEach(book => {
+        const a = document.createElement("a");
+        a.href = book.link;
+        a.className = "book";
+
+        const img = document.createElement("img");
+        img.src = book.cover;
+        img.alt = book.title;
+        img.loading = "lazy"; // 优化加载
+
+        const info = document.createElement("div");
+        info.className = "book-info";
+
+        const title = document.createElement("div");
+        title.className = "book-title";
+        title.textContent = book.title;
+
+        const author = document.createElement("div");
+        author.className = "book-author";
+        author.textContent = book.author;
+
+        info.appendChild(title);
+        info.appendChild(author);
+        a.appendChild(img);
+        a.appendChild(info);
+        container.appendChild(a);
+      });
+    }
+
+    // 页面加载完成后初始化
+    window.addEventListener('load', () => {
+      initVideo();
+      displayBooks(iqBooks, "iqBooks");
+      displayBooks(eqBooks, "eqBooks");
+      displayBooks(philosophyBooks, "philosophyBooks");
+    });
+
+    // 处理页面可见性变化（标签页切换）
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        video.pause();
+      } else {
+        video.play().catch(err => console.log("恢复播放失败:", err));
+      }
+    });
   </script>
 </body>
 </html>
