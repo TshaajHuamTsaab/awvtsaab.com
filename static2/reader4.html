@@ -271,7 +271,6 @@
   const book = params.get("book");
   let chapter = params.get("chapter") || "cover";
 
-  const maxChapter = 3; // ✅ your book has 3 chapters
   const titleEl = document.getElementById("chapterTitle");
   const contentEl = document.querySelector(".reader-text");
   const audioEl = document.getElementById("bookAudio");
@@ -279,109 +278,92 @@
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
 
-  // --- 主题切换功能 ---
+  // --- 主题切换 ---
   const themeBtn = document.querySelector('.theme-btn');
   const themePanel = document.querySelector('.theme-panel');
   const themeOptions = document.querySelectorAll('.theme-option');
 
-  themeBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    themePanel.classList.toggle('active');
-  });
-
+  themeBtn.addEventListener('click', e => { e.stopPropagation(); themePanel.classList.toggle('active'); });
   themeOptions.forEach(option => {
     option.addEventListener('click', function() {
       const theme = this.getAttribute('data-theme');
-      
-      // 移除所有主题类
       document.body.className = '';
-      // 添加新主题类
       document.body.classList.add(`theme-${theme}`);
-      
-      // 更新激活状态
       themeOptions.forEach(opt => opt.classList.remove('active'));
       this.classList.add('active');
-      
-      // 关闭面板
       themePanel.classList.remove('active');
-      
-      // 保存主题到本地存储
       localStorage.setItem('reader-theme', theme);
     });
   });
-
-  // 点击页面其他地方关闭主题面板
-  document.addEventListener('click', () => {
-    themePanel.classList.remove('active');
-  });
-
-  // 加载保存的主题
+  document.addEventListener('click', () => themePanel.classList.remove('active'));
   const savedTheme = localStorage.getItem('reader-theme') || 'default';
   document.body.classList.add(`theme-${savedTheme}`);
-  themeOptions.forEach(opt => {
-    if (opt.getAttribute('data-theme') === savedTheme) {
-      opt.classList.add('active');
-    }
-  });
+  themeOptions.forEach(opt => { if (opt.getAttribute('data-theme') === savedTheme) opt.classList.add('active'); });
 
-  // --- 加载章节内容 ---
+  // --- 动态检测书的最后一章 ---
+  async function findLastChapter() {
+    let n = 1;
+    while (true) {
+      const path = `assets/${category}/${book}/chapter${n}.html`;
+      const res = await fetch(path, { method: "HEAD" });
+      if (!res.ok) return n - 1;
+      n++;
+    }
+  }
+
+  let lastChapter = 0;
+
   async function loadChapter(autoPlay = false) {
+    if (lastChapter === 0) lastChapter = await findLastChapter(); // 首次检测
+
     const htmlPath = `assets/${category}/${book}/${chapter}.html`;
     const audioPath = `assets/${category}/${book}/audio/${chapter}.mp3`;
 
     try {
       const res = await fetch(htmlPath);
-      if (!res.ok) throw new Error("内容加载失败");
+      if (!res.ok) throw new Error();
       const text = await res.text();
       contentEl.innerHTML = text;
     } catch {
       contentEl.innerHTML = `<p style="color:#f88;">❌ 未找到章节内容。</p>`;
     }
 
-    // --- 设置章节标题 ---
-    if (chapter === "cover") {
-      titleEl.textContent = "封面";
-    } else {
-      const num = parseInt(chapter.replace("chapter", ""));
-      titleEl.textContent = `第${num}章`;
-    }
+    // --- 标题设置 ---
+    titleEl.textContent = chapter === "cover" ? "封面" : `第${parseInt(chapter.replace("chapter",""))}章`;
 
-    // --- 控制按钮状态 ---
-    const currentNum = chapter === "cover" ? 0 : parseInt(chapter.replace("chapter", ""));
+    // --- 上一章 / 下一章控制 ---
+    const currentNum = chapter === "cover" ? 0 : parseInt(chapter.replace("chapter",""));
+
+    // 上一章
     prevBtn.disabled = currentNum <= 0;
-    nextBtn.disabled = currentNum >= maxChapter;
-
     prevBtn.style.opacity = prevBtn.disabled ? 0.5 : 1;
-    nextBtn.style.opacity = nextBtn.disabled ? 0.5 : 1;
     prevBtn.style.cursor = prevBtn.disabled ? "not-allowed" : "pointer";
+
+    // 下一章（超出时禁用）
+    nextBtn.disabled = currentNum >= lastChapter;
+    nextBtn.style.opacity = nextBtn.disabled ? 0.5 : 1;
     nextBtn.style.cursor = nextBtn.disabled ? "not-allowed" : "pointer";
 
-    // --- 设置音频 ---
+    // --- 音频 ---
     audioEl.src = audioPath;
     audioEl.load();
 
-    // 检查音频文件是否存在
     fetch(audioPath, { method: "HEAD" })
       .then(res => {
         if (res.ok) {
           playBtn.style.display = "inline-block";
           audioEl.style.display = "inline";
-          playBtn.textContent = "▶️ 播放";
-          if (autoPlay) {
-            audioEl.play().catch(()=>{});
-            playBtn.textContent = "⏸️ 暂停";
-          }
+          playBtn.textContent = autoPlay ? "⏸️ 暂停" : "▶️ 播放";
+          if (autoPlay) audioEl.play().catch(()=>{});
         } else {
           playBtn.style.display = "none";
           audioEl.style.display = "none";
         }
       })
-      .catch(() => {
-        playBtn.style.display = "none";
-        audioEl.style.display = "none";
-      });
+      .catch(() => { playBtn.style.display = "none"; audioEl.style.display = "none"; });
   }
 
+  // --- 初始化 ---
   loadChapter();
 
   // --- 播放 / 暂停 ---
@@ -395,42 +377,27 @@
     }
   });
 
-  // --- 音频播放结束：自动跳下一章 ---
+  // --- 音频结束自动下一章 ---
   audioEl.addEventListener("ended", () => {
-    let num = chapter === "cover" ? 0 : parseInt(chapter.replace("chapter", ""));
-    if (num < maxChapter) {
-      changeChapter(1, true); // autoplay next
-    } else {
-      playBtn.textContent = "▶️ 播放"; // stop at end
-    }
+    changeChapter(1, true);
   });
 
-  // --- 切换章节（限制范围 + 自动播放选项）---
-  function changeChapter(step, autoPlayNext = false) {
-    let num = chapter === "cover" ? 0 : parseInt(chapter.replace("chapter", ""));
-    num += step;
+  // --- 切换章节 ---
+  async function changeChapter(step, autoPlayNext = false) {
+    const currentNum = chapter === "cover" ? 0 : parseInt(chapter.replace("chapter",""));
+    if (lastChapter === 0) lastChapter = await findLastChapter();
 
-    // 限制范围
-    if (num <= 0) {
-      chapter = "cover";
-    } else if (num > maxChapter) {
-      num = maxChapter;
-      chapter = `chapter${maxChapter}`;
-    } else {
-      chapter = `chapter${num}`;
-    }
+    let newNum = currentNum + step;
+    if (newNum < 0) newNum = 0;
+    if (newNum > lastChapter) return; // ❌ 不超出最后章节
 
+    chapter = newNum === 0 ? "cover" : `chapter${newNum}`;
     window.history.replaceState({}, "", `?category=${category}&book=${book}&chapter=${chapter}`);
     loadChapter(autoPlayNext);
   }
 
-  prevBtn.addEventListener("click", () => {
-    if (!prevBtn.disabled) changeChapter(-1);
-  });
-
-  nextBtn.addEventListener("click", () => {
-    if (!nextBtn.disabled) changeChapter(1);
-  });
+  prevBtn.addEventListener("click", () => { if (!prevBtn.disabled) changeChapter(-1); });
+  nextBtn.addEventListener("click", () => { if (!nextBtn.disabled) changeChapter(1); });
 </script>
 </body>
 </html>
