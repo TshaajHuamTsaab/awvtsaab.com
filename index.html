@@ -43,15 +43,14 @@
       padding: 20px;
     }
 
-        .language-selector {
-      position: relative;          /* no longer fixed */
-      margin-top: 20px;            /* space below 欢迎 text */
+    .language-selector {
+      position: relative;
+      margin-top: 20px;
       display: flex;
-      justify-content: center;     /* center horizontally */
+      justify-content: center;
       gap: 12px;
       z-index: 10;
     }
-
 
     .lang-btn {
       background: rgba(255, 255, 255, 0.1);
@@ -73,9 +72,9 @@
     .container {
       text-align: center;
       padding: 20px;
-      max-width: 500px;
+      max-width: 800px;
       width: 90%;
-      margin-bottom: 80px; /* 为底部按钮留出空间 */
+      margin-bottom: 80px;
     }
 
     .logo {
@@ -119,9 +118,9 @@
     }
 
     .countdown {
-      font-size: 120px;
+      font-size: 80px; /* 减小字体大小 */
       font-weight: 900;
-      margin: 30px 0;
+      margin: 20px 0; /* 减少上下边距 */
       opacity: 0;
       transform: scale(0.5);
       transition: all 0.5s ease;
@@ -177,7 +176,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 20px;
-      margin-top: 50px;
+      margin-top: 30px; /* 减少与欢迎文字的距离 */
       opacity: 0;
       transform: translateY(30px);
       transition: all 0.8s ease 0.5s;
@@ -265,7 +264,7 @@
       }
 
       .countdown {
-        font-size: 80px;
+        font-size: 60px;
       }
     }
 
@@ -279,7 +278,7 @@
       }
 
       .countdown {
-        font-size: 60px;
+        font-size: 50px;
       }
     }
   </style>
@@ -304,10 +303,7 @@
 
     <div class="welcome-text" id="welcome-text">欢迎来到漆书</div>
     
-    <div class="countdown" id="countdown">3</div>
-    
-    <div class="redirect-text" id="redirect-text">请稍后跳转到登录页面...</div>
-
+    <!-- 功能卡片 -->
     <div class="features" id="features">
       <div class="feature-card">
         <div class="feature-icon">
@@ -331,6 +327,11 @@
         <div class="feature-desc">尊享会员专属内容和无广告体验</div>
       </div>
     </div>
+    
+    <!-- 倒计时数字 -->
+    <div class="countdown" id="countdown">3</div>
+    
+    <div class="redirect-text" id="redirect-text">请稍后跳转到登录页面...</div>
   </div>
 
   <div class="footer">
@@ -339,73 +340,73 @@
 
   <script>
     // JSON Utilities
-const JsonUtils = {
-  // Save data to JSON
-  saveToJson: function(key, data) {
-    try {
-      const jsonData = JSON.stringify(data);
-      localStorage.setItem(key, jsonData);
-      return true;
-    } catch (error) {
-      console.error('Error saving to JSON:', error);
-      return false;
-    }
-  },
-
-  // Load data from JSON
-  loadFromJson: function(key) {
-    try {
-      const jsonData = localStorage.getItem(key);
-      return jsonData ? JSON.parse(jsonData) : null;
-    } catch (error) {
-      console.error('Error loading from JSON:', error);
-      return null;
-    }
-  },
-
-  // Export data to downloadable JSON file
-  exportToFile: function(data, filename = 'export.json') {
-    try {
-      const jsonString = JSON.stringify(data, null, 2);
-      const blob = new Blob([jsonString], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      return true;
-    } catch (error) {
-      console.error('Error exporting to file:', error);
-      return false;
-    }
-  },
-
-  // Import JSON file
-  importFromFile: function(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
+    const JsonUtils = {
+      // Save data to JSON
+      saveToJson: function(key, data) {
         try {
-          const data = JSON.parse(event.target.result);
-          resolve(data);
+          const jsonData = JSON.stringify(data);
+          localStorage.setItem(key, jsonData);
+          return true;
         } catch (error) {
-          reject(error);
+          console.error('Error saving to JSON:', error);
+          return false;
         }
-      };
-      reader.onerror = (error) => reject(error);
-      reader.readAsText(file);
-    });
-  }
-};
+      },
+
+      // Load data from JSON
+      loadFromJson: function(key) {
+        try {
+          const jsonData = localStorage.getItem(key);
+          return jsonData ? JSON.parse(jsonData) : null;
+        } catch (error) {
+          console.error('Error loading from JSON:', error);
+          return null;
+        }
+      },
+
+      // Export data to downloadable JSON file
+      exportToFile: function(data, filename = 'export.json') {
+        try {
+          const jsonString = JSON.stringify(data, null, 2);
+          const blob = new Blob([jsonString], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          return true;
+        } catch (error) {
+          console.error('Error exporting to file:', error);
+          return false;
+        }
+      },
+
+      // Import JSON file
+      importFromFile: function(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            try {
+              const data = JSON.parse(event.target.result);
+              resolve(data);
+            } catch (error) {
+              reject(error);
+            }
+          };
+          reader.onerror = (error) => reject(error);
+          reader.readAsText(file);
+        });
+      }
+    };
 
     // 🌐 多语言文本
     const translations = {
       zh: {
         subtitle: "您的个人数字图书馆",
-        welcome: "欢迎来到Hmoobtsaab's漆书",
+        welcome: "欢迎来到《奇迹踪印》",
         redirect: "即将跳转到登录页面...",
         feature1: "无限阅读",
         feature1desc: "畅读海量书籍，随时随地享受阅读乐趣",
@@ -417,7 +418,7 @@ const JsonUtils = {
       },
       en: {
         subtitle: "Your Personal Digital Library",
-        welcome: "Welcome to Hmoobtsaab's Book",
+        welcome: "Welcome to <Miracle Trail Seal>",
         redirect: "Redirecting to login page...",
         feature1: "Unlimited Reading",
         feature1desc: "Read vast collections of books anytime, anywhere",
@@ -429,7 +430,7 @@ const JsonUtils = {
       },
       my: {
         subtitle: "သင့်ရဲ့ဒစ်ဂျစ်တယ်စာကြည့်တိုက်",
-        welcome: "Hmoobtsaab's စာပေ မှကြိုဆိုပါတယ်",
+        welcome: "Miracle Trail Seal' မှကြိုဆိုပါတယ်",
         redirect: "လော့ဂ်အင်စာမျက်နှာသို့ခေါ်ဆောင်သွားမည်...",
         feature1: "အကန့်အသတ်မရှိဖတ်ရှုခြင်း",
         feature1desc: "မည်သည့်နေရာ၊ မည်သည့်အချိန်မဆိုစာအုပ်စာပေများစွာဖတ်ရှုပါ",
@@ -461,12 +462,12 @@ const JsonUtils = {
 
       // 动画序列
       setTimeout(() => welcomeText.classList.add('show'), 400);
+      setTimeout(() => features.classList.add('show'), 800);
       setTimeout(() => {
         countdownElement.classList.add('show');
         startCountdown();
       }, 1200);
       setTimeout(() => redirectText.classList.add('show'), 1800);
-      setTimeout(() => features.classList.add('show'), 2400);
     }
 
     // ⏱️ 开始倒计时
