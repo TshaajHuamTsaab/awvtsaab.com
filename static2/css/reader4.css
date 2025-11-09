@@ -1,0 +1,343 @@
+    /* ===== 🎧 Awv's Reader 4 — Dark Elegant Style ===== */
+    :root {
+      --bg-dark: #050505;
+      --bg-mid: #0f0f0f;
+      --bg-light: #181818;
+      --text-main: #ffffff;
+      --accent: #7d5fff;
+      --accent-glow: rgba(125, 95, 255, 0.4);
+      --radius: 16px;
+      --shadow: 0 0 20px var(--accent-glow);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", "Noto Sans SC", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(180deg, var(--bg-dark), var(--bg-mid));
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 30px 15px;
+      overflow-x: hidden;
+    }
+
+    /* ===== Header ===== */
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+      width: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      background: linear-gradient(to right, #9d72ff, #7cfaff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin: 0 auto;
+    }
+
+    /* 主题选择器样式 */
+    .theme-selector {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .theme-btn {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--text-main);
+      padding: 8px 15px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .theme-btn:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .theme-panel {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--bg-light);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 15px;
+      display: none;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+      z-index: 1000;
+      box-shadow: var(--shadow);
+    }
+
+    .theme-panel.active {
+      display: grid;
+    }
+
+    .theme-option {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .theme-option:hover {
+      transform: scale(1.1);
+      border-color: white;
+    }
+
+    .theme-option.active {
+      border-color: white;
+      box-shadow: 0 0 10px white;
+    }
+
+    /* ===== Book Info Section ===== */
+    .book-info {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .book-info img {
+      width: 180px;
+      height: 240px;
+      object-fit: cover;
+      border-radius: var(--radius);
+      box-shadow: 0 0 25px var(--accent-glow);
+      margin-bottom: 15px;
+    }
+
+    .book-info h2 {
+      font-size: 1.4rem;
+      color: #fff;
+      margin-bottom: 5px;
+    }
+
+    .book-info p {
+      font-size: 1rem;
+      color: #aaa;
+    }
+
+    /* ===== Reading Text Section ===== */
+    .reader-text {
+      width: 90%;
+      max-width: 800px;
+      background: var(--bg-light);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 25px;
+      line-height: 1.8;
+      font-size: 1.05rem;
+      overflow-y: auto;
+      animation: fadeIn 1.5s ease;
+      margin-bottom: 25px;
+      text-align: justify;
+    }
+
+    .reader-text p {
+      margin-bottom: 1em;
+    }
+
+    /* ===== Audio Player Section ===== */
+    .audio-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .audio-section audio {
+      width: 260px;
+      border-radius: var(--radius);
+      box-shadow: 0 0 20px var(--accent-glow);
+      outline: none;
+      background: var(--bg-light);
+    }
+
+    .play-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .play-btn:hover {
+      background: #9a7eff;
+      transform: scale(1.05);
+    }
+
+    /* ===== Navigation Buttons ===== */
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      width: 90%;
+      max-width: 800px;
+      margin-top: 15px;
+    }
+
+    .nav-buttons button {
+      flex: 1;
+      margin: 0 10px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 12px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .nav-buttons button:hover {
+      background: #9a7eff;
+      transform: scale(1.05);
+    }
+
+    /* ===== Animations ===== */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== Scrollbar ===== */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #222;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      margin-top: 30px;
+      font-size: 0.85rem;
+      color: #777;
+      text-align: center;
+    }
+
+    .book-header {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .category-title {
+      font-size: 1.5rem;
+      color: #9dfaff;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .cover-container {
+      display: inline-block;
+      padding: 8px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(255,255,255,0.3);
+    }
+
+    .book-cover {
+      width: 160px;       /* display size */
+      height: auto;
+      object-fit: contain; /* keep full GIF visible */
+      border-radius: 12px;
+    }
+
+    .chapter-name {
+      color: #ccc;
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+
+    /* 主题颜色定义 */
+    .theme-default {
+      --bg-dark: #050505;
+      --bg-mid: #0f0f0f;
+      --bg-light: #181818;
+      --text-main: #ffffff;
+      --accent: #7d5fff;
+      --accent-glow: rgba(125, 95, 255, 0.4);
+    }
+
+    .theme-emerald {
+      --bg-dark: #001f0f;
+      --bg-mid: #003320;
+      --bg-light: #004d30;
+      --text-main: #e8fff3;
+      --accent: #4dffb8;
+      --accent-glow: rgba(77,255,184,0.4);
+    }
+
+    .theme-sunset {
+      --bg-dark: #1a0f00;
+      --bg-mid: #332100;
+      --bg-light: #4d3300;
+      --text-main: #fff4e6;
+      --accent: #ffb74d;
+      --accent-glow: rgba(255,183,77,0.4);
+    }
+
+    .theme-rose {
+      --bg-dark: #1f000f;
+      --bg-mid: #33001a;
+      --bg-light: #4d0026;
+      --text-main: #ffe6f2;
+      --accent: #ff4d94;
+      --accent-glow: rgba(255,77,148,0.4);
+    }
+
+    .theme-purple {
+      --bg-dark: #0f001f;
+      --bg-mid: #1a0033;
+      --bg-light: #26004d;
+      --text-main: #f2e6ff;
+      --accent: #b74dff;
+      --accent-glow: rgba(183,77,255,0.4);
+    }
+
+    .theme-gold {
+      --bg-dark: #1f1a00;
+      --bg-mid: #332e00;
+      --bg-light: #4d4700;
+      --text-main: #fffce6;
+      --accent: #ffeb3b;
+      --accent-glow: rgba(255,235,59,0.4);
+    }
+
+    .theme-ocean {
+      --bg-dark: #00101f;
+      --bg-mid: #001f33;
+      --bg-light: #002e4d;
+      --text-main: #e6f7ff;
+      --accent: #4dccff;
+      --accent-glow: rgba(77,204,255,0.4);
+    }
