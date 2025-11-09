@@ -15,9 +15,9 @@
       height: 100%;
       object-fit: cover;
       z-index: -2;
-      opacity: 0.95; /* 提高透明度让背景更清晰 */
-      filter: blur(0px) brightness(1) contrast(1.1); /* 移除模糊，增加对比度 */
-      transform: scaleX(-1); /* ✅ Mirror effect */
+      opacity: 0.95;
+      filter: blur(0px) brightness(1) contrast(1.1);
+      transform: scaleX(-1);
     }
 
     /* ===== 🌫 Overlay ===== */
@@ -28,9 +28,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.2); /* 减少遮罩让背景更亮 */
+      background: rgba(0, 0, 0, 0.2);
       z-index: -1;
-      /* 移除 backdrop-filter */
     }
 
     body {
@@ -40,15 +39,14 @@
       padding-bottom: 60px;
       overflow-x: hidden;
       min-height: 100vh;
-      background: transparent; /* 移除渐变背景 */
+      background: transparent;
     }
 
     /* ===== 🪞 Header ===== */
     header {
       text-align: center;
       padding: 25px 10px;
-      background: rgba(0, 0, 0, 0.6); /* 增加不透明度提高可读性 */
-      /* 移除 backdrop-filter */
+      background: rgba(0, 0, 0, 0.6);
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
       position: relative;
       z-index: 1;
@@ -62,7 +60,7 @@
       -webkit-text-fill-color: transparent;
       font-weight: 600;
       letter-spacing: 1px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5); /* 添加文字阴影提高可读性 */
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
 
     /* ===== 📚 Category ===== */
@@ -80,7 +78,7 @@
       font-size: 1.5rem;
       color: #fff;
       margin-bottom: 10px;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.7); /* 增强文字阴影 */
+      text-shadow: 0 2px 8px rgba(0,0,0,0.7);
     }
 
     .category-header img {
@@ -88,7 +86,7 @@
       height: 36px;
       border-radius: 8px;
       object-fit: cover;
-      background: rgba(255, 255, 255, 0.1); /* 轻微背景提高可读性 */
+      background: rgba(255, 255, 255, 0.1);
     }
 
     /* ===== 🔲 Book Grid ===== */
@@ -100,16 +98,16 @@
     }
 
     .book {
-      background: rgba(0, 0, 0, 0.7); /* 改为深色半透明背景 */
+      background: rgba(0, 0, 0, 0.7);
       border-radius: 16px;
       overflow: hidden;
       transition: transform 0.2s, box-shadow 0.2s;
       cursor: pointer;
       text-decoration: none;
       color: inherit;
-      /* 移除 backdrop-filter */
       border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* 添加阴影 */
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      position: relative;
     }
 
     .book:hover {
@@ -131,10 +129,9 @@
 
     .book-info {
       padding: 12px;
-      background: rgba(0, 0, 0, 0.8); /* 深色背景提高文字可读性 */
+      background: rgba(0, 0, 0, 0.8);
       border-radius: 0 0 12px 12px;
       border: none;
-      /* 移除 backdrop-filter */
     }
 
     /* ===== 🌈 Animated Gradient Titles ===== */
@@ -145,7 +142,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       animation: gradientAnimation 4s ease infinite;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.3); /* 添加文字阴影 */
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
 
     .book-title {
@@ -164,6 +161,41 @@
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
+    }
+
+    /* ===== ⭐ 收藏按钮 ===== */
+    .favorite-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #fff;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      z-index: 2;
+      backdrop-filter: blur(10px);
+    }
+
+    .favorite-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.1);
+    }
+
+    .favorite-btn.active {
+      color: #ffd700;
+      background: rgba(255, 215, 0, 0.2);
+    }
+
+    .favorite-btn.active:hover {
+      background: rgba(255, 215, 0, 0.3);
     }
 
     /* ===== ⚡ Footer ===== */
@@ -195,7 +227,6 @@
       height: 50px;
       cursor: pointer;
       font-size: 1.2rem;
-      /* 移除 backdrop-filter */
       transition: all 0.3s ease;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
       border: 2px solid rgba(255, 255, 255, 0.3);
@@ -228,6 +259,12 @@
         height: 45px;
         bottom: 15px;
         right: 15px;
+      }
+      
+      .favorite-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
       }
     }
 
@@ -387,7 +424,7 @@
 
     // 初始化视频播放
     function initVideo() {
-      video.muted = true; // 初始静音以符合浏览器策略
+      video.muted = true;
       video.play().catch(err => {
         console.log("视频自动播放被阻止:", err);
       });
@@ -400,10 +437,8 @@
       audioToggle.textContent = audioEnabled ? "🔊" : "🔇";
       
       if (audioEnabled) {
-        // 尝试播放音频
         video.play().catch(err => {
           console.log("音频播放被阻止:", err);
-          // 如果播放失败，显示提示
           alert("请点击页面任意位置启用音频播放");
         });
       }
@@ -412,14 +447,107 @@
     // 用户交互后启用音频
     document.addEventListener('click', () => {
       if (!audioEnabled) return;
-      
       video.play().catch(err => {
         console.log("音频播放错误:", err);
       });
     }, { once: false });
 
+    // 收藏功能
+    function getFavorites() {
+      return JSON.parse(localStorage.getItem('bookFavorites') || '[]');
+    }
+
+    function saveFavorites(favorites) {
+      localStorage.setItem('bookFavorites', JSON.stringify(favorites));
+    }
+
+    function toggleFavorite(bookId, bookData) {
+      const favorites = getFavorites();
+      const existingIndex = favorites.findIndex(fav => fav.id === bookId);
+      
+      if (existingIndex > -1) {
+        // 取消收藏
+        favorites.splice(existingIndex, 1);
+        saveFavorites(favorites);
+        return false;
+      } else {
+        // 添加收藏
+        favorites.push({
+          id: bookId,
+          title: bookData.title,
+          author: bookData.author,
+          cover: bookData.cover,
+          link: bookData.link,
+          category: bookData.category,
+          timestamp: new Date().toISOString()
+        });
+        saveFavorites(favorites);
+        return true;
+      }
+    }
+
+    function isFavorite(bookId) {
+      const favorites = getFavorites();
+      return favorites.some(fav => fav.id === bookId);
+    }
+
+    // 创建收藏按钮
+    function createFavoriteButton(bookId, bookData) {
+      const button = document.createElement('button');
+      button.className = `favorite-btn ${isFavorite(bookId) ? 'active' : ''}`;
+      button.innerHTML = isFavorite(bookId) ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+      
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const isNowFavorite = toggleFavorite(bookId, bookData);
+        button.classList.toggle('active', isNowFavorite);
+        button.innerHTML = isNowFavorite ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
+        
+        // 显示收藏状态提示
+        showFavoriteNotification(bookData.title, isNowFavorite);
+      });
+      
+      return button;
+    }
+
+    // 显示收藏状态提示
+    function showFavoriteNotification(bookTitle, isFavorite) {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${isFavorite ? 'rgba(34, 197, 94, 0.9)' : 'rgba(239, 68, 68, 0.9)'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        z-index: 10000;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        backdrop-filter: blur(10px);
+        animation: slideIn 0.3s ease-out;
+      `;
+      
+      notification.textContent = isFavorite 
+        ? `⭐ 已收藏 "${bookTitle}"` 
+        : `🗑️ 已取消收藏 "${bookTitle}"`;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in forwards';
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 300);
+      }, 2000);
+    }
+
     // 显示书籍函数
-    function displayBooks(bookArray, containerId) {
+    function displayBooks(bookArray, containerId, category) {
       const container = document.getElementById(containerId);
       if (!container) return;
       container.innerHTML = "";
@@ -432,7 +560,7 @@
         const img = document.createElement("img");
         img.src = book.cover;
         img.alt = book.title;
-        img.loading = "lazy"; // 优化加载
+        img.loading = "lazy";
 
         const info = document.createElement("div");
         info.className = "book-info";
@@ -445,9 +573,16 @@
         author.className = "book-author";
         author.textContent = book.author;
 
+        // 添加收藏按钮
+        const favoriteBtn = createFavoriteButton(book.id, {
+          ...book,
+          category: category
+        });
+
         info.appendChild(title);
         info.appendChild(author);
         a.appendChild(img);
+        a.appendChild(favoriteBtn); // 添加收藏按钮
         a.appendChild(info);
         container.appendChild(a);
       });
@@ -456,12 +591,12 @@
     // 页面加载完成后初始化
     window.addEventListener('load', () => {
       initVideo();
-      displayBooks(iqBooks, "iqBooks");
-      displayBooks(eqBooks, "eqBooks");
-      displayBooks(philosophyBooks, "philosophyBooks");
+      displayBooks(iqBooks, "iqBooks", "iq");
+      displayBooks(eqBooks, "eqBooks", "eq");
+      displayBooks(philosophyBooks, "philosophyBooks", "philosophy");
     });
 
-    // 处理页面可见性变化（标签页切换）
+    // 处理页面可见性变化
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         video.pause();
@@ -469,6 +604,33 @@
         video.play().catch(err => console.log("恢复播放失败:", err));
       }
     });
+
+    // 添加动画样式
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   </script>
 </body>
 </html>
