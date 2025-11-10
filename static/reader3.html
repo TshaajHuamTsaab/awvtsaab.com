@@ -1,204 +1,290 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Awv's漆书</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awv's漆书</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="css/reader3.css">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-  <link rel="stylesheet" href="css/reader3.css">
+    <!-- PWA配置 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Awv's漆书">
 
-  <meta name="theme-color" content="#000">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Awv's漆书">
-  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <!-- 苹果Safari特定配置 -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
 
-  <style>
-    #dj-toggle-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 999;
-    }
-    .background-play-notification {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, #00ff88, #0ff);
-      color: #000;
-      padding: 12px 24px;
-      border-radius: 25px;
-      box-shadow: 0 4px 20px rgba(0, 255, 255, 0.5);
-      z-index: 10000;
-      display: none;
-      align-items: center;
-      gap: 12px;
-      font-weight: bold;
-      font-size: 14px;
-      animation: slideInDown 0.5s ease;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-    }
-    .background-play-notification.show { display: flex; }
+    <style>
+        /* 保证切换按钮始终可见 */
+        #dj-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+        }
 
-    @keyframes slideInDown {
-      from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
-      to { transform: translateX(-50%) translateY(0); opacity: 1; }
-    }
+        /* 锁屏播放提示样式 */
+        .background-play-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #00ff88, #0ff);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 25px;
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.5);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            animation: slideInDown 0.5s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .background-play-notification.show { display: flex; }
 
-    #chapter-audio {
-      position: absolute;
-      left: -9999px;
-      opacity: 0;
-      pointer-events: none;
-      width: 0;
-      height: 0;
-    }
+        @keyframes slideInDown {
+            from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
 
-    .loading-spinner {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 9999;
-    }
-    .loading-spinner.active { display: block; }
-    .spinner {
-      width: 50px; height: 50px;
-      border: 5px solid rgba(0, 255, 255, 0.3);
-      border-top: 5px solid #0ff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
-  </style>
+        /* 隐藏音频元素 */
+        #chapter-audio {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+            width: 0;
+            height: 0;
+        }
+
+        /* 加载动画 */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+        .loading-spinner.active { display: block; }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 5px solid rgba(0, 255, 255, 0.3);
+            border-top: 5px solid #0ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
+    </style>
 </head>
-
 <body>
-  <div class="loading-spinner" id="loading-spinner"><div class="spinner"></div></div>
-  <div id="bookTitle">加载中...</div>
-  <div id="book"></div>
-  <div id="error"></div>
-  <div id="outer-ring"></div>
-  <div id="square-rotation"></div>
+    <!-- 加载动画 -->
+    <div class="loading-spinner" id="loading-spinner"><div class="spinner"></div></div>
 
-  <div id="background-play-notification" class="background-play-notification">
-    <i class="fas fa-headphones"></i>
-    <span>锁屏播放已启用 - 锁屏后仍可继续收听</span>
-  </div>
+    <!-- 主要内容区域 -->
+    <div id="bookTitle">加载中...</div>
+    <div id="book"></div>
+    <div id="error"></div>
 
-  <!-- 🎧 DJ Player -->
-  <div id="dj-player" class="dj-player">
-    <div class="dj-chapter-info">
-      <div id="dj-chapter-title">加载中...</div>
-      <div id="dj-chapter-progress">- / -</div>
+    <!-- 装饰元素 -->
+    <div id="outer-ring"></div>
+    <div id="square-rotation"></div>
+
+    <!-- 锁屏播放提示 -->
+    <div id="background-play-notification" class="background-play-notification">
+        <i class="fas fa-headphones"></i>
+        <span>锁屏播放已启用 - 锁屏后仍可继续收听</span>
     </div>
 
-    <div class="dj-main-controls">
-      <button class="dj-btn" id="prev"><i class="fas fa-backward-step"></i></button>
-      <button class="dj-btn" id="play"><i class="fas fa-play"></i></button>
-      <button class="dj-btn" id="next"><i class="fas fa-forward-step"></i></button>
+    <!-- DJ风格播放控制器 -->
+    <div id="dj-player" class="dj-player">
+        <div class="dj-chapter-info">
+            <div class="dj-chapter-title" id="dj-chapter-title">加载中...</div>
+            <div class="dj-chapter-progress" id="dj-chapter-progress">- / -</div>
+        </div>
+
+        <div class="dj-main-controls">
+            <button class="dj-btn dj-prev-btn" title="上一章">
+                <i class="fas fa-backward-step"></i><span class="btn-text">上一章</span>
+            </button>
+            <button class="dj-btn dj-play-btn" id="dj-play-btn" title="播放/暂停">
+                <i class="fas fa-play"></i><span class="btn-text">播放</span>
+            </button>
+            <button class="dj-btn dj-next-btn" title="下一章">
+                <i class="fas fa-forward-step"></i><span class="btn-text">下一章</span>
+            </button>
+        </div>
+
+        <div class="dj-progress">
+            <div class="dj-time-display">
+                <span id="dj-current-time">00:00</span>
+                <span id="dj-duration">00:00</span>
+            </div>
+            <div class="dj-progress-bar"><div class="dj-progress-fill" id="dj-progress-fill"></div></div>
+        </div>
+
+        <div class="dj-visualizer" id="dj-visualizer"></div>
+
+        <div class="dj-secondary-controls">
+            <button class="dj-btn dj-speed-btn" id="dj-speed-btn" title="播放速度">
+                <i class="fas fa-gauge-high"></i><span class="btn-text">1x</span>
+            </button>
+            <button class="dj-btn dj-theme-btn" title="切换主题">
+                <i class="fas fa-palette"></i><span class="btn-text">主题</span>
+            </button>
+            <button class="dj-btn dj-font-btn dj-font-minus" title="减小字体">
+                <i class="fas fa-font"></i><span class="btn-text">A-</span>
+            </button>
+            <button class="dj-btn dj-font-btn dj-font-plus" title="增大字体">
+                <i class="fas fa-font"></i><span class="btn-text">A+</span>
+            </button>
+            <button class="dj-btn dj-home-btn" title="返回首页">
+                <i class="fas fa-home"></i><span class="btn-text">首页</span>
+            </button>
+        </div>
     </div>
 
-    <div class="dj-progress">
-      <div class="dj-time-display">
-        <span id="dj-current-time">00:00</span>
-        <span id="dj-duration">00:00</span>
-      </div>
-      <div class="dj-progress-bar">
-        <div class="dj-progress-fill" id="dj-progress-fill"></div>
-      </div>
-    </div>
-  </div>
+    <button id="dj-toggle-btn" class="dj-btn dj-toggle-btn">
+        <i class="fas fa-eye"></i><span class="btn-text">显示/隐藏</span>
+    </button>
 
-  <button id="dj-toggle-btn" class="dj-btn"><i class="fas fa-eye"></i></button>
-  <audio id="chapter-audio" preload="auto" playsinline crossorigin="anonymous"></audio>
+    <!-- 音频元素 -->
+    <audio id="chapter-audio" preload="auto" playsinline crossorigin="anonymous"></audio>
 
-  <script src="js/reader3.js"></script>
+    <!-- 原有逻辑 -->
+    <script src="js/reader3.js"></script>
 
+    <!-- 锁屏播放支持核心代码 -->
   <script>
   // ============================================================
-  // 🔊 UNIVERSAL AUDIO FIX — Never Banned or Blocked
+  // 🔊 锁屏播放 & 后台播放支持（最终修正版）
   // ============================================================
-  class UniversalAudio {
+  class LockScreenPlayback {
     constructor() {
       this.audio = document.getElementById('chapter-audio');
-      this.playBtn = document.getElementById('play');
       this.init();
     }
 
     init() {
-      this.ensureContext();
-      this.attachEvents();
-      this.setupMediaSession();
-      console.log("✅ Universal Audio initialized");
+      console.log('🚀 初始化锁屏播放支持...');
+      this.initMediaSession();
+      this.initEvents();
+      this.restoreState();
+      console.log('✅ 初始化完成');
     }
 
-    ensureContext() {
-      // Safari / iOS fix: unlock audio context after user tap
-      const resumeAudio = () => {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const src = ctx.createMediaElementSource(this.audio);
-        src.connect(ctx.destination);
-        ctx.resume();
-        document.removeEventListener("touchstart", resumeAudio);
-        document.removeEventListener("click", resumeAudio);
-      };
-      document.addEventListener("touchstart", resumeAudio, { once: true });
-      document.addEventListener("click", resumeAudio, { once: true });
-    }
-
-    attachEvents() {
-      this.playBtn.addEventListener('click', async () => {
+    initMediaSession() {
+      if (!('mediaSession' in navigator)) return;
+      this.updateMetadata();
+      ['play', 'pause', 'previoustrack', 'nexttrack'].forEach(action => {
         try {
-          if (this.audio.paused) {
-            await this.audio.play();
-            this.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-            navigator.mediaSession.playbackState = 'playing';
-          } else {
-            this.audio.pause();
-            this.playBtn.innerHTML = '<i class="fas fa-play"></i>';
-            navigator.mediaSession.playbackState = 'paused';
-          }
-        } catch (err) {
-          console.warn("Autoplay blocked, user must tap.", err);
-        }
+          navigator.mediaSession.setActionHandler(action, () => this.handleAction(action));
+        } catch {}
       });
     }
 
-    setupMediaSession() {
+    handleAction(action) {
+      switch(action) {
+        case 'play': this.audio.play(); break;
+        case 'pause': this.audio.pause(); break;
+        case 'previoustrack':
+          window.ReaderApp?.changeChapter?.(-1); break;
+        case 'nexttrack':
+          window.ReaderApp?.changeChapter?.(1); break;
+      }
+      this.saveState();
+    }
+
+    updateMetadata() {
       if (!('mediaSession' in navigator)) return;
+      const bookTitle = document.getElementById('bookTitle')?.textContent || 'Awv’s漆书';
+      const chapterTitle = document.getElementById('dj-chapter-title')?.textContent || '章节';
       navigator.mediaSession.metadata = new MediaMetadata({
-        title: "Awv’s漆书",
-        artist: "Awv Reader",
-        album: "Awv Audio",
+        title: `${bookTitle} - ${chapterTitle}`,
+        artist: 'Awv 朗读器',
+        album: 'Awv’s漆书',
         artwork: [
           { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
         ]
       });
+    }
 
-      navigator.mediaSession.setActionHandler('play', () => this.audio.play());
-      navigator.mediaSession.setActionHandler('pause', () => this.audio.pause());
-      navigator.mediaSession.setActionHandler('previoustrack', () => alert("上一章"));
-      navigator.mediaSession.setActionHandler('nexttrack', () => alert("下一章"));
+    initEvents() {
+      // 不再暂停音频，仅提示用户
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) this.showNotification();
+      });
+      this.audio.addEventListener('play', () => {
+        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+        this.saveState();
+      });
+      this.audio.addEventListener('pause', () => {
+        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+        this.saveState();
+      });
+      window.addEventListener('beforeunload', () => this.saveState());
+      setInterval(() => this.saveState(), 10000);
+    }
+
+    showNotification() {
+      const el = document.getElementById('background-play-notification');
+      if (!el) return;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    saveState() {
+      const s = {
+        currentTime: this.audio.currentTime,
+        isPlaying: !this.audio.paused,
+        rate: this.audio.playbackRate,
+        volume: this.audio.volume,
+        ts: Date.now(),
+        book: window.bookFolder || 'dev1',
+        chapter: window.chapterNum || 'cover'
+      };
+      localStorage.setItem('lockScreenPlayState', JSON.stringify(s));
+    }
+
+    restoreState() {
+      try {
+        const s = JSON.parse(localStorage.getItem('lockScreenPlayState') || '{}');
+        if (!s.ts || Date.now() - s.ts > 3600000) return;
+        this.audio.currentTime = s.currentTime || 0;
+        this.audio.playbackRate = s.rate || 1;
+        this.audio.volume = s.volume || 1;
+      } catch {}
     }
   }
 
-  // ============================================================
-  // 🪄 Initialize
-  // ============================================================
-  document.addEventListener("DOMContentLoaded", () => {
-    const audioSystem = new UniversalAudio();
-    const audio = document.getElementById('chapter-audio');
-    // Example test audio
-    audio.src = "天使.mp4";
-    audio.load();
+  document.addEventListener('DOMContentLoaded', () => {
+    window.lockScreenPlayback = new LockScreenPlayback();
+    window.updateMediaSessionMetadata = () => lockScreenPlayback.updateMetadata();
   });
+
+  // ============================================================
+  // ✅ Service Worker 注册 (PWA 必须)
+  // ============================================================
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+      try {
+        const swPath = window.location.pathname.includes('/js/') ? '../sw.js' : '/sw.js';
+        const reg = await navigator.serviceWorker.register(swPath);
+        console.log('✅ Service Worker 注册成功:', reg.scope);
+      } catch (e) {
+        console.error('❌ Service Worker 注册失败:', e);
+      }
+    });
+  }
   </script>
 </body>
 </html>
