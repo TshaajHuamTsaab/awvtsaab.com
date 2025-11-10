@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Download Center — Real Downloads & Offline</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Microsoft Yahei",sans-serif;margin:0;background:#f4f6f8;color:#111}
+  header{background:#0b6; color:#002; padding:14px 18px;text-align:center}
+  main{max-width:980px;margin:20px auto;padding:18px;background:#fff;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.06)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+  .card{border:1px solid #eef;border-radius:10px;padding:12px;background:linear-gradient(180deg,#fff,#fafafa);display:flex;flex-direction:column;gap:8px}
+  .cover{width:100%;height:160px;object-fit:cover;border-radius:6px}
+  .title{font-weight:700;font-size:1rem}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn{background:#0b6;color:#002;border:none;padding:8px 10px;border-radius:6px;cursor:pointer}
+  .btn.secondary{background:#2d6;padding:linear-gradient(90deg,#2d6,#0b6);color:#002}
+  .btn.ghost{background:transparent;border:1px solid #ddd}
+  .progress{height:8px;background:#eee;border-radius:6px;overflow:hidden}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#0b6,#2d6)}
+  #historyList{margin-top:18px;display:flex;flex-direction:column;gap:8px}
+  .hist{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;background:#fbfbfb;border:1px solid #eee}
+  footer{font-size:13px;color:#666;text-align:center;margin:18px 0}
+  .note{font-size:13px;color:#444;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<header><h1><i class="fas fa-cloud-download-alt"></i> Download Center (real downloads & offline)</h1></header>
+
+<main>
+  <p class="note">User type: <strong id="userTypeLabel">free</strong>. (Open console to toggle user type via <code>localStorage.setItem('userType','premium')</code> and refresh.)</p>
+
+  <section>
+    <h2>Available Books</h2>
+    <div class="grid" id="bookGrid"></div>
+  </section>
+
+  <section style="margin-top:18px">
+    <h2>Download History / Offline</h2>
+    <div id="historyList"></div>
+  </section>
+
+  <section style="margin-top:18px">
+    <h2>Developer / Notes</h2>
+    <p class="note">
+      This page downloads files via <code>fetch()</code> streaming and saves blobs into IndexedDB for offline opening.
+      Ensure your download URLs allow CORS. For very large files consider letting user save to disk (File System Access API).
+    </p>
+  </section>
+</main>
+
+<footer>© 2025 — use responsibly. Files must be legally distributable.</footer>
+
+<script>
+/* -------------------------
+  Simple IndexedDB helper (promisified)
+   - store blobs under 'downloads' store keyed by id
+--------------------------*/
+const DB_NAME = 'bookDownloadsDB';
+const DB_STORE = 'downloads';
+function openDb(){
+  return new Promise((res, rej)=>{
+    const rq = indexedDB.open(DB_NAME, 1);
+    rq.onupgradeneeded = e => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains(DB_STORE)){
+        db.createObjectStore(DB_STORE, { keyPath: 'id' }); // id unique
+      }
+    };
+    rq.onsuccess = e => res(e.target.result);
+    rq.onerror = e => rej(e.target.error);
+  });
+}
+async function idbPut(record){
+  const db = await openDb();
+  return new Promise((res, rej)=>{
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    const os = tx.objectStore(DB_STORE);
+    const rq = os.put(record);
+    rq.onsuccess = ()=>{ res(true); db.close(); };
+    rq.onerror = e=>{ rej(e.target.error); db.close(); };
+  });
+}
+async function idbGet(id){
+  const db = await openDb();
+  return new Promise((res, rej)=>{
+    const tx = db.transaction(DB_STORE, 'readonly');
+    const os = tx.objectStore(DB_STORE);
+    const rq = os.get(id);
+    rq.onsuccess = ()=>{ res(rq.result); db.close(); };
+    rq.onerror = e=>{ rej(e.target.error); db.close(); };
+  });
+}
+async function idbGetAll(){
+  const db = await openDb();
+  return new Promise((res, rej)=>{
+    const tx = db.transaction(DB_STORE, 'readonly');
+    const os = tx.objectStore(DB_STORE);
+    const rq = os.getAll();
+    rq.onsuccess = ()=>{ res(rq.result); db.close(); };
+    rq.onerror = e=>{ rej(e.target.error); db.close(); };
+  });
+}
+async function idbDelete(id){
+  const db = await openDb();
+  return new Promise((res, rej)=>{
+    const tx = db.transaction(DB_STORE, 'readwrite');
+    const os = tx.objectStore(DB_STORE);
+    const rq = os.delete(id);
+    rq.onsuccess = ()=>{ res(true); db.close(); };
+    rq.onerror = e=>{ rej(e.target.error); db.close(); };
+  });
+}
+
+/* ---------------------------
+  Sample real download URLs
+  Replace these with your actual .pdf/.epub/.mp3 URLs (must allow CORS)
+----------------------------*/
+const BOOKS = [
+  { id: 'b1', title: 'Sample Book 1 (pdf)', cover: 'https://i.postimg.cc/SRTw3Bmm/book1.jpg', url: 'https://cors-anywhere.herokuapp.com/https://file-examples-com.github.io/uploads/2017/10/file-sample_150kB.pdf', premium: false },
+  { id: 'b2', title: 'Sample Book 2 (epub)', cover: 'https://i.postimg.cc/2ycPMsCb/book10.jpg', url: 'https://cors-anywhere.herokuapp.com/https://file-examples-com.github.io/uploads/2017/11/file_example_EPUB_1kb.epub', premium: false },
+  { id: 'b3', title: 'Premium Audio (mp3)', cover: 'https://i.postimg.cc/h42WXdT8/book11.jpg', url: 'https://cors-anywhere.herokuapp.com/https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_700KB.mp3', premium: true },
+];
+
+/* ---------------------------
+  Helper: create DOM card with progress + actions
+----------------------------*/
+function createBookCard(book){
+  const el = document.createElement('div'); el.className = 'card';
+  el.innerHTML = `
+    <img class="cover" src="${book.cover}" alt="${book.title}">
+    <div class="title">${book.title}</div>
+    <div class="controls">
+      <button class="btn downloadBtn">${book.premium ? '<i class="fas fa-lock"></i> Premium' : '<i class="fas fa-download"></i> Download'}</button>
+      <button class="btn ghost saveDiskBtn" title="Save to disk (File Save)"><i class="fas fa-save"></i></button>
+      <div style="flex:1"></div>
+    </div>
+    <div class="progress" style="display:none;margin-top:8px"><i></i></div>
+    <div class="status" style="font-size:13px;color:#666;margin-top:6px"></div>
+  `;
+  // event handlers
+  const downloadBtn = el.querySelector('.downloadBtn');
+  const saveDiskBtn = el.querySelector('.saveDiskBtn');
+  const prog = el.querySelector('.progress');
+  const bar = prog.querySelector('i');
+  const status = el.querySelector('.status');
+
+  downloadBtn.addEventListener('click', ()=> handleDownload(book, prog, bar, status));
+  saveDiskBtn.addEventListener('click', ()=> saveToDiskOption(book));
+  return el;
+}
+
+/* ---------------------------
+  Download streaming with progress -> store blob in idb
+----------------------------*/
+async function handleDownload(book, progEl, barEl, statusEl){
+  const userType = localStorage.getItem('userType') || 'free';
+  if(book.premium && userType !== 'premium'){
+    alert('This is a premium file. Upgrade to download.');
+    return;
+  }
+
+  progEl.style.display = 'block';
+  barEl.style.width = '0%';
+  statusEl.textContent = 'Starting...';
+
+  try{
+    // fetch with streaming
+    const resp = await fetch(book.url, { method: 'GET' });
+    if(!resp.ok) throw new Error('Network error: ' + resp.status);
+
+    // total size if provided
+    const contentLength = resp.headers.get('Content-Length') || resp.headers.get('content-length');
+    const total = contentLength ? parseInt(contentLength,10) : null;
+
+    const reader = resp.body.getReader();
+    const chunks = [];
+    let received = 0;
+
+    while(true){
+      const {done, value} = await reader.read();
+      if(done) break;
+      chunks.push(value);
+      received += value.length || value.byteLength || value.size || (value.constructor && value.constructor.BYTES_PER_ELEMENT*value.length) || 0;
+      if(total){
+        const pct = Math.floor((received/total)*100);
+        barEl.style.width = pct + '%';
+        statusEl.textContent = `Downloading — ${pct}%`;
+      } else {
+        // animated blob progress
+        const guess = Math.min(95, Math.floor(received/1024));
+        barEl.style.width = guess + '%';
+        statusEl.textContent = `Downloading — ${Math.round(received/1024)} KB`;
+      }
+    }
+
+    // combine chunks to blob
+    const blob = new Blob(chunks);
+    barEl.style.width = '100%';
+    statusEl.textContent = 'Finalizing...';
+
+    // store to IndexedDB for offline
+    const record = {
+      id: book.id,
+      title: book.title,
+      blob,
+      url: book.url,
+      date: new Date().toISOString(),
+      size: blob.size
+    };
+    await idbPut(record);
+
+    // trigger save (download)
+    const filename = sanitizeFilename(book.title) + detectExtFromUrl(book.url);
+    triggerBrowserDownload(blob, filename);
+
+    statusEl.textContent = 'Downloaded & saved for offline';
+    renderHistory(); // update history
+  }catch(err){
+    console.error(err);
+    statusEl.textContent = 'Error: ' + (err.message||err);
+    progEl.style.display = 'none';
+    alert('Download failed: ' + (err.message || err));
+  }
+}
+
+/* ---------------------------
+  Utility: trigger a browser download from blob
+----------------------------*/
+function triggerBrowserDownload(blob, filename){
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=> {
+    URL.revokeObjectURL(url);
+    a.remove();
+  }, 1000);
+}
+
+/* ---------------------------
+  Utility: naive filename & extension detection
+----------------------------*/
+function sanitizeFilename(name){
+  return name.replace(/[\/\\?%*:|"<>]/g,'-').trim().slice(0,120);
+}
+function detectExtFromUrl(url){
+  try{
+    const u = new URL(url);
+    const p = u.pathname;
+    const ext = p.split('.').pop();
+    if(ext && ext.length<=5) return '.'+ext;
+  }catch(e){}
+  return '.bin';
+}
+
+/* ---------------------------
+  Save to disk via File System Access API (optional)
+  (Prompts user to choose location — good for large files)
+----------------------------*/
+async function saveToDiskOption(book){
+  if(!('showSaveFilePicker' in window)){
+    alert('File System Access API not available in this browser. Use normal download.');
+    return;
+  }
+
+  try{
+    // fetch the resource fully as blob (could reuse cached idb entry if exists)
+    const resp = await fetch(book.url);
+    if(!resp.ok) throw new Error('Network error: ' + resp.status);
+    const blob = await resp.blob();
+
+    // ask user where to save
+    const ext = detectExtFromUrl(book.url) || '.bin';
+    const handle = await window.showSaveFilePicker({
+      suggestedName: sanitizeFilename(book.title) + ext,
+      types: [{ description: 'Book file', accept: { 'application/*': [ext] } }]
+    });
+    const writable = await handle.createWritable();
+    await writable.write(blob);
+    await writable.close();
+    alert('Saved to disk successfully');
+  }catch(err){
+    console.error(err);
+    alert('Save failed: ' + (err.message||err));
+  }
+}
+
+/* ---------------------------
+  History rendering and open offline
+----------------------------*/
+async function renderHistory(){
+  const list = document.getElementById('historyList');
+  const all = await idbGetAll();
+  if(!all || all.length === 0){
+    list.innerHTML = '<div class="hist">No downloads saved for offline.</div>';
+    return;
+  }
+  // newest first
+  all.sort((a,b)=> new Date(b.date)-new Date(a.date));
+  list.innerHTML = '';
+  all.forEach(item => {
+    const row = document.createElement('div'); row.className='hist';
+    const left = document.createElement('div');
+    left.innerHTML = `<strong>${item.title}</strong><div style="font-size:12px;color:#666">${new Date(item.date).toLocaleString()} — ${Math.round(item.size/1024)} KB</div>`;
+    const right = document.createElement('div');
+    right.style.display='flex'; right.style.gap='8px';
+    const openBtn = document.createElement('button'); openBtn.className='btn'; openBtn.textContent='Open';
+    const dlBtn = document.createElement('button'); dlBtn.className='btn ghost'; dlBtn.textContent='Download';
+    const delBtn = document.createElement('button'); delBtn.className='btn ghost'; delBtn.textContent='Delete';
+
+    openBtn.onclick = async ()=>{
+      // create object URL and open in new tab if possible (depends on file type)
+      const rec = await idbGet(item.id);
+      if(!rec){ alert('Offline file not found'); return; }
+      const url = URL.createObjectURL(rec.blob);
+      window.open(url, '_blank');
+      setTimeout(()=> URL.revokeObjectURL(url), 20000);
+    };
+    dlBtn.onclick = async ()=>{
+      const rec = await idbGet(item.id);
+      if(!rec){ alert('Offline file not found'); return; }
+      const filename = sanitizeFilename(rec.title) + '.bin';
+      triggerBrowserDownload(rec.blob, filename);
+    };
+    delBtn.onclick = async ()=>{
+      if(!confirm('Delete offline copy?')) return;
+      await idbDelete(item.id);
+      renderHistory();
+    };
+
+    right.appendChild(openBtn);
+    right.appendChild(dlBtn);
+    right.appendChild(delBtn);
+
+    row.appendChild(left);
+    row.appendChild(right);
+    list.appendChild(row);
+  });
+}
+
+/* ---------------------------
+  Render available books and boot
+----------------------------*/
+function renderAvailable(){
+  const grid = document.getElementById('bookGrid');
+  grid.innerHTML = '';
+  BOOKS.forEach(b => grid.appendChild(createBookCard(b)));
+  document.getElementById('userTypeLabel').textContent = localStorage.getItem('userType') || 'free';
+}
+
+renderAvailable();
+renderHistory();
+
+/* ---------------------------
+  Small helper: enable toggling user type quickly in console
+----------------------------*/
+window.__setUserType = (t)=>{
+  if(!['free','premium'].includes(t)) throw new Error('type free|premium');
+  localStorage.setItem('userType', t);
+  document.getElementById('userTypeLabel').textContent = t;
+  alert('userType set to ' + t + '. Refresh if needed.');
+};
+
+console.log('Download page ready. Use __setUserType("premium") to simulate premium.');
+</script>
+</body>
+</html>
