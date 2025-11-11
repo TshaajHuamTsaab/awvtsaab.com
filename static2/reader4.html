@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>📖 Awv Reader</title>
-  <link rel="stylesheet" href="css/reader4.css" />
   <style>
     :root {
       --bg-primary: #000;
@@ -15,6 +14,8 @@
       --button-bg: #00bcd4;
       --button-hover: #00acc1;
       --shadow-color: rgba(0,255,255,0.2);
+      --reader-bg: #1a1a1a;
+      --reader-border: #333;
     }
 
     body {
@@ -108,13 +109,27 @@
       font-size: 1.4rem;
     }
 
+    .reader-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 95%;
+    }
+
     .reader-text {
       flex: 1;
-      padding: 20px;
+      padding: 30px;
       line-height: 1.8;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       overflow-y: auto;
       transition: color 0.5s ease;
+      background: var(--reader-bg);
+      border: 2px solid var(--reader-border);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
     }
 
     .audio-section, .chapter-nav {
@@ -122,26 +137,117 @@
       margin: 20px 0;
     }
 
-    button {
-      background: var(--button-bg);
+    /* 固定彩色按钮样式 */
+    .fixed-color-btn {
+      background: linear-gradient(135deg, #ff6b6b, #ff8e53);
       border: none;
       color: white;
-      padding: 10px 20px;
+      padding: 12px 24px;
       border-radius: 12px;
       cursor: pointer;
       font-weight: 600;
       transition: 0.2s;
-      margin: 0 5px;
+      margin: 0 10px;
+      box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+      font-size: 1rem;
     }
 
-    button:hover {
-      background: var(--button-hover);
+    .fixed-color-btn:hover {
+      background: linear-gradient(135deg, #ff5252, #ff7b42);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
     }
 
-    audio {
-      width: 70%;
-      border-radius: 10px;
-      margin-top: 10px;
+    .fixed-color-btn:disabled {
+      background: linear-gradient(135deg, #aaa, #888);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* 音频播放器样式 */
+    .audio-section {
+      width: 95%;
+      max-width: 800px;
+      margin: 20px auto;
+    }
+
+    .audio-player {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #111;
+      border: 3px solid #00ff00;
+      border-radius: 16px;
+      padding: 12px 20px;
+      box-shadow: 0 0 16px #00ff00;
+    }
+
+    .audio-player button {
+      background: #1a1a1a;
+      color: #00ff00;
+      border: 2px solid #00ff00;
+      border-radius: 12px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.2s;
+      font-weight: 600;
+    }
+
+    .audio-player button:hover {
+      background: #00ff00;
+      color: #111;
+      box-shadow: 0 0 12px #00ff00;
+    }
+
+    #audio-progress {
+      flex: 1;
+      height: 10px;
+      border-radius: 5px;
+      background: #333;
+      cursor: pointer;
+      accent-color: #00ff00;
+    }
+
+    #audio-time {
+      color: #00ff00;
+      font-family: monospace;
+      font-size: 0.9rem;
+      min-width: 100px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    /* 速度按钮样式 */
+    #speed-btn {
+      background: #1a1a1a;
+      color: #00ff00;
+      border: 2px solid #00ff00;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      user-select: none;
+      font-weight: 600;
+    }
+
+    #speed-btn:hover {
+      background: #00ff00;
+      color: #111;
+      box-shadow: 0 0 12px #00ff00;
+    }
+
+    #speed-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 6px #00ff00 inset;
+    }
+
+    #speed-btn.active {
+      background: #00ff00;
+      color: #111;
+      box-shadow: 0 0 12px #00ff00;
     }
 
     footer {
@@ -150,6 +256,7 @@
       padding: 15px;
       font-size: 0.9rem;
       color: #777;
+      margin-top: 20px;
     }
 
     /* 主题颜色定义 */
@@ -162,6 +269,8 @@
       --button-bg: #00bcd4;
       --button-hover: #00acc1;
       --shadow-color: rgba(0,255,255,0.2);
+      --reader-bg: #1a1a1a;
+      --reader-border: #333;
     }
 
     .theme-emerald {
@@ -173,6 +282,8 @@
       --button-bg: #00c853;
       --button-hover: #00a844;
       --shadow-color: rgba(77,255,184,0.3);
+      --reader-bg: #002a14;
+      --reader-border: #005a28;
     }
 
     .theme-sunset {
@@ -184,6 +295,8 @@
       --button-bg: #ff9800;
       --button-hover: #e68900;
       --shadow-color: rgba(255,183,77,0.3);
+      --reader-bg: #2a1a00;
+      --reader-border: #5a3a00;
     }
 
     .theme-rose {
@@ -195,6 +308,8 @@
       --button-bg: #e91e63;
       --button-hover: #d81b60;
       --shadow-color: rgba(255,77,148,0.3);
+      --reader-bg: #2a0014;
+      --reader-border: #5a0028;
     }
 
     .theme-purple {
@@ -206,6 +321,8 @@
       --button-bg: #9c27b0;
       --button-hover: #8e24aa;
       --shadow-color: rgba(183,77,255,0.3);
+      --reader-bg: #1a002a;
+      --reader-border: #33005a;
     }
 
     .theme-gold {
@@ -217,6 +334,8 @@
       --button-bg: #ffc107;
       --button-hover: #ffb300;
       --shadow-color: rgba(255,235,59,0.3);
+      --reader-bg: #2a2800;
+      --reader-border: #5a5400;
     }
 
     .theme-ocean {
@@ -228,6 +347,8 @@
       --button-bg: #2196f3;
       --button-hover: #1e88e5;
       --shadow-color: rgba(77,204,255,0.3);
+      --reader-bg: #001a2a;
+      --reader-border: #00335a;
     }
   </style>
 </head>
@@ -248,24 +369,31 @@
     </div>
   </header>
 
-  <h2 id="chapterTitle"></h2>
+  <div class="reader-container">
+    <h2 id="chapterTitle"></h2>
+    
+    <div class="reader-text"></div>
 
-  <div class="reader-text"></div>
+    <div class="audio-section">
+      <div class="audio-player">
+        <button id="playBtn">播放</button>
+        <input type="range" id="audio-progress" min="0" max="100" value="0">
+        <span id="audio-time">0:00 / 0:00</span>
+        <button id="speed-btn">1x</button>
+      </div>
+      <audio id="audio" src="" preload="metadata"></audio>
+    </div>
 
-  <div class="audio-section">
-    <button id="playBtn" class="play-btn">▶️ 播放</button><br />
-    <audio id="bookAudio" controls></audio>
-  </div>
-
-  <div class="chapter-nav">
-    <button id="prevBtn">上一章</button>
-    <button id="nextBtn">下一章</button>
+    <div class="chapter-nav">
+      <button id="prevBtn" class="fixed-color-btn">上一章</button>
+      <button id="nextBtn" class="fixed-color-btn">下一章</button>
+    </div>
   </div>
 
   <footer>© 2025 Awv's Reading System</footer>
 
 <script>
-  // --- 解析 URL 参数 ---
+  // --- URL parameters ---
   const params = new URLSearchParams(window.location.search);
   const category = params.get("category");
   const book = params.get("book");
@@ -273,17 +401,24 @@
 
   const titleEl = document.getElementById("chapterTitle");
   const contentEl = document.querySelector(".reader-text");
-  const audioEl = document.getElementById("bookAudio");
   const playBtn = document.getElementById("playBtn");
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
+  const speedBtn = document.getElementById('speed-btn');
+  const audioEl = document.getElementById('audio');
+  const progress = document.getElementById('audio-progress');
+  const timeEl = document.getElementById('audio-time');
 
-  // --- 主题切换 ---
+  // --- Theme switcher ---
   const themeBtn = document.querySelector('.theme-btn');
   const themePanel = document.querySelector('.theme-panel');
   const themeOptions = document.querySelectorAll('.theme-option');
 
-  themeBtn.addEventListener('click', e => { e.stopPropagation(); themePanel.classList.toggle('active'); });
+  themeBtn.addEventListener('click', e => { 
+    e.stopPropagation(); 
+    themePanel.classList.toggle('active'); 
+  });
+
   themeOptions.forEach(option => {
     option.addEventListener('click', function() {
       const theme = this.getAttribute('data-theme');
@@ -295,12 +430,33 @@
       localStorage.setItem('reader-theme', theme);
     });
   });
+
   document.addEventListener('click', () => themePanel.classList.remove('active'));
+
   const savedTheme = localStorage.getItem('reader-theme') || 'default';
   document.body.classList.add(`theme-${savedTheme}`);
-  themeOptions.forEach(opt => { if (opt.getAttribute('data-theme') === savedTheme) opt.classList.add('active'); });
+  themeOptions.forEach(opt => { 
+    if (opt.getAttribute('data-theme') === savedTheme) opt.classList.add('active'); 
+  });
 
-  // --- 动态检测书的最后一章 ---
+  // --- Playback speed control ---
+  const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+  let currentSpeedIndex = speeds.indexOf(1);
+
+  const savedSpeed = parseFloat(localStorage.getItem('reader-playback-speed')) || 1;
+  currentSpeedIndex = speeds.indexOf(savedSpeed);
+  audioEl.playbackRate = speeds[currentSpeedIndex];
+  speedBtn.textContent = speeds[currentSpeedIndex] + 'x';
+
+  speedBtn.addEventListener('click', () => {
+    currentSpeedIndex = (currentSpeedIndex + 1) % speeds.length;
+    const newSpeed = speeds[currentSpeedIndex];
+    speedBtn.textContent = newSpeed + 'x';
+    audioEl.playbackRate = newSpeed;
+    localStorage.setItem('reader-playback-speed', newSpeed);
+  });
+
+  // --- Dynamic last chapter detection ---
   async function findLastChapter() {
     let n = 1;
     while (true) {
@@ -313,83 +469,99 @@
 
   let lastChapter = 0;
 
+  // --- Load chapter ---
   async function loadChapter(autoPlay = false) {
-    if (lastChapter === 0) lastChapter = await findLastChapter(); // 首次检测
+    if (lastChapter === 0) lastChapter = await findLastChapter();
 
     const htmlPath = `assets/${category}/${book}/${chapter}.html`;
     const audioPath = `assets/${category}/${book}/audio/${chapter}.mp3`;
 
+    // --- Load chapter content ---
     try {
       const res = await fetch(htmlPath);
       if (!res.ok) throw new Error();
       const text = await res.text();
       contentEl.innerHTML = text;
     } catch {
-      contentEl.innerHTML = `<p style="color:#f88;">❌ 未找到章节内容。</p>`;
+      contentEl.innerHTML = `<p style="color:#f88; text-align: center;">❌ 未找到章节内容。</p>`;
     }
 
-    // --- 标题设置 ---
+    // --- Title ---
     titleEl.textContent = chapter === "cover" ? "封面" : `第${parseInt(chapter.replace("chapter",""))}章`;
 
-    // --- 上一章 / 下一章控制 ---
+    // --- Prev / Next buttons ---
     const currentNum = chapter === "cover" ? 0 : parseInt(chapter.replace("chapter",""));
-
-    // 上一章
     prevBtn.disabled = currentNum <= 0;
     prevBtn.style.opacity = prevBtn.disabled ? 0.5 : 1;
     prevBtn.style.cursor = prevBtn.disabled ? "not-allowed" : "pointer";
 
-    // 下一章（超出时禁用）
     nextBtn.disabled = currentNum >= lastChapter;
     nextBtn.style.opacity = nextBtn.disabled ? 0.5 : 1;
     nextBtn.style.cursor = nextBtn.disabled ? "not-allowed" : "pointer";
 
-    // --- 音频 ---
+    // --- Audio setup ---
     audioEl.src = audioPath;
     audioEl.load();
 
-    fetch(audioPath, { method: "HEAD" })
-      .then(res => {
-        if (res.ok) {
-          playBtn.style.display = "inline-block";
-          audioEl.style.display = "inline";
-          playBtn.textContent = autoPlay ? "⏸️ 暂停" : "▶️ 播放";
-          if (autoPlay) audioEl.play().catch(()=>{});
-        } else {
-          playBtn.style.display = "none";
-          audioEl.style.display = "none";
-        }
-      })
-      .catch(() => { playBtn.style.display = "none"; audioEl.style.display = "none"; });
+    try {
+      const res = await fetch(audioPath, { method: "HEAD" });
+      if (!res.ok) {
+        playBtn.disabled = true;
+        playBtn.textContent = "无音频";
+        audioEl.style.display = "none";
+      } else {
+        playBtn.disabled = false;
+        playBtn.textContent = autoPlay ? "暂停" : "播放";
+        if (autoPlay) audioEl.play().catch(()=>{});
+      }
+    } catch {
+      playBtn.disabled = true;
+      playBtn.textContent = "无音频";
+      audioEl.style.display = "none";
+    }
   }
 
-  // --- 初始化 ---
+  // --- Initialize ---
   loadChapter();
 
-  // --- 播放 / 暂停 ---
+  // --- Play / Pause ---
   playBtn.addEventListener("click", async () => {
     if (audioEl.paused) {
       await audioEl.play().catch(()=>{});
-      playBtn.textContent = "⏸️ 暂停";
+      playBtn.textContent = "暂停";
     } else {
       audioEl.pause();
-      playBtn.textContent = "▶️ 播放";
+      playBtn.textContent = "播放";
     }
   });
 
-  // --- 音频结束自动下一章 ---
+  // --- Audio progress update ---
+  audioEl.addEventListener('timeupdate', () => {
+    const percent = (audioEl.currentTime / audioEl.duration) * 100 || 0;
+    progress.value = percent;
+
+    const formatTime = t => `${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+    timeEl.textContent = `${formatTime(audioEl.currentTime)} / ${formatTime(audioEl.duration || 0)}`;
+  });
+
+  // --- Seek audio ---
+  progress.addEventListener('input', () => {
+    audioEl.currentTime = (progress.value / 100) * audioEl.duration;
+  });
+
+  // --- Auto next chapter on end ---
   audioEl.addEventListener("ended", () => {
     changeChapter(1, true);
   });
 
-  // --- 切换章节 ---
+  // --- Change chapter ---
   async function changeChapter(step, autoPlayNext = false) {
     const currentNum = chapter === "cover" ? 0 : parseInt(chapter.replace("chapter",""));
     if (lastChapter === 0) lastChapter = await findLastChapter();
 
     let newNum = currentNum + step;
     if (newNum < 0) newNum = 0;
-    if (newNum > lastChapter) return; // ❌ 不超出最后章节
+    if (newNum > lastChapter) return;
 
     chapter = newNum === 0 ? "cover" : `chapter${newNum}`;
     window.history.replaceState({}, "", `?category=${category}&book=${book}&chapter=${chapter}`);
