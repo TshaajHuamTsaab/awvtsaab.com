@@ -473,12 +473,12 @@
         
         <button class="dj-btn" onclick="toggleContinuousPlay()" id="playlistBtn">
             <i class="fas fa-list-ul"></i>
-            <span>连续: <span id="continuousStatus">关</span></span>
+            <span>连续播放: <span id="continuousStatus">已关闭</span></span>
         </button>
         
         <button class="dj-btn" onclick="generateSummary()" id="summaryBtn">
             <i class="fas fa-magic"></i>
-            <span>总结章节</span>
+            <span>✨ 总结章节</span>
         </button>
         
         <button class="dj-btn" onclick="goHome()">
@@ -529,10 +529,10 @@ class LockScreenPlayback {
     handleAction(action) {
         switch(action) {
             case 'play': 
-                this.audio.play().catch(e => console.log('Play action failed:', e));
+                togglePlay();
                 break;
             case 'pause': 
-                this.audio.pause();
+                togglePlay();
                 break;
             case 'previoustrack':
                 prevChapter();
@@ -626,7 +626,7 @@ class LockScreenPlayback {
 }
 
 // ============================================================
-// 📚 阅读器核心逻辑（使用下面的代码模版逻辑）
+// 📚 阅读器核心逻辑（严格按照下面代码模版的播放逻辑）
 // ============================================================
 
 // --- Global Constants and State Management ---
@@ -635,19 +635,17 @@ const category = params.get("category");
 const bookId = params.get("book");
 let chapter = params.get("chapter") || "cover";
 
-// State
+// State - 严格遵循下面代码模版的逻辑
 let chapterPlainText = "";
-let isPlayingSequence = false;
+let isPlayingSequence = false; // 初始为false，等待用户第一次点击
 let currentSegmentIndex = 0;
 let playbackRate = 1.0;
+let djPlayerVisible = true;
 
 // 搜索相关状态
 let searchMatches = [];
 let currentMatchIndex = -1;
 let lastSearchTerm = "";
-
-// DJ播放器状态
-let djPlayerVisible = true;
 
 if (!category || !bookId) {
     document.getElementById("chapter-body").innerHTML =
@@ -665,7 +663,6 @@ function searchInChapter() {
     const searchStatsOutput = document.getElementById('search-stats-output');
     const searchStatsText = document.getElementById('search-stats-text');
     const searchNavigation = document.getElementById('search-navigation');
-    const searchBtn = document.querySelector('.btn-search');
     
     if (!searchTerm) {
         searchStatsText.innerHTML = '<p class="text-red-500">请输入要搜索的关键词。</p>';
@@ -676,14 +673,12 @@ function searchInChapter() {
     clearSearchHighlights();
     lastSearchTerm = searchTerm;
     
-    searchBtn && (searchBtn.disabled = true);
     searchInput.disabled = true;
     searchStatsOutput.classList.remove('hidden');
     searchStatsText.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> 正在搜索 "${searchTerm}"...`;
     
     setTimeout(() => {
         performSearch(searchTerm);
-        searchBtn && (searchBtn.disabled = false);
         searchInput.disabled = false;
     }, 100);
 }
@@ -941,6 +936,8 @@ async function loadChapter() {
         audioEl.src = "";
         audioEl.pause();
         document.getElementById("dj-play-btn").disabled = true;
+        document.getElementById("dj-play-btn").innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
+        document.getElementById("dj-play-btn").classList.remove('playing');
         bodyEl.insertAdjacentHTML('beforebegin', '<div class="error" id="audio-error"><b>注意:</b> 找不到本章音频。仅提供文字阅读。</div>');
     }
 
@@ -966,6 +963,7 @@ function setupAudioEvents() {
     if (errorEl) errorEl.remove();
 }
 
+// --- 核心播放逻辑：严格遵循下面代码模版的逻辑 ---
 async function togglePlay(forcePlay = false) {
     const audioEl = document.getElementById("audio");
     const playBtn = document.getElementById("dj-play-btn");
@@ -973,12 +971,14 @@ async function togglePlay(forcePlay = false) {
     if (audioEl.disabled || !audioEl.src) return;
     
     if (audioEl.paused || forcePlay) {
+        // --- 核心逻辑：用户手动点击播放时激活连续播放模式 ---
         if (!forcePlay && !isPlayingSequence) {
-             isPlayingSequence = true;
-             localStorage.setItem('isPlayingSequence', true);
-             updateContinuousStatus();
-             console.log("Continuous Play Activated by User Click.");
+            isPlayingSequence = true; // 激活连续播放模式
+            localStorage.setItem('isPlayingSequence', true); // 保存状态
+            updateContinuousStatus();
+            console.log("Continuous Play Activated by User Click.");
         }
+        // -----------------------------------------------------------------
         
         try {
             await audioEl.play();
@@ -997,6 +997,7 @@ async function togglePlay(forcePlay = false) {
 }
 
 async function nextChapter(isAuto = false) {
+    // 如果是自动跳转（音频结束）且连续播放未开启，则不跳转
     if (isAuto && !isPlayingSequence) return;
     
     let nextChapterNum;
@@ -1007,6 +1008,7 @@ async function nextChapter(isAuto = false) {
     }
 
     if (!(await chapterExists(nextChapterNum))) {
+        // 本书已读完
         alert("🎉 本书已读完!");
         isPlayingSequence = false;
         localStorage.setItem('isPlayingSequence', false);
@@ -1032,8 +1034,9 @@ async function handleAudioEnded() {
     console.log('Audio ended. Sequence mode:', isPlayingSequence);
     
     if (isPlayingSequence) {
-        await nextChapter(true);
+        await nextChapter(true); // true表示这是自动跳转
     } else {
+        // 未开启连续播放，只重置按钮状态
         document.getElementById("dj-play-btn").innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
         document.getElementById("dj-play-btn").classList.remove('playing');
     }
@@ -1061,15 +1064,21 @@ function handleTimeUpdate() {
         paragraphs.forEach(p => p.classList.remove("highlight"));
         if (paragraphs[index]) {
             paragraphs[index].classList.add("highlight");
-            paragraphs[index].scrollIntoView({ 
-                behavior: "smooth", 
-                block: "center",
-                inline: "nearest"
-            });
+            // 平滑滚动到高亮段落
+            if (!isScrolling) {
+                paragraphs[index].scrollIntoView({ 
+                    behavior: "smooth", 
+                    block: "center",
+                    inline: "nearest"
+                });
+            }
         }
         currentSegmentIndex = index;
     }
 }
+
+// 防止滚动冲突
+let isScrolling = false;
 
 function updateTimeDisplay() {
     const audioEl = document.getElementById("audio");
@@ -1140,7 +1149,9 @@ async function updateNavigationButtons() {
 }
 
 function updateContinuousStatus() {
-    document.getElementById('continuousStatus').textContent = isPlayingSequence ? '开' : '关';
+    const statusText = isPlayingSequence ? '已开启' : '已关闭';
+    document.getElementById('continuousStatus').textContent = statusText;
+    
     const playlistBtn = document.getElementById("playlistBtn");
     if (isPlayingSequence) {
         playlistBtn.style.background = 'linear-gradient(45deg, #2ecc71, #27ae60)';
@@ -1149,6 +1160,7 @@ function updateContinuousStatus() {
     }
 }
 
+// 手动切换连续播放模式（按钮功能）
 function toggleContinuousPlay() {
     isPlayingSequence = !isPlayingSequence;
     localStorage.setItem('isPlayingSequence', isPlayingSequence);
@@ -1157,7 +1169,7 @@ function toggleContinuousPlay() {
     if (!isPlayingSequence) {
         const audioEl = document.getElementById("audio");
         if (!audioEl.paused) {
-             togglePlay(); 
+            togglePlay(); // 暂停音频
         }
     }
 }
@@ -1194,7 +1206,6 @@ function getBookTitleFromURL() {
 function updateChapterProgress() {
     const progressEl = document.getElementById('dj-chapter-progress');
     if (progressEl) {
-        // 这里可以添加获取总章节数的逻辑
         progressEl.textContent = `${chapter === "cover" ? "封面" : `第 ${chapter} 章`}`;
     }
 }
@@ -1227,23 +1238,25 @@ function initSettings() {
         djPlayerVisible = false;
         const djPlayer = document.getElementById('dj-player');
         const toggleBtn = document.getElementById('dj-toggle-btn');
-        const toggleIcon = toggleBtn.querySelector('i');
-        const toggleText = toggleBtn.querySelector('span');
         
         if (djPlayer) {
             djPlayer.classList.add('hidden');
+            const toggleIcon = toggleBtn.querySelector('i');
+            const toggleText = toggleBtn.querySelector('span');
             toggleIcon.className = 'fas fa-eye';
             toggleText.textContent = '显示播放器';
         }
     }
     
-    // 加载连续播放状态
+    // 加载连续播放状态 - 严格遵循下面代码模版的逻辑
     const savedSequence = localStorage.getItem('isPlayingSequence');
     const urlContinue = params.get("continueplay") === "true";
 
+    // 连续播放状态在localStorage中为true，或者URL中有continueplay标志
     if (savedSequence === 'true' || urlContinue) {
         isPlayingSequence = true;
     } else {
+        // 默认是false，等待用户第一次点击播放
         isPlayingSequence = false;
     }
     updateContinuousStatus();
@@ -1260,7 +1273,7 @@ async function initApp() {
     // 3. 加载章节内容和音频
     await loadChapter();
     
-    // 4. 处理自动继续播放
+    // 4. 处理自动继续播放 - 严格遵循下面代码模版的逻辑
     const urlContinue = params.get("continueplay") === "true";
     const audioEl = document.getElementById("audio");
     const audioAvailable = !!audioEl.src;
@@ -1271,7 +1284,7 @@ async function initApp() {
         url.searchParams.delete('continueplay');
         window.history.replaceState({}, '', url.toString());
 
-        // 尝试恢复播放
+        // 尝试恢复播放（forcePlay = true）
         togglePlay(true);
     }
 }
@@ -1327,6 +1340,14 @@ document.getElementById('searchInput').addEventListener('keypress', function(e) 
     if (e.key === 'Enter') {
         searchInChapter();
     }
+});
+
+// 防止滚动冲突
+document.addEventListener('wheel', function() {
+    isScrolling = true;
+    setTimeout(() => {
+        isScrolling = false;
+    }, 1000);
 });
 
 // --- Service Worker 注册 ---
