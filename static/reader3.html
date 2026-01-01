@@ -1,1371 +1,290 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Audio Reader - DJ风格锁屏播放</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awv's漆书</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="css/reader3.css">
 
-<!-- PWA配置 -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Audio Reader">
+    <!-- PWA配置 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Awv's漆书">
 
-<!-- 苹果Safari特定配置 -->
-<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <!-- 苹果Safari特定配置 -->
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
 
-<!-- DJ播放器样式 -->
-<style>
-/* DJ播放器容器 */
-.dj-player {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(135deg, #1a1a2e, #16213e);
-    padding: 20px;
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
-    z-index: 900;
-    display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
-    gap: 20px;
-    align-items: center;
-    border-top: 3px solid #0ff;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
+    <style>
+        /* 保证切换按钮始终可见 */
+        #dj-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+        }
 
-.dj-player.hidden {
-    transform: translateY(100%);
-    opacity: 0;
-    pointer-events: none;
-}
+        /* 锁屏播放提示样式 */
+        .background-play-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #00ff88, #0ff);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 25px;
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.5);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            animation: slideInDown 0.5s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .background-play-notification.show { display: flex; }
 
-/* DJ按钮样式 */
-.dj-btn {
-    background: linear-gradient(45deg, #3498db, #8e44ad);
-    border: none;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-}
+        @keyframes slideInDown {
+            from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
 
-.dj-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.5);
-}
+        /* 隐藏音频元素 */
+        #chapter-audio {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+            width: 0;
+            height: 0;
+        }
 
-.dj-btn i {
-    font-size: 18px;
-}
-
-/* 章节信息 */
-.dj-chapter-info {
-    color: white;
-    text-align: center;
-}
-
-.dj-chapter-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #0ff;
-}
-
-.dj-chapter-progress {
-    font-size: 14px;
-    color: #bdc3c7;
-}
-
-/* 主控制按钮 */
-.dj-main-controls {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    align-items: center;
-}
-
-.dj-play-btn {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: linear-gradient(45deg, #2ecc71, #27ae60);
-}
-
-.dj-play-btn.playing {
-    background: linear-gradient(45deg, #e74c3c, #c0392b);
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-/* 进度条 */
-.dj-progress {
-    grid-column: 1 / -1;
-}
-
-.dj-time-display {
-    display: flex;
-    justify-content: space-between;
-    color: white;
-    font-size: 14px;
-    margin-bottom: 5px;
-}
-
-.dj-progress-bar {
-    width: 100%;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.dj-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #0ff, #00ff88);
-    width: 0%;
-    transition: width 0.1s linear;
-}
-
-/* 可视化效果 */
-.dj-visualizer {
-    grid-column: 1 / -1;
-    height: 60px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 14px;
-}
-
-/* 二级控制 */
-.dj-secondary-controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    grid-column: 1 / -1;
-}
-
-/* 切换按钮 */
-.dj-toggle-btn {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 999;
-}
-
-/* 锁屏播放提示 */
-.background-play-notification {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, #00ff88, #0ff);
-    color: #000;
-    padding: 12px 24px;
-    border-radius: 25px;
-    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.5);
-    z-index: 10000;
-    display: none;
-    align-items: center;
-    gap: 12px;
-    font-weight: bold;
-    font-size: 14px;
-    animation: slideInDown 0.5s ease;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-}
-.background-play-notification.show { display: flex; }
-
-@keyframes slideInDown {
-    from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
-    to { transform: translateX(-50%) translateY(0); opacity: 1; }
-}
-
-/* 内容区域 */
-#content {
-    padding: 20px;
-    max-width: 850px;
-    margin: auto;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 12px;
-    margin-top: 20px;
-    margin-bottom: 200px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-
-#chapter-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin-bottom: 25px;
-    text-align: center;
-    color: #2c3e50;
-}
-
-/* 搜索区域 */
-.search-section {
-    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    border: 2px solid #90caf9;
-}
-
-/* 段落样式 */
-.segment {
-    line-height: 1.8;
-    margin-bottom: 1rem;
-    padding: 10px 15px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-}
-
-.segment:hover {
-    background-color: rgba(0, 180, 0, 0.1);
-}
-
-.segment.highlight {
-    background-color: rgba(0, 255, 0, 0.2);
-    box-shadow: 0 0 10px rgba(0,180,0,0.3);
-    font-weight: 500;
-}
-
-/* 搜索匹配 */
-.segment.search-match {
-    background-color: rgba(255, 235, 59, 0.3);
-    border-left: 4px solid #ff9800;
-}
-
-.segment.current-search-match {
-    background-color: rgba(255, 152, 0, 0.4);
-    border-left: 4px solid #ff5722;
-    font-weight: bold;
-}
-
-/* 输出框 */
-.search-output-box {
-    margin-top: 30px;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.search-results {
-    background-color: #f0f9ff;
-    border-left: 5px solid #0ea5e9;
-}
-
-.search-stats {
-    background-color: #fff7ed;
-    border-left: 5px solid #f97316;
-}
-
-/* 搜索导航按钮 */
-.search-nav {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    justify-content: center;
-}
-
-.search-nav-btn {
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: none;
-    background: linear-gradient(45deg, #2ecc71, #27ae60);
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
-}
-
-.search-nav-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-.search-nav-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* 加载动画 */
-.loading-spinner {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999;
-}
-.loading-spinner.active { display: block; }
-.spinner {
-    width: 50px; height: 50px;
-    border: 5px solid rgba(0, 255, 255, 0.3);
-    border-top: 5px solid #0ff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-    .dj-player {
-        grid-template-columns: 1fr;
-        padding: 15px;
-        gap: 15px;
-    }
-    
-    .dj-main-controls {
-        gap: 10px;
-    }
-    
-    .dj-secondary-controls {
-        flex-wrap: wrap;
-    }
-    
-    .dj-btn {
-        padding: 10px 15px;
-        font-size: 14px;
-    }
-    
-    #content {
-        margin-bottom: 250px;
-    }
-}
-</style>
+        /* 加载动画 */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+        .loading-spinner.active { display: block; }
+        .spinner {
+            width: 50px; height: 50px;
+            border: 5px solid rgba(0, 255, 255, 0.3);
+            border-top: 5px solid #0ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);} }
+    </style>
 </head>
-
 <body>
+    <!-- 加载动画 -->
+    <div class="loading-spinner" id="loading-spinner"><div class="spinner"></div></div>
 
-<!-- 锁屏播放提示 -->
-<div id="background-play-notification" class="background-play-notification">
-    <i class="fas fa-headphones"></i>
-    <span>锁屏播放已启用 - 锁屏后仍可继续收听</span>
-</div>
+    <!-- 主要内容区域 -->
+    <div id="bookTitle">加载中...</div>
+    <div id="book"></div>
+    <div id="error"></div>
 
-<!-- 加载动画 -->
-<div class="loading-spinner" id="loading-spinner"><div class="spinner"></div></div>
+    <!-- 装饰元素 -->
+    <div id="outer-ring"></div>
+    <div id="square-rotation"></div>
 
-<!-- Main Content Area -->
-<div id="content">
-    <div id="chapter-title">加载中...</div>
-    
-    <!-- Search Section -->
-    <div class="search-section">
-        <h3 class="text-md font-semibold text-blue-700 mb-3">🔍 搜索章节内容</h3>
-        <div class="flex flex-col md:flex-row gap-3">
-            <input type="text" id="searchInput" placeholder="输入要搜索的关键词..." 
-                   class="flex-grow p-3 border-2 border-blue-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150" />
-            <button class="dj-btn" onclick="searchInChapter()" style="background: linear-gradient(45deg, #3498db, #2980b9);">
-                <i class="fas fa-search"></i>
-                <span>搜索</span>
+    <!-- 锁屏播放提示 -->
+    <div id="background-play-notification" class="background-play-notification">
+        <i class="fas fa-headphones"></i>
+        <span>锁屏播放已启用 - 锁屏后仍可继续收听</span>
+    </div>
+
+    <!-- DJ风格播放控制器 -->
+    <div id="dj-player" class="dj-player">
+        <div class="dj-chapter-info">
+            <div class="dj-chapter-title" id="dj-chapter-title">加载中...</div>
+            <div class="dj-chapter-progress" id="dj-chapter-progress">- / -</div>
+        </div>
+
+        <div class="dj-main-controls">
+            <button class="dj-btn dj-prev-btn" title="上一章">
+                <i class="fas fa-backward-step"></i><span class="btn-text">上一章</span>
+            </button>
+            <button class="dj-btn dj-play-btn" id="dj-play-btn" title="播放/暂停">
+                <i class="fas fa-play"></i><span class="btn-text">播放</span>
+            </button>
+            <button class="dj-btn dj-next-btn" title="下一章">
+                <i class="fas fa-forward-step"></i><span class="btn-text">下一章</span>
             </button>
         </div>
-        <div class="text-sm text-gray-600 mt-2">
-            支持高亮显示所有匹配结果，按 F3 键快速导航
-        </div>
-    </div>
 
-    <!-- 搜索统计和导航 -->
-    <div id="search-stats-output" class="search-output-box search-stats hidden">
-        <h3 class="text-lg font-bold text-orange-700 mb-2 flex items-center">
-            <i class="fas fa-chart-bar mr-2"></i> 搜索结果统计
-        </h3>
-        <div id="search-stats-content">
-            <p id="search-stats-text" class="text-gray-800 mb-3">等待搜索...</p>
-            <div id="search-navigation" class="search-nav hidden">
-                <button id="prev-match-btn" class="search-nav-btn" onclick="navigateToPrevMatch()">
-                    <i class="fas fa-arrow-left mr-1"></i> 上一个匹配
-                </button>
-                <button id="next-match-btn" class="search-nav-btn" onclick="navigateToNextMatch()">
-                    下一个匹配 <i class="fas fa-arrow-right ml-1"></i>
-                </button>
-                <button id="clear-search-btn" class="search-nav-btn" onclick="clearSearch()" 
-                        style="background: linear-gradient(45deg, #e74c3c, #c0392b);">
-                    <i class="fas fa-times mr-1"></i> 清除搜索
-                </button>
+        <div class="dj-progress">
+            <div class="dj-time-display">
+                <span id="dj-current-time">00:00</span>
+                <span id="dj-duration">00:00</span>
             </div>
+            <div class="dj-progress-bar"><div class="dj-progress-fill" id="dj-progress-fill"></div></div>
         </div>
-    </div>
-    
-    <!-- LLM Summary Output -->
-    <div id="llm-summary-output" class="search-output-box search-results hidden">
-        <h3 class="text-lg font-bold text-blue-700 mb-2 flex items-center">
-            <i class="fas fa-book-open mr-2"></i> 章节摘要
-        </h3>
-        <p id="summary-text" class="text-gray-700">点击下方的 "✨ 总结章节" 按钮来生成摘要。</p>
-    </div>
-    
-    <!-- Chapter Body -->
-    <div id="chapter-body" class="loading">请稍候…</div>
-</div>
 
-<!-- DJ风格播放控制器 -->
-<div id="dj-player" class="dj-player">
-    <div class="dj-chapter-info">
-        <div class="dj-chapter-title" id="dj-chapter-title">加载中...</div>
-        <div class="dj-chapter-progress" id="dj-chapter-progress">- / -</div>
-    </div>
+        <div class="dj-visualizer" id="dj-visualizer"></div>
 
-    <div class="dj-main-controls">
-        <button class="dj-btn dj-prev-btn" onclick="prevChapter()" id="prevBtn">
-            <i class="fas fa-backward-step"></i>
-            <span>上一章</span>
-        </button>
-        <button class="dj-btn dj-play-btn" id="dj-play-btn" onclick="togglePlay()">
-            <i class="fas fa-play"></i>
-            <span>播放</span>
-        </button>
-        <button class="dj-btn dj-next-btn" onclick="nextChapter()" id="nextBtn">
-            <i class="fas fa-forward-step"></i>
-            <span>下一章</span>
-        </button>
-    </div>
-
-    <div class="dj-progress">
-        <div class="dj-time-display">
-            <span id="dj-current-time">00:00</span>
-            <span id="dj-duration">00:00</span>
-        </div>
-        <div class="dj-progress-bar">
-            <div class="dj-progress-fill" id="dj-progress-fill"></div>
+        <div class="dj-secondary-controls">
+            <button class="dj-btn dj-speed-btn" id="dj-speed-btn" title="播放速度">
+                <i class="fas fa-gauge-high"></i><span class="btn-text">1x</span>
+            </button>
+            <button class="dj-btn dj-theme-btn" title="切换主题">
+                <i class="fas fa-palette"></i><span class="btn-text">主题</span>
+            </button>
+            <button class="dj-btn dj-font-btn dj-font-minus" title="减小字体">
+                <i class="fas fa-font"></i><span class="btn-text">A-</span>
+            </button>
+            <button class="dj-btn dj-font-btn dj-font-plus" title="增大字体">
+                <i class="fas fa-font"></i><span class="btn-text">A+</span>
+            </button>
+            <button class="dj-btn dj-home-btn" title="返回首页">
+                <i class="fas fa-home"></i><span class="btn-text">首页</span>
+            </button>
         </div>
     </div>
 
-    <div class="dj-visualizer" id="dj-visualizer">
-        <i class="fas fa-music mr-2"></i>
-        <span>音频可视化</span>
-    </div>
+    <button id="dj-toggle-btn" class="dj-btn dj-toggle-btn">
+        <i class="fas fa-eye"></i><span class="btn-text">显示/隐藏</span>
+    </button>
 
-    <div class="dj-secondary-controls">
-        <button class="dj-btn dj-speed-btn" onclick="changeSpeed(-0.25)" title="减速">
-            <i class="fas fa-minus"></i>
-            <span>减速</span>
-        </button>
-        <div class="dj-btn" style="cursor: default; opacity: 0.9;">
-            <i class="fas fa-gauge-high"></i>
-            <span id="currentSpeed">1.0x</span>
-        </div>
-        <button class="dj-btn dj-speed-btn" onclick="changeSpeed(0.25)" title="加速">
-            <i class="fas fa-plus"></i>
-            <span>加速</span>
-        </button>
-        
-        <button class="dj-btn" onclick="toggleContinuousPlay()" id="playlistBtn">
-            <i class="fas fa-list-ul"></i>
-            <span>连续播放: <span id="continuousStatus">已关闭</span></span>
-        </button>
-        
-        <button class="dj-btn" onclick="generateSummary()" id="summaryBtn">
-            <i class="fas fa-magic"></i>
-            <span>✨ 总结章节</span>
-        </button>
-        
-        <button class="dj-btn" onclick="goHome()">
-            <i class="fas fa-home"></i>
-            <span>首页</span>
-        </button>
-    </div>
-</div>
+    <!-- 音频元素 -->
+    <audio id="chapter-audio" preload="auto" playsinline crossorigin="anonymous"></audio>
 
-<button id="dj-toggle-btn" class="dj-btn dj-toggle-btn" onclick="toggleDJPlayer()">
-    <i class="fas fa-eye-slash"></i>
-    <span>隐藏播放器</span>
-</button>
+    <!-- 原有逻辑 -->
+    <script src="js/reader3.js"></script>
 
-<!-- 音频元素 -->
-<audio id="audio" preload="auto" playsinline crossorigin="anonymous"></audio>
-
-<script>
-// ============================================================
-// 🔒 锁屏播放 & 后台播放支持类
-// ============================================================
-class LockScreenPlayback {
+    <!-- 锁屏播放支持核心代码 -->
+  <script>
+  // ============================================================
+  // 🔊 锁屏播放 & 后台播放支持（最终修正版）
+  // ============================================================
+  class LockScreenPlayback {
     constructor() {
-        this.audio = document.getElementById('audio');
-        this.init();
+      this.audio = document.getElementById('chapter-audio');
+      this.init();
     }
 
     init() {
-        console.log('🚀 初始化锁屏播放支持...');
-        this.initMediaSession();
-        this.initEvents();
-        this.restoreState();
-        console.log('✅ 锁屏播放初始化完成');
+      console.log('🚀 初始化锁屏播放支持...');
+      this.initMediaSession();
+      this.initEvents();
+      this.restoreState();
+      console.log('✅ 初始化完成');
     }
 
     initMediaSession() {
-        if (!('mediaSession' in navigator)) return;
-        this.updateMetadata();
-        ['play', 'pause', 'previoustrack', 'nexttrack'].forEach(action => {
-            try {
-                navigator.mediaSession.setActionHandler(action, () => this.handleAction(action));
-            } catch (error) {
-                console.log(`Action ${action} not supported:`, error);
-            }
-        });
+      if (!('mediaSession' in navigator)) return;
+      this.updateMetadata();
+      ['play', 'pause', 'previoustrack', 'nexttrack'].forEach(action => {
+        try {
+          navigator.mediaSession.setActionHandler(action, () => this.handleAction(action));
+        } catch {}
+      });
     }
 
     handleAction(action) {
-        switch(action) {
-            case 'play': 
-                togglePlay();
-                break;
-            case 'pause': 
-                togglePlay();
-                break;
-            case 'previoustrack':
-                prevChapter();
-                break;
-            case 'nexttrack':
-                nextChapter();
-                break;
-        }
-        this.saveState();
+      switch(action) {
+        case 'play': this.audio.play(); break;
+        case 'pause': this.audio.pause(); break;
+        case 'previoustrack':
+          window.ReaderApp?.changeChapter?.(-1); break;
+        case 'nexttrack':
+          window.ReaderApp?.changeChapter?.(1); break;
+      }
+      this.saveState();
     }
 
     updateMetadata() {
-        if (!('mediaSession' in navigator)) return;
-        const bookTitle = getBookTitleFromURL();
-        const chapterTitle = document.getElementById('chapter-title')?.textContent || '章节';
-        navigator.mediaSession.metadata = new MediaMetadata({
-            title: `${bookTitle} - ${chapterTitle}`,
-            artist: 'Audio Reader',
-            album: '有声书籍',
-            artwork: [
-                { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-                { src: 'icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
-            ]
-        });
+      if (!('mediaSession' in navigator)) return;
+      const bookTitle = document.getElementById('bookTitle')?.textContent || 'Awv’s漆书';
+      const chapterTitle = document.getElementById('dj-chapter-title')?.textContent || '章节';
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: `${bookTitle} - ${chapterTitle}`,
+        artist: 'Awv 朗读器',
+        album: 'Awv’s漆书',
+        artwork: [
+          { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
+        ]
+      });
     }
 
     initEvents() {
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                this.showNotification();
-            }
-        });
-
-        this.audio.addEventListener('play', () => {
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.playbackState = 'playing';
-            }
-            this.saveState();
-        });
-
-        this.audio.addEventListener('pause', () => {
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.playbackState = 'paused';
-            }
-            this.saveState();
-        });
-
-        window.addEventListener('beforeunload', () => this.saveState());
-        setInterval(() => this.saveState(), 10000);
+      // 不再暂停音频，仅提示用户
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) this.showNotification();
+      });
+      this.audio.addEventListener('play', () => {
+        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+        this.saveState();
+      });
+      this.audio.addEventListener('pause', () => {
+        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
+        this.saveState();
+      });
+      window.addEventListener('beforeunload', () => this.saveState());
+      setInterval(() => this.saveState(), 10000);
     }
 
     showNotification() {
-        const el = document.getElementById('background-play-notification');
-        if (!el) return;
-        el.classList.add('show');
-        setTimeout(() => el.classList.remove('show'), 3000);
+      const el = document.getElementById('background-play-notification');
+      if (!el) return;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3000);
     }
 
     saveState() {
-        const state = {
-            currentTime: this.audio.currentTime,
-            isPlaying: !this.audio.paused,
-            rate: this.audio.playbackRate,
-            volume: this.audio.volume,
-            timestamp: Date.now(),
-            category: category,
-            book: bookId,
-            chapter: chapter
-        };
-        localStorage.setItem('lockScreenPlayState', JSON.stringify(state));
+      const s = {
+        currentTime: this.audio.currentTime,
+        isPlaying: !this.audio.paused,
+        rate: this.audio.playbackRate,
+        volume: this.audio.volume,
+        ts: Date.now(),
+        book: window.bookFolder || 'dev1',
+        chapter: window.chapterNum || 'cover'
+      };
+      localStorage.setItem('lockScreenPlayState', JSON.stringify(s));
     }
 
     restoreState() {
-        try {
-            const saved = JSON.parse(localStorage.getItem('lockScreenPlayState') || '{}');
-            
-            if (!saved.timestamp || Date.now() - saved.timestamp > 3600000) {
-                return;
-            }
-
-            if (saved.category === category && saved.book === bookId && saved.chapter === chapter) {
-                this.audio.currentTime = saved.currentTime || 0;
-                this.audio.playbackRate = saved.rate || 1;
-                this.audio.volume = saved.volume || 1;
-                console.log('🔍 恢复播放状态:', saved);
-            }
-        } catch (error) {
-            console.error('恢复状态失败:', error);
-        }
+      try {
+        const s = JSON.parse(localStorage.getItem('lockScreenPlayState') || '{}');
+        if (!s.ts || Date.now() - s.ts > 3600000) return;
+        this.audio.currentTime = s.currentTime || 0;
+        this.audio.playbackRate = s.rate || 1;
+        this.audio.volume = s.volume || 1;
+      } catch {}
     }
-}
-
-// ============================================================
-// 📚 阅读器核心逻辑（严格按照下面代码模版的播放逻辑）
-// ============================================================
-
-// --- Global Constants and State Management ---
-const params = new URLSearchParams(window.location.search);
-const category = params.get("category");
-const bookId = params.get("book");
-let chapter = params.get("chapter") || "cover";
-
-// State - 严格遵循下面代码模版的逻辑
-let chapterPlainText = "";
-let isPlayingSequence = false; // 初始为false，等待用户第一次点击
-let currentSegmentIndex = 0;
-let playbackRate = 1.0;
-let djPlayerVisible = true;
-
-// 搜索相关状态
-let searchMatches = [];
-let currentMatchIndex = -1;
-let lastSearchTerm = "";
-
-if (!category || !bookId) {
-    document.getElementById("chapter-body").innerHTML =
-    '<div class="error"><b>错误:</b> 缺少URL参数 (category/book)。</div>';
-    throw new Error("Missing params");
-}
-
-// 锁屏播放实例
-let lockScreenPlayback;
-
-// --- 搜索功能函数 ---
-function searchInChapter() {
-    const searchInput = document.getElementById('searchInput');
-    const searchTerm = searchInput.value.trim();
-    const searchStatsOutput = document.getElementById('search-stats-output');
-    const searchStatsText = document.getElementById('search-stats-text');
-    const searchNavigation = document.getElementById('search-navigation');
-    
-    if (!searchTerm) {
-        searchStatsText.innerHTML = '<p class="text-red-500">请输入要搜索的关键词。</p>';
-        searchStatsOutput.classList.remove('hidden');
-        return;
-    }
-    
-    clearSearchHighlights();
-    lastSearchTerm = searchTerm;
-    
-    searchInput.disabled = true;
-    searchStatsOutput.classList.remove('hidden');
-    searchStatsText.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> 正在搜索 "${searchTerm}"...`;
-    
-    setTimeout(() => {
-        performSearch(searchTerm);
-        searchInput.disabled = false;
-    }, 100);
-}
-
-function performSearch(searchTerm) {
-    const segments = document.querySelectorAll("#chapter-body .segment");
-    const searchStatsText = document.getElementById('search-stats-text');
-    const searchNavigation = document.getElementById('search-navigation');
-    
-    searchMatches = [];
-    currentMatchIndex = -1;
-    
-    segments.forEach((segment, index) => {
-        const text = segment.textContent || segment.innerText;
-        const regex = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-        const matches = [...text.matchAll(regex)];
-        
-        if (matches.length > 0) {
-            searchMatches.push({
-                segmentIndex: index,
-                segment: segment,
-                matches: matches.length
-            });
-            segment.classList.add('search-match');
-        }
-    });
-    
-    if (searchMatches.length > 0) {
-        const totalMatches = searchMatches.reduce((sum, match) => sum + match.matches, 0);
-        searchStatsText.innerHTML = `
-            <p>搜索 "<span class="font-bold text-blue-600">${searchTerm}</span>" 的结果：</p>
-            <p class="mt-2">• 匹配段落数: <span class="font-bold">${searchMatches.length}</span></p>
-            <p>• 总匹配次数: <span class="font-bold">${totalMatches}</span></p>
-            <p class="mt-2 text-sm text-gray-600">使用下方按钮在匹配结果间导航</p>
-        `;
-        searchNavigation.classList.remove('hidden');
-        navigateToNextMatch();
-    } else {
-        searchStatsText.innerHTML = `
-            <p>未找到包含 "<span class="font-bold text-red-600">${searchTerm}</span>" 的段落。</p>
-            <p class="mt-2 text-sm text-gray-600">请尝试其他关键词。</p>
-        `;
-        searchNavigation.classList.add('hidden');
-    }
-}
-
-function navigateToPrevMatch() {
-    if (searchMatches.length === 0) return;
-    
-    if (currentMatchIndex >= 0 && currentMatchIndex < searchMatches.length) {
-        searchMatches[currentMatchIndex].segment.classList.remove('current-search-match');
-    }
-    
-    currentMatchIndex--;
-    if (currentMatchIndex < 0) {
-        currentMatchIndex = searchMatches.length - 1;
-    }
-    
-    searchMatches[currentMatchIndex].segment.classList.add('current-search-match');
-    searchMatches[currentMatchIndex].segment.scrollIntoView({ 
-        behavior: "smooth", 
-        block: "center"
-    });
-    
-    updateSearchNavButtons();
-}
-
-function navigateToNextMatch() {
-    if (searchMatches.length === 0) return;
-    
-    if (currentMatchIndex >= 0 && currentMatchIndex < searchMatches.length) {
-        searchMatches[currentMatchIndex].segment.classList.remove('current-search-match');
-    }
-    
-    currentMatchIndex++;
-    if (currentMatchIndex >= searchMatches.length) {
-        currentMatchIndex = 0;
-    }
-    
-    searchMatches[currentMatchIndex].segment.classList.add('current-search-match');
-    searchMatches[currentMatchIndex].segment.scrollIntoView({ 
-        behavior: "smooth", 
-        block: "center"
-    });
-    
-    updateSearchNavButtons();
-}
-
-function updateSearchNavButtons() {
-    const prevMatchBtn = document.getElementById('prev-match-btn');
-    const nextMatchBtn = document.getElementById('next-match-btn');
-    
-    if (searchMatches.length > 1) {
-        prevMatchBtn.disabled = false;
-        nextMatchBtn.disabled = false;
-    } else {
-        prevMatchBtn.disabled = true;
-        nextMatchBtn.disabled = true;
-    }
-}
-
-function clearSearch() {
-    clearSearchHighlights();
-    searchMatches = [];
-    currentMatchIndex = -1;
-    lastSearchTerm = "";
-    document.getElementById('search-stats-output').classList.add('hidden');
-    document.getElementById('searchInput').value = "";
-}
-
-function clearSearchHighlights() {
-    const segments = document.querySelectorAll("#chapter-body .segment");
-    segments.forEach(segment => {
-        segment.classList.remove('search-match');
-        segment.classList.remove('current-search-match');
-    });
-}
-
-// --- 章节摘要功能 ---
-async function generateSummary() {
-    const summaryOutput = document.getElementById('llm-summary-output');
-    const summaryTextEl = document.getElementById('summary-text');
-    const summaryBtn = document.getElementById('summaryBtn');
-    
-    if (chapterPlainText.trim().length < 50) {
-        summaryTextEl.innerHTML = "章节内容过短，无法生成摘要。";
-        summaryOutput.classList.remove('hidden');
-        return;
-    }
-    
-    summaryOutput.classList.remove('hidden');
-    summaryTextEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> 正在生成章节摘要，请稍候...';
-    summaryBtn.disabled = true;
-
-    setTimeout(() => {
-        const sentences = chapterPlainText.split(/[。！？.!?]/).filter(s => s.trim().length > 0);
-        let summary = "";
-        
-        if (sentences.length > 5) {
-            summary += sentences[0] + "。";
-            const middleIndex = Math.floor(sentences.length / 2);
-            summary += sentences[middleIndex] + "。";
-            summary += sentences[sentences.length - 1] + "。";
-        } else if (sentences.length > 0) {
-            for (let i = 0; i < Math.min(3, sentences.length); i++) {
-                summary += sentences[i] + "。";
-            }
-        } else {
-            summary = "无法从当前内容生成摘要。";
-        }
-        
-        summaryTextEl.innerHTML = summary;
-        summaryBtn.disabled = false;
-    }, 1500);
-}
-
-// --- Utility Functions ---
-function getPaths() {
-    const base = `database/${category}/${bookId}`;
-    const chapterName = chapter === "cover" ? "cover" : `chapter${chapter}`;
-    return {
-        html: `${base}/${chapterName}.html`,
-        audio: `${base}/audio/${chapterName}.mp3`
-    };
-}
-
-function redirect(shouldContinuePlay = false) {
-    let url = `reader.html?category=${category}&book=${bookId}&chapter=${chapter}`;
-    if (shouldContinuePlay) {
-        url += '&continueplay=true';
-    }
-    location.href = url;
-}
-
-async function chapterExists(chNum) {
-    const chapterName = chNum === "cover" ? "cover" : `chapter${chNum}`;
-    const testPath = `database/${category}/${bookId}/${chapterName}.html`;
-    try {
-        const resp = await fetch(testPath, { method: 'HEAD' });
-        return resp.ok;
-    } catch {
-        return false;
-    }
-}
-
-async function audioExists(audioPath) {
-    try {
-        const resp = await fetch(audioPath, { method: 'HEAD' });
-        return resp.ok;
-    } catch {
-        return false;
-    }
-}
-
-// --- Audio and Player Functions ---
-async function loadChapter() {
-    showLoading(true);
-    
-    const { html, audio } = getPaths();
-    const audioEl = document.getElementById("audio");
-    const titleEl = document.getElementById("chapter-title");
-    const bodyEl = document.getElementById("chapter-body");
-    const summaryOutput = document.getElementById('llm-summary-output');
-    const searchStatsOutput = document.getElementById('search-stats-output');
-
-    // 更新DJ播放器标题
-    document.getElementById('dj-chapter-title').textContent = chapter === "cover" ? "封面" : `第 ${chapter} 章`;
-
-    summaryOutput.classList.add('hidden');
-    searchStatsOutput.classList.add('hidden');
-    document.getElementById('summary-text').textContent = '点击下方的 "✨ 总结章节" 按钮来生成摘要。';
-    
-    clearSearchHighlights();
-    
-    titleEl.innerText = chapter === "cover" ? "封面" : `第 ${chapter} 章`;
-    bodyEl.innerHTML = '<div class="loading">📖 正在加载章节内容...</div>';
-
-    try {
-        const resp = await fetch(html);
-        if (!resp.ok) throw new Error("Chapter content not found.");
-
-        const text = await resp.text();
-        
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = text;
-        chapterPlainText = tempDiv.textContent || tempDiv.innerText || "";
-        
-        const segmentedText = text.replace(/<p>/g, '<p class="segment" onclick="seekToSegment(this)">');
-        bodyEl.innerHTML = segmentedText;
-        document.getElementById('summaryBtn').disabled = false;
-
-    } catch (e) {
-        bodyEl.innerHTML =
-        `<div class="error"><b>⚠️ 内容加载错误:</b> 找不到章节文件 ${html}</div>`;
-        console.error(e);
-        document.getElementById('summaryBtn').disabled = true;
-        showLoading(false);
-        return;
-    }
-
-    const audioPath = `database/${category}/${bookId}/audio/${chapter === "cover" ? "cover" : `chapter${chapter}`}.mp3`;
-    const audioAvailable = await audioExists(audioPath);
-
-    if (audioAvailable) {
-        audioEl.src = audio;
-        audioEl.load();
-        audioEl.playbackRate = playbackRate;
-        setupAudioEvents();
-        
-        // 更新MediaSession元数据
-        if (lockScreenPlayback) {
-            lockScreenPlayback.updateMetadata();
-        }
-    } else {
-        audioEl.src = "";
-        audioEl.pause();
-        document.getElementById("dj-play-btn").disabled = true;
-        document.getElementById("dj-play-btn").innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
-        document.getElementById("dj-play-btn").classList.remove('playing');
-        bodyEl.insertAdjacentHTML('beforebegin', '<div class="error" id="audio-error"><b>注意:</b> 找不到本章音频。仅提供文字阅读。</div>');
-    }
-
-    currentSegmentIndex = 0;
-    updateNavigationButtons();
-    updateContinuousStatus();
-    updateChapterProgress();
-    saveProgress();
-    
-    showLoading(false);
-}
-
-function setupAudioEvents() {
-    const audioEl = document.getElementById("audio");
-    
-    audioEl.onended = null;
-    audioEl.ontimeupdate = null;
-    
-    audioEl.onended = handleAudioEnded;
-    audioEl.ontimeupdate = handleTimeUpdate;
-    document.getElementById("dj-play-btn").disabled = false;
-    const errorEl = document.getElementById("audio-error");
-    if (errorEl) errorEl.remove();
-}
-
-// --- 核心播放逻辑：严格遵循下面代码模版的逻辑 ---
-async function togglePlay(forcePlay = false) {
-    const audioEl = document.getElementById("audio");
-    const playBtn = document.getElementById("dj-play-btn");
-    
-    if (audioEl.disabled || !audioEl.src) return;
-    
-    if (audioEl.paused || forcePlay) {
-        // --- 核心逻辑：用户手动点击播放时激活连续播放模式 ---
-        if (!forcePlay && !isPlayingSequence) {
-            isPlayingSequence = true; // 激活连续播放模式
-            localStorage.setItem('isPlayingSequence', true); // 保存状态
-            updateContinuousStatus();
-            console.log("Continuous Play Activated by User Click.");
-        }
-        // -----------------------------------------------------------------
-        
-        try {
-            await audioEl.play();
-            playBtn.innerHTML = '<i class="fas fa-pause"></i><span>暂停</span>';
-            playBtn.classList.add('playing');
-        } catch (e) {
-            console.error("Playback failed:", e);
-            playBtn.innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
-            playBtn.classList.remove('playing');
-        }
-    } else {
-        audioEl.pause();
-        playBtn.innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
-        playBtn.classList.remove('playing');
-    }
-}
-
-async function nextChapter(isAuto = false) {
-    // 如果是自动跳转（音频结束）且连续播放未开启，则不跳转
-    if (isAuto && !isPlayingSequence) return;
-    
-    let nextChapterNum;
-    if (chapter === "cover") {
-        nextChapterNum = 1;
-    } else {
-        nextChapterNum = parseInt(chapter) + 1;
-    }
-
-    if (!(await chapterExists(nextChapterNum))) {
-        // 本书已读完
-        alert("🎉 本书已读完!");
-        isPlayingSequence = false;
-        localStorage.setItem('isPlayingSequence', false);
-        updateContinuousStatus();
-        document.getElementById("dj-play-btn").innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
-        document.getElementById("dj-play-btn").classList.remove('playing');
-        return;
-    }
-
-    chapter = nextChapterNum.toString();
-    redirect(isPlayingSequence);
-}
-
-function prevChapter() {
-    if (chapter === "cover") return;
-
-    const prev = Number(chapter) - 1;
-    chapter = prev <= 0 ? "cover" : prev.toString();
-    redirect(isPlayingSequence);
-}
-
-async function handleAudioEnded() {
-    console.log('Audio ended. Sequence mode:', isPlayingSequence);
-    
-    if (isPlayingSequence) {
-        await nextChapter(true); // true表示这是自动跳转
-    } else {
-        // 未开启连续播放，只重置按钮状态
-        document.getElementById("dj-play-btn").innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
-        document.getElementById("dj-play-btn").classList.remove('playing');
-    }
-}
-
-function handleTimeUpdate() {
-    const audioEl = document.getElementById("audio");
-    const paragraphs = document.querySelectorAll("#chapter-body .segment");
-    
-    // 更新时间显示
-    updateTimeDisplay();
-    
-    // 更新进度条
-    updateProgressBar();
-    
-    // 高亮段落
-    if (!paragraphs.length || !audioEl.duration) return;
-
-    const duration = audioEl.duration;
-    const segmentDuration = duration / paragraphs.length;
-    let index = Math.floor(audioEl.currentTime / segmentDuration);
-    index = Math.max(0, Math.min(index, paragraphs.length - 1));
-
-    if (index !== currentSegmentIndex) {
-        paragraphs.forEach(p => p.classList.remove("highlight"));
-        if (paragraphs[index]) {
-            paragraphs[index].classList.add("highlight");
-            // 平滑滚动到高亮段落
-            if (!isScrolling) {
-                paragraphs[index].scrollIntoView({ 
-                    behavior: "smooth", 
-                    block: "center",
-                    inline: "nearest"
-                });
-            }
-        }
-        currentSegmentIndex = index;
-    }
-}
-
-// 防止滚动冲突
-let isScrolling = false;
-
-function updateTimeDisplay() {
-    const audioEl = document.getElementById("audio");
-    const currentTimeEl = document.getElementById("dj-current-time");
-    const durationEl = document.getElementById("dj-duration");
-    
-    if (audioEl.duration) {
-        currentTimeEl.textContent = formatTime(audioEl.currentTime);
-        durationEl.textContent = formatTime(audioEl.duration);
-    }
-}
-
-function updateProgressBar() {
-    const audioEl = document.getElementById("audio");
-    const progressFill = document.getElementById("dj-progress-fill");
-    
-    if (audioEl.duration > 0) {
-        const percent = (audioEl.currentTime / audioEl.duration) * 100;
-        progressFill.style.width = percent + "%";
-    }
-}
-
-function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-}
-
-function seekToSegment(p) {
-    const audioEl = document.getElementById("audio");
-    const paragraphs = Array.from(document.querySelectorAll("#chapter-body .segment"));
-    const index = paragraphs.indexOf(p);
-    
-    if (index === -1 || !audioEl.duration) return;
-
-    const duration = audioEl.duration;
-    const segmentDuration = duration / paragraphs.length;
-    
-    audioEl.currentTime = index * segmentDuration;
-    
-    if (audioEl.paused) {
-        togglePlay(true);
-    }
-}
-
-function changeSpeed(delta) {
-    const audioEl = document.getElementById("audio");
-    playbackRate = Math.max(0.5, Math.min(2.0, playbackRate + delta));
-    playbackRate = Math.round(playbackRate * 100) / 100;
-    
-    if (audioEl) {
-        audioEl.playbackRate = playbackRate;
-    }
-    
-    document.getElementById('currentSpeed').textContent = playbackRate.toFixed(2) + 'x';
-    localStorage.setItem('playbackRate', playbackRate);
-}
-
-// --- UI and Settings Functions ---
-async function updateNavigationButtons() {
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    
-    prevBtn.disabled = chapter === "cover";
-    
-    let nextNum = chapter === "cover" ? 1 : Number(chapter) + 1;
-    nextBtn.disabled = !(await chapterExists(nextNum));
-}
-
-function updateContinuousStatus() {
-    const statusText = isPlayingSequence ? '已开启' : '已关闭';
-    document.getElementById('continuousStatus').textContent = statusText;
-    
-    const playlistBtn = document.getElementById("playlistBtn");
-    if (isPlayingSequence) {
-        playlistBtn.style.background = 'linear-gradient(45deg, #2ecc71, #27ae60)';
-    } else {
-        playlistBtn.style.background = 'linear-gradient(45deg, #3498db, #8e44ad)';
-    }
-}
-
-// 手动切换连续播放模式（按钮功能）
-function toggleContinuousPlay() {
-    isPlayingSequence = !isPlayingSequence;
-    localStorage.setItem('isPlayingSequence', isPlayingSequence);
-    updateContinuousStatus();
-    
-    if (!isPlayingSequence) {
-        const audioEl = document.getElementById("audio");
-        if (!audioEl.paused) {
-            togglePlay(); // 暂停音频
-        }
-    }
-}
-
-function toggleDJPlayer() {
-    djPlayerVisible = !djPlayerVisible;
-    const djPlayer = document.getElementById('dj-player');
-    const toggleBtn = document.getElementById('dj-toggle-btn');
-    const toggleIcon = toggleBtn.querySelector('i');
-    const toggleText = toggleBtn.querySelector('span');
-    
-    if (djPlayerVisible) {
-        djPlayer.classList.remove('hidden');
-        toggleIcon.className = 'fas fa-eye-slash';
-        toggleText.textContent = '隐藏播放器';
-    } else {
-        djPlayer.classList.add('hidden');
-        toggleIcon.className = 'fas fa-eye';
-        toggleText.textContent = '显示播放器';
-    }
-    
-    localStorage.setItem('djPlayerVisible', djPlayerVisible);
-}
-
-function goHome() {
-    window.location.href = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')) + '/library.html';
-}
-
-// --- 辅助函数 ---
-function getBookTitleFromURL() {
-    return bookId ? `书籍 ${bookId}` : '有声书籍';
-}
-
-function updateChapterProgress() {
-    const progressEl = document.getElementById('dj-chapter-progress');
-    if (progressEl) {
-        progressEl.textContent = `${chapter === "cover" ? "封面" : `第 ${chapter} 章`}`;
-    }
-}
-
-function showLoading(show) {
-    const spinner = document.getElementById('loading-spinner');
-    if (show) {
-        spinner.classList.add('active');
-    } else {
-        spinner.classList.remove('active');
-    }
-}
-
-function saveProgress() {
-    localStorage.setItem(`progress_${category}_${bookId}`, chapter);
-}
-
-// --- Initialization and State Restoration ---
-function initSettings() {
-    // 加载播放速度
-    const savedSpeed = localStorage.getItem('playbackRate');
-    if (savedSpeed) {
-        playbackRate = parseFloat(savedSpeed);
-        document.getElementById('currentSpeed').textContent = playbackRate.toFixed(2) + 'x';
-    }
-    
-    // 加载DJ播放器可见性
-    const savedDJVisible = localStorage.getItem('djPlayerVisible');
-    if (savedDJVisible === 'false') {
-        djPlayerVisible = false;
-        const djPlayer = document.getElementById('dj-player');
-        const toggleBtn = document.getElementById('dj-toggle-btn');
-        
-        if (djPlayer) {
-            djPlayer.classList.add('hidden');
-            const toggleIcon = toggleBtn.querySelector('i');
-            const toggleText = toggleBtn.querySelector('span');
-            toggleIcon.className = 'fas fa-eye';
-            toggleText.textContent = '显示播放器';
-        }
-    }
-    
-    // 加载连续播放状态 - 严格遵循下面代码模版的逻辑
-    const savedSequence = localStorage.getItem('isPlayingSequence');
-    const urlContinue = params.get("continueplay") === "true";
-
-    // 连续播放状态在localStorage中为true，或者URL中有continueplay标志
-    if (savedSequence === 'true' || urlContinue) {
-        isPlayingSequence = true;
-    } else {
-        // 默认是false，等待用户第一次点击播放
-        isPlayingSequence = false;
-    }
-    updateContinuousStatus();
-}
-
-// --- 主初始化函数 ---
-async function initApp() {
-    // 1. 初始化设置和恢复状态
-    initSettings();
-    
-    // 2. 初始化锁屏播放支持
-    lockScreenPlayback = new LockScreenPlayback();
-    
-    // 3. 加载章节内容和音频
-    await loadChapter();
-    
-    // 4. 处理自动继续播放 - 严格遵循下面代码模版的逻辑
-    const urlContinue = params.get("continueplay") === "true";
-    const audioEl = document.getElementById("audio");
-    const audioAvailable = !!audioEl.src;
-
-    if (urlContinue && audioAvailable && isPlayingSequence) {
-        // 清除URL参数
-        const url = new URL(window.location);
-        url.searchParams.delete('continueplay');
-        window.history.replaceState({}, '', url.toString());
-
-        // 尝试恢复播放（forcePlay = true）
-        togglePlay(true);
-    }
-}
-
-// --- 事件监听器 ---
-document.addEventListener('keydown', function(e) {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-    switch(e.key) {
-        case "ArrowLeft":
-            e.preventDefault();
-            prevChapter();
-            break;
-        case "ArrowRight":
-            e.preventDefault();
-            nextChapter();
-            break;
-        case " ":
-            e.preventDefault();
-            togglePlay();
-            break;
-        case "[":
-            e.preventDefault();
-            changeSpeed(-0.25);
-            break;
-        case "]":
-            e.preventDefault();
-            changeSpeed(0.25);
-            break;
-        case "/":
-            e.preventDefault();
-            document.getElementById('searchInput').focus();
-            break;
-        case "F3":
-            e.preventDefault();
-            if (lastSearchTerm) {
-                navigateToNextMatch();
-            }
-            break;
-        case "Escape":
-            e.preventDefault();
-            clearSearch();
-            break;
-        case "h":
-        case "H":
-            e.preventDefault();
-            toggleDJPlayer();
-            break;
-    }
-});
-
-document.getElementById('searchInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        searchInChapter();
-    }
-});
-
-// 防止滚动冲突
-document.addEventListener('wheel', function() {
-    isScrolling = true;
-    setTimeout(() => {
-        isScrolling = false;
-    }, 1000);
-});
-
-// --- Service Worker 注册 ---
-if ('serviceWorker' in navigator) {
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    window.lockScreenPlayback = new LockScreenPlayback();
+    window.updateMediaSessionMetadata = () => lockScreenPlayback.updateMetadata();
+  });
+
+  // ============================================================
+  // ✅ Service Worker 注册 (PWA 必须)
+  // ============================================================
+  if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
-        try {
-            const swPath = window.location.pathname.includes('/js/') ? '../sw.js' : '/sw.js';
-            const registration = await navigator.serviceWorker.register(swPath);
-            console.log('✅ Service Worker 注册成功:', registration.scope);
-        } catch (error) {
-            console.error('❌ Service Worker 注册失败:', error);
-        }
+      try {
+        const swPath = window.location.pathname.includes('/js/') ? '../sw.js' : '/sw.js';
+        const reg = await navigator.serviceWorker.register(swPath);
+        console.log('✅ Service Worker 注册成功:', reg.scope);
+      } catch (e) {
+        console.error('❌ Service Worker 注册失败:', e);
+      }
     });
-}
-
-// --- 启动应用 ---
-initApp();
-</script>
-
+  }
+  </script>
 </body>
 </html>
