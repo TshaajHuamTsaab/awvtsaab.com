@@ -1,299 +1,1174 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Awvtsaab's漆书 Login</title>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <style>
-    .rainbow-header {
-      text-align: center;
-      margin-bottom: 12px;
-      /* optional: give a little backdrop glow to match hacker theme */
-      filter: drop-shadow(0 0 12px rgba(0,255,128,0.06));
-    }
-
-    /* 大字样式 */
-    .rainbow-header h1 {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 32px;             /* 根据需要调整大小 */
-      letter-spacing: 1px;
-      font-weight: 700;
-
-      /* 关键：用线性渐变并裁剪到文字上 */
-      background: linear-gradient(90deg,
-        #ff3b3b,
-        #ff903b,
-        #ffd93b,
-        #7fff3b,
-        #3bffdf,
-        #3b8bff,
-        #8b3bff,
-        #ff3bcf,
-        #ff3b3b
-      );
-      background-size: 300% 300%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-
-      /* 平滑移动渐变 */
-      animation: rainbowShift 6s linear infinite, neonFlicker 3s infinite;
-
-      /* optional subtle glow behind text for contrast on dark bg */
-      text-shadow:
-        0 0 6px rgba(255,255,255,0.03),
-        0 0 12px rgba(0,255,128,0.08),
-        0 0 24px rgba(0,255,128,0.06);
-    }
-
-    /* 渐变移动动画（左右流动） */
-    @keyframes rainbowShift {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* 轻微闪烁/呼吸效果，增强黑科技感 */
-    @keyframes neonFlicker {
-      0%, 100% { opacity: 1; transform: translateY(0); }
-      45% { opacity: 0.95; transform: translateY(-1px); }
-      50% { opacity: 1; transform: translateY(0); }
-      80% { opacity: 0.98; transform: translateY(-0.5px); }
-    }
-
-    /* 小屏幕缩小文字 */
-    @media (max-width: 420px) {
-      .rainbow-header h1 { font-size: 22px; }
-    }
-    * {margin:0;padding:0;box-sizing:border-box;font-family:'Share Tech Mono', monospace;}
-    body {
-      height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      background:black;
-      color:white;
-      overflow:hidden;
-    }
-
-    canvas#matrix {
-      position:fixed;
-      top:0;left:0;
-      width:100%;height:100%;
-      z-index:-1;
-    }
-
-    .container {
-      background:rgba(0,0,0,0.85);
-      padding:30px;
-      border-radius:12px;
-      box-shadow:0 0 20px rgba(0,255,100,0.5);
-      text-align:center;
-      width:280px;
-    }
-
-    .logo {margin-bottom:15px;}
-    .logo img {width:70px;}
-
-    h2 {margin-bottom:15px;color:#0f0;}
-
-    input, select {
-      width:100%;
-      padding:10px;
-      margin:8px 0;
-      border:none;
-      border-radius:6px;
-      outline:none;
-      background:#111;
-      color:#0f0;
-    }
-    input::placeholder {color:#555;}
-
-    .btn {
-      width:100%;
-      padding:10px;
-      margin:8px 0;
-      font-size:14px;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-      font-weight:bold;
-      text-transform:uppercase;
-    }
-
-    .btn-login {
-      background:#111;
-      color:white;
-      border:1px solid white;
-      box-shadow:0 0 10px white;
-      transition:0.3s;
-    }
-    .btn-login:hover {background:white;color:black;box-shadow:0 0 20px white;}
-
-    .btn-create {
-      background:#111;
-      color:red;
-      border:1px solid red;
-      box-shadow:0 0 10px red;
-      transition:0.3s;
-    }
-    .btn-create:hover {background:red;color:white;box-shadow:0 0 20px red;}
-
-    #createForm {display:none;margin-top:20px;}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Awv's奇迹踪印 - 量子图书馆入口</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ==================== 量子玻璃看窗全局样式 ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Arial Black', 'Microsoft YaHei', sans-serif;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0033 100%);
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 量子玻璃容器 - 核心效果 */
+        .quantum-glass-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        /* 玻璃看窗背景视频 */
+        #quantum-video-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: cover;
+            
+            /* 玻璃看窗关键效果 */
+            opacity: 0.9;
+            filter: 
+                brightness(1.3) 
+                contrast(1.2) 
+                saturate(1.4)
+                blur(0px);
+            
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 玻璃磨砂层 */
+        .glass-frost-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            mask-image: radial-gradient(circle at center, transparent 30%, black 70%);
+            z-index: -1;
+        }
+        
+        /* 玻璃折射光效 */
+        .glass-refraction {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0) 30%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0) 70%
+            );
+            animation: refraction-flow 15s infinite linear;
+            z-index: -1;
+        }
+        
+        @keyframes refraction-flow {
+            0% { transform: rotate(0deg) translateX(-50%); }
+            100% { transform: rotate(360deg) translateX(-50%); }
+        }
+        
+        /* ==================== 量子控制面板 ==================== */
+        .quantum-control-panel {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+        
+        .quantum-control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            color: #00ffcc;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quantum-control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        
+        .quantum-control-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            background: rgba(0, 0, 0, 0.5);
+            border-color: rgba(0, 255, 204, 0.6);
+            box-shadow: 
+                0 10px 30px rgba(0, 255, 204, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        
+        .quantum-control-btn:hover::before {
+            left: 100%;
+        }
+        
+        /* ==================== 主内容区 - 量子玻璃看窗 ==================== */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 标题容器 - 玻璃效果 */
+        .title-container {
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 30px;
+            padding: 40px 60px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .title-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 255, 204, 0.6), 
+                transparent);
+        }
+        
+        /* 火焰文字 - 量子升级版 */
+        .quantum-fire-text {
+            font-size: 5rem;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            font-weight: 900;
+            background: linear-gradient(45deg, 
+                #00ffcc 0%, 
+                #00ff99 25%, 
+                #00ff66 50%, 
+                #00ff33 75%, 
+                #00ff00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 
+                0 0 20px rgba(0, 255, 204, 0.5),
+                0 0 40px rgba(0, 255, 153, 0.3),
+                0 0 60px rgba(0, 255, 102, 0.2);
+            animation: quantum-pulse 3s infinite alternate;
+        }
+        
+        @keyframes quantum-pulse {
+            0%, 100% {
+                text-shadow: 
+                    0 0 20px rgba(0, 255, 204, 0.5),
+                    0 0 40px rgba(0, 255, 153, 0.3),
+                    0 0 60px rgba(0, 255, 102, 0.2);
+                filter: hue-rotate(0deg);
+            }
+            50% {
+                text-shadow: 
+                    0 0 30px rgba(0, 255, 204, 0.8),
+                    0 0 60px rgba(0, 255, 153, 0.5),
+                    0 0 90px rgba(0, 255, 102, 0.3);
+                filter: hue-rotate(90deg);
+            }
+        }
+        
+        /* 副标题 */
+        .quantum-subtitle {
+            font-size: 1.8rem;
+            margin-top: 20px;
+            opacity: 0.9;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* ==================== 量子倒计时容器 ==================== */
+        .quantum-countdown-container {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 25px;
+            padding: 50px 80px;
+            margin: 40px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 25px 70px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 玻璃光晕效果 */
+        .quantum-countdown-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                #00ffcc, #00ff99, #00ff66, #00ff33, #00ff00);
+            border-radius: 27px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .quantum-countdown-container:hover::before {
+            opacity: 0.1;
+            animation: border-glow 2s infinite alternate;
+        }
+        
+        @keyframes border-glow {
+            0% { opacity: 0.1; }
+            100% { opacity: 0.3; }
+        }
+        
+        /* 量子倒计时数字 */
+        .quantum-countdown-number {
+            font-size: 9rem;
+            font-weight: 900;
+            font-family: 'Arial Black', 'Segoe UI', sans-serif;
+            background: linear-gradient(45deg, 
+                #00ffcc 0%, 
+                #00ff99 33%, 
+                #00ff66 66%, 
+                #00ff33 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 
+                0 0 30px rgba(0, 255, 204, 0.7),
+                0 0 60px rgba(0, 255, 204, 0.5),
+                0 0 90px rgba(0, 255, 204, 0.3);
+            animation: quantum-digital-pulse 1s infinite alternate;
+            transition: all 0.3s ease;
+        }
+        
+        @keyframes quantum-digital-pulse {
+            0% {
+                transform: scale(1);
+                text-shadow: 
+                    0 0 30px rgba(0, 255, 204, 0.7),
+                    0 0 60px rgba(0, 255, 204, 0.5),
+                    0 0 90px rgba(0, 255, 204, 0.3);
+            }
+            100% {
+                transform: scale(1.05);
+                text-shadow: 
+                    0 0 40px rgba(0, 255, 204, 0.9),
+                    0 0 80px rgba(0, 255, 204, 0.7),
+                    0 0 120px rgba(0, 255, 204, 0.5);
+            }
+        }
+        
+        /* 数字颜色变化 */
+        .quantum-countdown-number.color-12 { filter: hue-rotate(0deg); }
+        .quantum-countdown-number.color-11 { filter: hue-rotate(-30deg); }
+        .quantum-countdown-number.color-10 { filter: hue-rotate(-60deg); }
+        .quantum-countdown-number.color-9 { filter: hue-rotate(-90deg); }
+        .quantum-countdown-number.color-8 { filter: hue-rotate(-120deg); }
+        .quantum-countdown-number.color-7 { filter: hue-rotate(-150deg); }
+        .quantum-countdown-number.color-6 { filter: hue-rotate(-180deg); }
+        .quantum-countdown-number.color-5 { filter: hue-rotate(-210deg); }
+        .quantum-countdown-number.color-4 { filter: hue-rotate(-240deg); }
+        .quantum-countdown-number.color-3 { filter: hue-rotate(-270deg); }
+        .quantum-countdown-number.color-2 { filter: hue-rotate(-300deg); }
+        .quantum-countdown-number.color-1 { filter: hue-rotate(-330deg); }
+        .quantum-countdown-number.color-0 { 
+            filter: hue-rotate(-360deg) brightness(1.5); 
+            animation: final-pulse 0.5s infinite alternate;
+        }
+        
+        @keyframes final-pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.2); opacity: 0.8; }
+        }
+        
+        /* 倒计时标签 */
+        .quantum-countdown-label {
+            font-size: 1.5rem;
+            letter-spacing: 4px;
+            margin-top: 20px;
+            color: rgba(0, 255, 204, 0.9);
+            text-align: center;
+            text-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+            font-weight: 300;
+        }
+        
+        /* ==================== 加载指示器 ==================== */
+        .quantum-loader {
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .loader-text {
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+        
+        .loader-ring {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .loader-ring div {
+            box-sizing: border-box;
+            display: block;
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            margin: 8px;
+            border: 4px solid rgba(0, 255, 204, 0.3);
+            border-radius: 50%;
+            animation: loader-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            border-color: rgba(0, 255, 204, 0.3) transparent transparent transparent;
+        }
+        
+        .loader-ring div:nth-child(1) { animation-delay: -0.45s; }
+        .loader-ring div:nth-child(2) { animation-delay: -0.3s; }
+        .loader-ring div:nth-child(3) { animation-delay: -0.15s; }
+        
+        @keyframes loader-ring {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* ==================== 玻璃进度条 ==================== */
+        .glass-progress {
+            width: 300px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 30px auto;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .glass-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, 
+                #00ffcc, #00ff99, #00ff66);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                transparent);
+            animation: progress-shine 2s infinite;
+        }
+        
+        @keyframes progress-shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* ==================== 底部版权信息 ==================== */
+        .quantum-footer {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            z-index: 1;
+        }
+        
+        .footer-text {
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, 
+                #00ffcc, #00ff99, #00ff66);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+        }
+        
+        .copyright {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* ==================== 高级阅读机预览 ==================== */
+        .reader-preview {
+            position: absolute;
+            bottom: 120px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 20px;
+            padding: 25px;
+            width: 350px;
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .reader-preview.active {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .reader-preview h3 {
+            color: #00ffcc;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+        }
+        
+        .reader-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .feature-tag {
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            color: #00ffcc;
+        }
+        
+        /* ==================== 响应式设计 ==================== */
+        @media (max-width: 1200px) {
+            .quantum-fire-text { font-size: 4rem; }
+            .quantum-countdown-number { font-size: 7rem; }
+            .quantum-countdown-container { padding: 40px 60px; }
+        }
+        
+        @media (max-width: 768px) {
+            .quantum-fire-text { font-size: 2.8rem; letter-spacing: 4px; }
+            .quantum-subtitle { font-size: 1.3rem; }
+            .quantum-countdown-number { font-size: 5rem; }
+            .quantum-countdown-container { padding: 30px 40px; }
+            .footer-text { font-size: 1.4rem; }
+            .reader-preview { display: none; }
+        }
+        
+        @media (max-width: 480px) {
+            .quantum-fire-text { font-size: 2rem; }
+            .quantum-countdown-number { font-size: 4rem; }
+            .title-container { padding: 25px 35px; }
+            .quantum-countdown-container { padding: 25px 35px; }
+            .footer-text { font-size: 1.1rem; }
+        }
+        
+        /* ==================== 跳过按钮样式 ==================== */
+        .skip-container {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            z-index: 100;
+        }
+        
+        .glass-skip-btn {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 102, 0, 0.5);
+            color: #ffcc00;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glass-skip-btn:hover {
+            background: rgba(255, 102, 0, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 102, 0, 0.3);
+        }
+    </style>
 </head>
 <body>
-  <canvas id="matrix"></canvas>
-
-  <div class="container">
-    <div class="logo">
-      <img src="https://i.postimg.cc/DwzYYTWD/logo.webp" alt="Logo">
-    </div>
-      
-    <!-- 登录区域 -->
-    <div id="loginSection">
-      <div class="rainbow-header">
-        <h1>Awvtsaab's 漆书</h1>
-      </div>
-      <h2>Login</h2>
-      <input type="email" id="loginEmail" placeholder="Email">
-      <input type="password" id="loginPassword" placeholder="Password">
-      <button class="btn btn-login" onclick="login()">登录</button>
-      <button class="btn btn-create" onclick="promptCreate()">创建新用户</button>
+    <!-- 🌌 量子玻璃看窗容器 -->
+    <div class="quantum-glass-container">
+        <video id="quantum-video-bg" autoplay loop playsinline muted>
+            <source src="./awvtsaab-v2/database/videos/Heaven fall to Lucifa.mp4" type="video/mp4">
+            <!-- 备用量子视觉特效 -->
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-geometric-pattern-loop-3495-large.mp4" type="video/mp4">
+        </video>
+        <div class="glass-frost-layer"></div>
+        <div class="glass-refraction"></div>
     </div>
 
-    <!-- 创建用户表单 -->
-    <div id="createForm">
-      <h2>确保隐私安全，随便即可！</h2>
-      <input type="text" id="signupName" placeholder="姓名">
-      <input type="email" id="signupEmail" placeholder="邮箱">
-      <input type="password" id="signupPassword" placeholder="密码">
-      <input type="number" id="signupAge" placeholder="年龄">
-      <select id="signupGender">
-        <option value="" disabled selected>请选择性别</option>
-        <option value="male">男</option>
-        <option value="female">女</option>
-        <option value="other">其他</option>
-      </select>
-      <input type="tel" id="signupPhone" placeholder="手机号码">
-      <button class="btn btn-create" onclick="confirmSignup()">确认</button>
+    <!-- 🎛️ 量子控制面板 -->
+    <div class="quantum-control-panel">
+        <button id="audioToggle" class="quantum-control-btn" title="音频控制">
+            <i class="fas fa-volume-mute"></i>
+        </button>
+        <button id="videoToggle" class="quantum-control-btn" title="视频效果">
+            <i class="fas fa-film"></i>
+        </button>
+        <button id="effectsToggle" class="quantum-control-btn" title="特效开关">
+            <i class="fas fa-magic"></i>
+        </button>
     </div>
-  </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- ⏭️ 跳过按钮 -->
+    <div class="skip-container">
+        <button id="skipButton" class="glass-skip-btn">
+            <i class="fas fa-rocket"></i>
+            <span>量子跃迁</span>
+        </button>
+    </div>
 
-  <script>
-    // ✅ Your Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyBCIVYd8e5vBeGRz-H12Nj9hd5dyqnZCDI",
-      authDomain: "guardiangate-7xkgi.firebaseapp.com",
-      projectId: "guardiangate-7xkgi",
-      storageBucket: "guardiangate-7xkgi.firebasestorage.app",
-      messagingSenderId: "133766737758",
-      appId: "1:133766737758:web:38de135254fef4664769cf"
-    };
+    <!-- 📚 高级阅读机预览 -->
+    <div class="reader-preview" id="readerPreview">
+        <h3><i class="fas fa-book-open"></i> Awv智慧阅读机</h3>
+        <p>即将为您呈现超越维度的阅读体验</p>
+        <div class="reader-features">
+            <span class="feature-tag">玻璃看窗UI</span>
+            <span class="feature-tag">AI语音阅读</span>
+            <span class="feature-tag">量子搜索</span>
+            <span class="feature-tag">智能摘要</span>
+            <span class="feature-tag">全息书签</span>
+            <span class="feature-tag">多维注释</span>
+        </div>
+    </div>
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    <!-- 🎯 主要内容区 -->
+    <div class="main-content">
+        <!-- 标题 -->
+        <div class="title-container">
+            <h1 class="quantum-fire-text">Awv's奇迹踪印</h1>
+            <p class="quantum-subtitle">量子图书馆启动序列 · 第12维度</p>
+        </div>
 
-    // 🔹 点击创建新用户按钮时
-    function promptCreate() {
-      if (confirm("⚡ 你确定要创建一个新用户吗？")) {
-        document.getElementById("loginSection").style.display = "none"; // 隐藏登录
-        document.getElementById("createForm").style.display = "block"; // 显示注册
-      }
-    }
+        <!-- 倒计时 -->
+        <div class="quantum-countdown-container">
+            <div class="quantum-countdown-number color-12" id="countdown">12</div>
+            <div class="quantum-countdown-label">维度同步倒计时</div>
+        </div>
 
-    // 🔹 二次确认提交
-    function confirmSignup() {
-      const name = document.getElementById("signupName").value;
-      const email = document.getElementById("signupEmail").value;
-      const password = document.getElementById("signupPassword").value;
-      const age = document.getElementById("signupAge").value;
-      const gender = document.getElementById("signupGender").value;
-      const phone = document.getElementById("signupPhone").value;
+        <!-- 加载指示器 -->
+        <div class="quantum-loader">
+            <div class="loader-text">
+                <i class="fas fa-atom"></i> 正在初始化量子图书馆...
+            </div>
+            <div class="glass-progress">
+                <div class="glass-progress-bar" id="progressBar"></div>
+            </div>
+            <div class="loader-ring">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
 
-      if (!name || !email || !password || !age || !gender || !phone) {
-        alert("⚠️ 保护您的隐私安全，随便填写即可🔐💡");
-        return;
-      }
+    <!-- 📄 底部信息 -->
+    <div class="quantum-footer">
+        <div class="footer-text">Awvtsaab 2026 · 无限维度智慧矩阵</div>
+        <div class="copyright">每一本书都是一个宇宙，每一次阅读都是一次星际穿越</div>
+    </div>
 
-      const confirmText =
-        "请确认以下信息:\n\n" +
-        "👤 姓名: " + name + "\n" +
-        "📧 邮箱: " + email + "\n" +
-        "🔑 密码: " + "*".repeat(password.length) + "\n" +
-        "🎂 年龄: " + age + "\n" +
-        "⚧ 性别: " + gender + "\n" +
-        "📱 手机: " + phone + "\n\n" +
-        "是否确认创建新用户？";
+    <script>
+        // ==================== 量子玻璃看窗系统 ====================
+        
+        // 核心状态
+        const quantumState = {
+            countdown: 12,
+            audioEnabled: false,
+            videoEffects: true,
+            specialEffects: true,
+            readerPreviewShown: false
+        };
 
-      if (confirm(confirmText)) {
-        signup(name, email, password, age, gender, phone);
-      }
-    }
+        // DOM元素
+        const elements = {
+            countdown: document.getElementById('countdown'),
+            quantumVideoBg: document.getElementById('quantum-video-bg'),
+            progressBar: document.getElementById('progressBar'),
+            audioToggle: document.getElementById('audioToggle'),
+            videoToggle: document.getElementById('videoToggle'),
+            effectsToggle: document.getElementById('effectsToggle'),
+            skipButton: document.getElementById('skipButton'),
+            readerPreview: document.getElementById('readerPreview')
+        };
 
-    // 🔹 Firebase 创建账号
-    async function signup(name, email, password, age, gender, phone) {
-      try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
+        let countdownInterval;
 
-        await db.collection("users").doc(user.uid).set({
-          name, email, age, gender, phone,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        alert("✅ 新用户创建成功！");
-        window.location.href = "home.html"; // 跳转主页
-      } catch (error) {
-        alert("❌ " + error.message);
-      }
-    }
-
-    // 🔹 Firebase 登录
-    async function login() {
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        alert("✅ 登录成功！");
-        window.location.href = "home.html";
-      } catch (error) {
-        alert("❌ " + error.message);
-      }
-    }
-
-    // 🔹 矩阵黑客背景
-    const canvas = document.getElementById("matrix");
-    const ctx = canvas.getContext("2d");
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
-
-    function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#0f0";
-      ctx.font = fontSize + "px monospace";
-      for (let i = 0; i < drops.length; i++) {
-        const text = letters.charAt(Math.floor(Math.random() * letters.length));
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
+        // 初始化量子系统
+        function initQuantumSystem() {
+            console.log('🌌 Awv量子玻璃看窗系统启动...');
+            
+            // 初始化视频
+            initQuantumVideo();
+            
+            // 开始倒计时序列
+            startQuantumCountdown();
+            
+            // 设置控制监听
+            setupQuantumControls();
+            
+            // 初始化进度条
+            initProgressBar();
+            
+            // 预加载图书馆资源
+            preloadLibraryResources();
+            
+            // 检查系统兼容性
+            checkSystemCompatibility();
         }
-        drops[i]++;
-      }
-    }
-    setInterval(draw, 33);
-  </script>
+
+        // 初始化量子视频效果
+        function initQuantumVideo() {
+            const video = elements.quantumVideoBg;
+            
+            // 尝试自动播放
+            video.play().catch(error => {
+                console.log('视频自动播放被阻止，将在用户交互后播放');
+                // 添加用户交互后播放
+                document.addEventListener('click', () => {
+                    video.muted = false;
+                    video.play();
+                }, { once: true });
+            });
+            
+            // 监听视频就绪
+            video.addEventListener('loadeddata', () => {
+                console.log('🎥 量子玻璃看窗视频加载完成');
+                updateVideoEffects();
+            });
+        }
+
+        // 开始量子倒计时
+        function startQuantumCountdown() {
+            console.log('⏳ 开始量子倒计时序列...');
+            
+            // 播放初始量子脉冲
+            playQuantumPulse(12);
+            
+            // 每秒更新倒计时
+            countdownInterval = setInterval(() => {
+                quantumState.countdown--;
+                updateQuantumCountdown();
+                
+                // 播放量子音效
+                playQuantumPulse(quantumState.countdown);
+                
+                // 更新进度条
+                updateProgressBar();
+                
+                // 在特定时间显示阅读机预览
+                if (quantumState.countdown === 8 && !quantumState.readerPreviewShown) {
+                    showReaderPreview();
+                }
+                
+                // 倒计时结束
+                if (quantumState.countdown <= 0) {
+                    completeCountdownSequence();
+                }
+            }, 1000);
+        }
+
+        // 更新量子倒计时显示
+        function updateQuantumCountdown() {
+            const countdownEl = elements.countdown;
+            countdownEl.textContent = quantumState.countdown;
+            
+            // 更新颜色类
+            countdownEl.className = 'quantum-countdown-number';
+            countdownEl.classList.add(`color-${quantumState.countdown}`);
+            
+            // 根据剩余时间增强效果
+            applyQuantumEffects();
+            
+            // 更新视频效果
+            updateVideoEffects();
+        }
+
+        // 应用量子效果
+        function applyQuantumEffects() {
+            const seconds = quantumState.countdown;
+            
+            // 玻璃看窗效果增强
+            const container = document.querySelector('.quantum-countdown-container');
+            if (seconds <= 5) {
+                const intensity = 6 - seconds;
+                container.style.boxShadow = 
+                    `0 0 ${30 + intensity * 15}px rgba(0, 255, 204, 0.${5 + intensity})`;
+                
+                // 增强玻璃光晕
+                container.style.borderColor = 
+                    `rgba(0, 255, 204, 0.${4 + intensity})`;
+                
+                // 添加量子振动效果
+                if (seconds <= 3) {
+                    container.style.animation = 
+                        `quantum-vibrate ${0.5 / seconds}s infinite`;
+                }
+            }
+        }
+
+        // 更新视频效果
+        function updateVideoEffects() {
+            if (!quantumState.videoEffects) return;
+            
+            const video = elements.quantumVideoBg;
+            const seconds = quantumState.countdown;
+            
+            // 根据倒计时调整视频效果
+            if (seconds > 6) {
+                video.style.filter = 
+                    `brightness(${1.2}) contrast(${1.1}) saturate(${1.3})`;
+            } else {
+                const intensity = (6 - seconds) * 0.2;
+                video.style.filter = 
+                    `brightness(${1.2 + intensity}) 
+                     contrast(${1.1 + intensity * 0.3}) 
+                     saturate(${1.3 + intensity * 0.2}) 
+                     hue-rotate(${intensity * 30}deg)`;
+            }
+        }
+
+        // 播放量子脉冲音效
+        function playQuantumPulse(second) {
+            if (!quantumState.audioEnabled) return;
+            
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // 创建量子合成器
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                const filter = audioContext.createBiquadFilter();
+                
+                oscillator.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // 设置量子频率
+                let baseFreq = 200;
+                let duration = 0.5;
+                
+                if (second >= 10) {
+                    baseFreq = 300 + (12 - second) * 15;
+                    filter.frequency.value = 800;
+                } else if (second >= 5) {
+                    baseFreq = 400 + (9 - second) * 30;
+                    filter.frequency.value = 1200;
+                    filter.type = 'bandpass';
+                } else {
+                    baseFreq = 500 + (5 - second) * 50;
+                    filter.frequency.value = 2000;
+                    filter.type = 'highpass';
+                    duration = 0.8;
+                }
+                
+                // 初始脉冲
+                if (second === 12) {
+                    baseFreq = 180;
+                    duration = 1;
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 500;
+                }
+                
+                // 设置声音参数
+                oscillator.frequency.value = baseFreq;
+                oscillator.type = second <= 3 ? 'sawtooth' : 'sine';
+                
+                // 量子包络
+                const now = audioContext.currentTime;
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.4, now + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration);
+                
+                oscillator.start(now);
+                oscillator.stop(now + duration);
+                
+            } catch (error) {
+                console.log('量子音效播放失败:', error);
+            }
+        }
+
+        // 设置量子控制
+        function setupQuantumControls() {
+            // 音频切换
+            elements.audioToggle.addEventListener('click', toggleQuantumAudio);
+            
+            // 视频效果切换
+            elements.videoToggle.addEventListener('click', toggleVideoEffects);
+            
+            // 特效切换
+            elements.effectsToggle.addEventListener('click', toggleSpecialEffects);
+            
+            // 跳过按钮
+            elements.skipButton.addEventListener('click', quantumJump);
+            
+            // 全局跳过（点击任意位置或按任意键）
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.skip-container') && 
+                    !e.target.closest('.quantum-control-panel')) {
+                    quantumJump();
+                }
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ' || 
+                    e.key === 'Escape' || e.key === 'ArrowRight') {
+                    quantumJump();
+                }
+            });
+        }
+
+        // 切换量子音频
+        function toggleQuantumAudio() {
+            quantumState.audioEnabled = !quantumState.audioEnabled;
+            
+            const video = elements.quantumVideoBg;
+            const icon = elements.audioToggle.querySelector('i');
+            
+            if (quantumState.audioEnabled) {
+                video.muted = false;
+                icon.className = 'fas fa-volume-up';
+                elements.audioToggle.title = '关闭量子音效';
+                
+                // 播放启用音效
+                playControlFeedbackSound(true);
+            } else {
+                video.muted = true;
+                icon.className = 'fas fa-volume-mute';
+                elements.audioToggle.title = '开启量子音效';
+                
+                // 播放禁用音效
+                playControlFeedbackSound(false);
+            }
+        }
+
+        // 切换视频效果
+        function toggleVideoEffects() {
+            quantumState.videoEffects = !quantumState.videoEffects;
+            const icon = elements.videoToggle.querySelector('i');
+            
+            if (quantumState.videoEffects) {
+                icon.className = 'fas fa-film';
+                elements.videoToggle.title = '关闭玻璃效果';
+                updateVideoEffects();
+            } else {
+                icon.className = 'fas fa-film-slash';
+                elements.videoToggle.title = '开启玻璃效果';
+                elements.quantumVideoBg.style.filter = 'none';
+            }
+            
+            playControlFeedbackSound(quantumState.videoEffects);
+        }
+
+        // 切换特效
+        function toggleSpecialEffects() {
+            quantumState.specialEffects = !quantumState.specialEffects;
+            const icon = elements.effectsToggle.querySelector('i');
+            
+            if (quantumState.specialEffects) {
+                icon.className = 'fas fa-magic';
+                elements.effectsToggle.title = '关闭量子特效';
+                document.body.classList.remove('effects-off');
+            } else {
+                icon.className = 'fas fa-magic-slash';
+                elements.effectsToggle.title = '开启量子特效';
+                document.body.classList.add('effects-off');
+            }
+            
+            playControlFeedbackSound(quantumState.specialEffects);
+        }
+
+        // 播放控制反馈音效
+        function playControlFeedbackSound(enabled) {
+            if (!quantumState.audioEnabled) return;
+            
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = enabled ? 600 : 300;
+                oscillator.type = 'triangle';
+                
+                const now = audioContext.currentTime;
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                
+                oscillator.start(now);
+                oscillator.stop(now + 0.3);
+            } catch (error) {
+                console.log('控制反馈音效失败');
+            }
+        }
+
+        // 初始化进度条
+        function initProgressBar() {
+            const progress = (12 - quantumState.countdown) / 12 * 100;
+            elements.progressBar.style.width = `${progress}%`;
+        }
+
+        // 更新进度条
+        function updateProgressBar() {
+            const progress = (12 - quantumState.countdown) / 12 * 100;
+            elements.progressBar.style.width = `${progress}%`;
+        }
+
+        // 显示阅读机预览
+        function showReaderPreview() {
+            quantumState.readerPreviewShown = true;
+            elements.readerPreview.classList.add('active');
+            
+            // 5秒后自动隐藏
+            setTimeout(() => {
+                elements.readerPreview.classList.remove('active');
+            }, 5000);
+        }
+
+        // 量子跃迁（跳过）
+        function quantumJump() {
+            console.log('🚀 启动量子跃迁...');
+            
+            // 清除倒计时
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            
+            // 播放跃迁音效
+            playJumpSound();
+            
+            // 添加跃迁特效
+            document.body.style.opacity = '0';
+            document.body.style.transform = 'scale(1.1)';
+            
+            // 量子延迟后跳转
+            setTimeout(() => {
+                window.location.href = './awvtsaab-v2/public/login.html';
+            }, 500);
+        }
+
+        // 播放跃迁音效
+        function playJumpSound() {
+            if (!quantumState.audioEnabled) return;
+            
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // 量子跃迁频率变化
+                const now = audioContext.currentTime;
+                oscillator.frequency.setValueAtTime(800, now);
+                oscillator.frequency.exponentialRampToValueAtTime(100, now + 0.8);
+                oscillator.type = 'sawtooth';
+                
+                gainNode.gain.setValueAtTime(0.5, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                
+                oscillator.start(now);
+                oscillator.stop(now + 0.8);
+            } catch (error) {
+                console.log('跃迁音效播放失败');
+            }
+        }
+
+        // 完成倒计时序列
+        function completeCountdownSequence() {
+            console.log('🎯 量子倒计时完成，启动图书馆...');
+            
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            
+            // 播放完成序列
+            playCompletionSequence();
+            
+            // 添加过渡效果
+            document.body.classList.add('quantum-complete');
+            
+            // 延迟跳转
+            setTimeout(() => {
+                quantumJump();
+            }, 2000);
+        }
+
+        // 播放完成序列
+        function playCompletionSequence() {
+            if (!quantumState.audioEnabled) return;
+            
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // 创建合成器数组
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        oscillator.frequency.value = 400 + i * 100;
+                        oscillator.type = 'sine';
+                        
+                        const now = audioContext.currentTime;
+                        gainNode.gain.setValueAtTime(0.3, now);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                        
+                        oscillator.start(now);
+                        oscillator.stop(now + 0.5);
+                    }, i * 100);
+                }
+            } catch (error) {
+                console.log('完成序列音效失败');
+            }
+        }
+
+        // 预加载图书馆资源
+        function preloadLibraryResources() {
+            console.log('📚 预加载量子图书馆资源...');
+            
+            // 这里可以添加资源预加载逻辑
+            const resources = [
+                './awvtsaab-v2/public/login.html',
+                // 添加其他需要预加载的资源
+            ];
+            
+            resources.forEach(resource => {
+                const link = document.createElement('link');
+                link.rel = 'prefetch';
+                link.href = resource;
+                document.head.appendChild(link);
+            });
+        }
+
+        // 检查系统兼容性
+        function checkSystemCompatibility() {
+            // 检查WebGL支持
+            if (!isWebGLAvailable()) {
+                console.warn('⚠️ WebGL不可用，部分玻璃效果可能受限');
+            }
+            
+            // 检查音频API
+            if (!window.AudioContext && !window.webkitAudioContext) {
+                console.warn('⚠️ Web Audio API不可用，音频效果禁用');
+                quantumState.audioEnabled = false;
+                elements.audioToggle.disabled = true;
+            }
+            
+            // 检查backdrop-filter支持
+            if (!isBackdropFilterSupported()) {
+                console.warn('⚠️ backdrop-filter不支持，玻璃效果降级');
+                document.body.classList.add('no-backdrop-filter');
+            }
+        }
+
+        // 检查WebGL支持
+        function isWebGLAvailable() {
+            try {
+                const canvas = document.createElement('canvas');
+                return !!(window.WebGLRenderingContext && 
+                    (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // 检查backdrop-filter支持
+        function isBackdropFilterSupported() {
+            return CSS.supports('backdrop-filter', 'blur(10px)') || 
+                   CSS.supports('-webkit-backdrop-filter', 'blur(10px)');
+        }
+
+        // ==================== 启动量子系统 ====================
+        document.addEventListener('DOMContentLoaded', initQuantumSystem);
+    </script>
 </body>
 </html>
