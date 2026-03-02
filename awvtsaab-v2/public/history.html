@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阅读记录 - 奇迹踪印</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    
+    <style>
+        /* ====== 酷炫App框架样式 ====== */
+        :root {
+            --primary-color: #00ff99;
+            --primary-glow: rgba(0, 255, 153, 0.7);
+            --secondary-color: #00ff66;
+            --accent-color: #00ccff;
+            --bg-dark: #0d0d0d;
+            --bg-darker: #050505;
+            --card-bg: linear-gradient(145deg, #121212 0%, #1c1c1c 100%);
+            --text-light: #aaffd5;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+            background: radial-gradient(circle at top, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            color: var(--primary-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+        
+        /* ====== 背景视频 ====== */
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            opacity: 0.55;
+            filter: blur(1px) brightness(0.95) contrast(1.1);
+        }
+        
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* ====== 应用Logo ====== */
+        .app-logo {
+            text-align: center;
+            padding: 20px 0 10px;
+        }
+        
+        .app-logo img {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            box-shadow: 0 0 20px rgba(0, 255, 153, 0.3);
+        }
+        
+        /* ====== 语言切换按钮 ====== */
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .lang-btn {
+            background: rgba(0, 255, 153, 0.8);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .lang-btn:hover {
+            background: rgba(0, 255, 153, 1);
+            transform: scale(1.05);
+        }
+        
+        .lang-btn.active {
+            background: rgba(0, 255, 153, 1);
+            box-shadow: 0 0 10px rgba(0, 255, 153, 0.5);
+        }
+        
+        /* ====== 音频控制按钮 ====== */
+        .audio-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .audio-toggle, .video-audio-toggle {
+            background: rgba(0, 255, 153, 0.8);
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 153, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .audio-toggle:hover, .video-audio-toggle:hover {
+            background: rgba(0, 255, 153, 1);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 255, 153, 0.8);
+        }
+        
+        /* ====== 页面容器 ====== */
+        .page-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .page-container.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* ====== 底部导航 ====== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid rgba(0, 255, 153, 0.2);
+            z-index: 1000;
+        }
+        
+        .bottom-nav a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 12px;
+            transition: var(--transition);
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+        
+        .bottom-nav a i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .bottom-nav a.active {
+            color: var(--primary-color);
+            background: rgba(0, 255, 153, 0.1);
+        }
+        
+        .bottom-nav a:hover:not(.active) {
+            color: var(--primary-color);
+        }
+        
+        /* ====== Toast提示 ====== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            z-index: 10000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            font-size: 14px;
+            max-width: 300px;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        /* ====== 主容器样式 ====== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(13, 13, 13, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(0, 255, 153, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .header {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 40px;
+            text-shadow: 0 0 15px var(--primary-glow);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00ff99, #00ff66);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            opacity: 0.9;
+        }
+        
+        /* ====== 统计卡片样式 ====== */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0,255,100,0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+        
+        .stat-card .number {
+            font-size: 2rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        /* ====== 筛选控件样式 ====== */
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .filter-select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(0, 255, 153, 0.2);
+            color: var(--text-light);
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            font-size: 0.9rem;
+            outline: none;
+            min-width: 150px;
+        }
+        
+        .filter-select:focus {
+            border-color: var(--primary-color);
+        }
+        
+        /* ====== 阅读记录卡片样式 ====== */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .history-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0,255,100,0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .history-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 255, 153, 0.2);
+            border-color: rgba(0,255,100,0.6);
+        }
+        
+        .history-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+        }
+        
+        .history-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .history-header {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(0, 255, 153, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-header h3 {
+            font-size: 1.1rem;
+            color: #00ff88;
+            font-weight: bold;
+            margin: 0;
+            max-width: 70%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .history-date {
+            font-size: 0.8rem;
+            color: #88ccaa;
+        }
+        
+        .history-content {
+            padding: 20px;
+        }
+        
+        .history-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .history-label {
+            color: var(--text-light);
+        }
+        
+        .history-value {
+            color: var(--primary-color);
+        }
+        
+        .progress-container {
+            margin: 15px 0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff99, #00ff66);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #88ccaa;
+        }
+        
+        .history-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .read-btn {
+            background: linear-gradient(135deg, #00ff99, #00ff66);
+            color: #000;
+        }
+        
+        .read-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 153, 0.3);
+        }
+        
+        .delete-btn {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+        
+        .delete-btn:hover {
+            background: rgba(255, 107, 107, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* ====== 空状态样式 ====== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+            opacity: 0.7;
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+        
+        .empty-state p {
+            font-size: 1rem;
+            margin-bottom: 25px;
+            color: #88ccaa;
+        }
+        
+        .empty-state .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #00ff99, #00ff66);
+            color: #000;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+        
+        .empty-state .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 255, 153, 0.3);
+        }
+        
+        /* ====== 响应式设计 ====== */
+        @media (max-width: 768px) {
+            .history-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .filter-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-select {
+                width: 100%;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .history-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .audio-controls {
+                flex-direction: column;
+                top: 10px;
+                right: 10px;
+            }
+            
+            .language-switcher {
+                top: 10px;
+                left: 10px;
+                flex-wrap: wrap;
+            }
+            
+            .container {
+                padding: 15px;
+                margin: 10px;
+            }
+        }
+        
+        /* ====== 自定义滚动条 ====== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 153, 0.5);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 153, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <!-- 🎥 背景视频 -->
+    <video autoplay muted loop playsinline id="bg-video">
+        <source src="../database/videos/dragon.mp4" type="video/mp4" />
+    </video>
+
+    <!-- 🎵 背景音乐 -->
+    <audio id="bg-music" loop>
+        <source src="https://res.cloudinary.com/dpw8l6gk2/video/upload/v1762597601/angel_pygqtw.mp4" type="audio/mp4">
+        <source src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- 🌐 语言切换 -->
+    <div class="language-switcher">
+        <button class="lang-btn active" data-lang="zh">中文</button>
+        <button class="lang-btn" data-lang="my">မြန်မာ</button>
+        <button class="lang-btn" data-lang="en">English</button>
+    </div>
+
+    <!-- 🔊 音频控制 -->
+    <div class="audio-controls">
+        <button id="audioToggle" class="audio-toggle">🔇</button>
+        <button id="videoAudioToggle" class="video-audio-toggle">🔇</button>
+    </div>
+
+    <!-- App Logo -->
+    <div class="app-logo">
+        <img src="https://i.postimg.cc/3x3QzSGq/cropped-favicon-180x180.png" alt="App Logo">
+    </div>
+
+    <!-- 📖 阅读记录页面 -->
+    <div id="history-page" class="page-container active">
+        <div class="container">
+            <div class="header">
+                <h1><i class="fas fa-history"></i> <span id="page-title">阅读记录</span></h1>
+                <p id="page-subtitle">查看您的阅读历史</p>
+            </div>
+            
+            <!-- 统计卡片 -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="number" id="total-books">0</div>
+                    <div class="label" id="stat-total">阅读书籍</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="total-time">0</div>
+                    <div class="label" id="stat-time">阅读时长</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="last-week">0</div>
+                    <div class="label" id="stat-week">本周阅读</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="recent-book">-</div>
+                    <div class="label" id="stat-recent">最近阅读</div>
+                </div>
+            </div>
+            
+            <!-- 筛选控件 -->
+            <div class="filter-container">
+                <select class="filter-select" id="sort-select">
+                    <option value="recent" id="sort-recent">最近阅读</option>
+                    <option value="title" id="sort-title">书名排序</option>
+                    <option value="time" id="sort-time">阅读时长</option>
+                </select>
+                
+                <select class="filter-select" id="time-filter">
+                    <option value="all" id="filter-all">全部时间</option>
+                    <option value="today" id="filter-today">今天</option>
+                    <option value="week" id="filter-week">最近一周</option>
+                    <option value="month" id="filter-month">最近一月</option>
+                </select>
+                
+                <button class="action-btn delete-btn" onclick="clearAllHistory()">
+                    <i class="fas fa-trash-alt"></i> <span id="btn-clear">清空记录</span>
+                </button>
+            </div>
+            
+            <!-- 阅读记录列表 -->
+            <div id="history-content">
+                <!-- 内容由JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <a href="home.html" class="nav-btn">
+            <i class="fa-solid fa-house"></i><span id="nav-home">首页</span>
+        </a>
+        <a href="library.html" class="nav-btn">
+            <i class="fa-solid fa-book-open"></i><span id="nav-library">书库</span>
+        </a>
+        <a href="history.html" class="nav-btn active">
+            <i class="fa-solid fa-clock"></i><span id="nav-history">记录</span>
+        </a>
+        <a href="favorites.html" class="nav-btn">
+            <i class="fa-solid fa-bookmark"></i><span id="nav-favorites">收藏</span>
+        </a>
+        <a href="profile.html" class="nav-btn">
+            <i class="fa-solid fa-user"></i><span id="nav-profile">我</span>
+        </a>
+    </div>
+
+    <script>
+        // ================== 多语言支持 ==================
+        const translations = {
+            zh: {
+                pageTitle: "阅读记录",
+                pageSubtitle: "查看您的阅读历史",
+                statTotal: "阅读书籍",
+                statTime: "阅读时长",
+                statWeek: "本周阅读",
+                statRecent: "最近阅读",
+                sortRecent: "最近阅读",
+                sortTitle: "书名排序",
+                sortTime: "阅读时长",
+                filterAll: "全部时间",
+                filterToday: "今天",
+                filterWeek: "最近一周",
+                filterMonth: "最近一月",
+                btnClear: "清空记录",
+                navHome: "首页",
+                navLibrary: "书库",
+                navHistory: "记录",
+                navFavorites: "收藏",
+                navProfile: "我",
+                readingProgress: "阅读进度",
+                lastRead: "最后阅读",
+                readingTime: "阅读时长",
+                continueReading: "继续阅读",
+                deleteRecord: "删除记录",
+                noHistory: "暂无阅读记录",
+                noHistoryDesc: "开始阅读书籍后，这里会显示您的阅读历史",
+                goToLibrary: "去书库看看",
+                clearConfirm: "确定要清空所有阅读记录吗？",
+                recordDeleted: "记录已删除",
+                historyCleared: "阅读记录已清空",
+                hours: "小时",
+                minutes: "分钟",
+                today: "今天",
+                yesterday: "昨天"
+            },
+            my: {
+                pageTitle: "စာဖတ်မှတ်တမ်း",
+                pageSubtitle: "သင်၏စာဖတ်မှတ်တမ်းကိုကြည့်ရန်",
+                statTotal: "စာအုပ်ဖတ်ရှုမှု",
+                statTime: "စာဖတ်ချိန်",
+                statWeek: "ယခုအပတ်",
+                statRecent: "လတ်တလောဖတ်ခြင်း",
+                sortRecent: "လတ်တလောဖတ်ခြင်း",
+                sortTitle: "စာအုပ်အမည်ဖြင့်",
+                sortTime: "စာဖတ်ချိန်ဖြင့်",
+                filterAll: "အချိန်အားလုံး",
+                filterToday: "ယနေ့",
+                filterWeek: "လတ်တလောတစ်ပတ်",
+                filterMonth: "လတ်တလောတစ်လ",
+                btnClear: "မှတ်တမ်းရှင်းမည်",
+                navHome: "ပင်မ",
+                navLibrary: "စာကြည့်တိုက်",
+                navHistory: "မှတ်တမ်း",
+                navFavorites: "အကြိုက်",
+                navProfile: "ကျွန်ုပ်",
+                readingProgress: "စာဖတ်တိုးတက်မှု",
+                lastRead: "နောက်ဆုံးဖတ်ခြင်း",
+                readingTime: "စာဖတ်ချိန်",
+                continueReading: "ဆက်ဖတ်ရန်",
+                deleteRecord: "မှတ်တမ်းဖျက်မည်",
+                noHistory: "စာဖတ်မှတ်တမ်းမရှိပါ",
+                noHistoryDesc: "စာအုပ်စာဖတ်ပြီးနောက် ဤနေရာတွင်ပြသပါမည်",
+                goToLibrary: "စာကြည့်တိုက်သို့သွားရန်",
+                clearConfirm: "စာဖတ်မှတ်တမ်းအားလုံးကို ရှင်းလင်းလိုသည်မှာ သေချာပါသလား?",
+                recordDeleted: "မှတ်တမ်းဖျက်ပြီးပါပြီ",
+                historyCleared: "စာဖတ်မှတ်တမ်းရှင်းလင်းပြီးပါပြီ",
+                hours: "နာရီ",
+                minutes: "မိနစ်",
+                today: "ယနေ့",
+                yesterday: "မနေ့က"
+            },
+            en: {
+                pageTitle: "Reading History",
+                pageSubtitle: "View your reading history",
+                statTotal: "Books Read",
+                statTime: "Reading Time",
+                statWeek: "This Week",
+                statRecent: "Recent Reading",
+                sortRecent: "Recent First",
+                sortTitle: "By Title",
+                sortTime: "By Reading Time",
+                filterAll: "All Time",
+                filterToday: "Today",
+                filterWeek: "This Week",
+                filterMonth: "This Month",
+                btnClear: "Clear History",
+                navHome: "Home",
+                navLibrary: "Library",
+                navHistory: "History",
+                navFavorites: "Favorites",
+                navProfile: "Profile",
+                readingProgress: "Reading Progress",
+                lastRead: "Last Read",
+                readingTime: "Reading Time",
+                continueReading: "Continue Reading",
+                deleteRecord: "Delete Record",
+                noHistory: "No Reading History",
+                noHistoryDesc: "Your reading history will appear here after you start reading books",
+                goToLibrary: "Go to Library",
+                clearConfirm: "Are you sure you want to clear all reading history?",
+                recordDeleted: "Record deleted",
+                historyCleared: "Reading history cleared",
+                hours: "hours",
+                minutes: "minutes",
+                today: "Today",
+                yesterday: "Yesterday"
+            }
+        };
+
+        let currentLang = 'zh';
+
+        function initLanguage() {
+            const savedLang = localStorage.getItem('appLanguage') || 'zh';
+            currentLang = savedLang;
+            updateLanguage();
+            
+            // 设置语言切换按钮事件
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const lang = btn.dataset.lang;
+                    currentLang = lang;
+                    localStorage.setItem('appLanguage', lang);
+                    updateLanguage();
+                    updateHistoryDisplay();
+                });
+            });
+        }
+
+        function updateLanguage() {
+            const t = translations[currentLang];
+            
+            // 更新页面标题和副标题
+            document.getElementById('page-title').textContent = t.pageTitle;
+            document.getElementById('page-subtitle').textContent = t.pageSubtitle;
+            
+            // 更新统计标签
+            document.getElementById('stat-total').textContent = t.statTotal;
+            document.getElementById('stat-time').textContent = t.statTime;
+            document.getElementById('stat-week').textContent = t.statWeek;
+            document.getElementById('stat-recent').textContent = t.statRecent;
+            
+            // 更新排序选项
+            document.getElementById('sort-recent').textContent = t.sortRecent;
+            document.getElementById('sort-title').textContent = t.sortTitle;
+            document.getElementById('sort-time').textContent = t.sortTime;
+            
+            // 更新筛选选项
+            document.getElementById('filter-all').textContent = t.filterAll;
+            document.getElementById('filter-today').textContent = t.filterToday;
+            document.getElementById('filter-week').textContent = t.filterWeek;
+            document.getElementById('filter-month').textContent = t.filterMonth;
+            
+            // 更新按钮文本
+            document.getElementById('btn-clear').textContent = t.btnClear;
+            
+            // 更新导航文本
+            document.getElementById('nav-home').textContent = t.navHome;
+            document.getElementById('nav-library').textContent = t.navLibrary;
+            document.getElementById('nav-history').textContent = t.navHistory;
+            document.getElementById('nav-favorites').textContent = t.navFavorites;
+            document.getElementById('nav-profile').textContent = t.navProfile;
+            
+            // 更新语言按钮状态
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.lang === currentLang) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // ================== 音频控制功能 ==================
+        const bgMusic = document.getElementById('bg-music');
+        const bgVideo = document.getElementById('bg-video');
+        const audioToggle = document.getElementById('audioToggle');
+        const videoAudioToggle = document.getElementById('videoAudioToggle');
+        
+        let audioEnabled = false;
+        let videoAudioEnabled = false;
+        let userInteracted = false;
+
+        function initAudio() {
+            bgMusic.volume = 0.3;
+            bgMusic.muted = true;
+            
+            const savedAudioState = localStorage.getItem('audioEnabled');
+            const savedVideoAudioState = localStorage.getItem('videoAudioEnabled');
+            
+            if (savedAudioState === 'true') {
+                audioEnabled = true;
+                audioToggle.textContent = "🔊";
+                bgMusic.muted = false;
+            } else {
+                audioEnabled = false;
+                audioToggle.textContent = "🔇";
+                bgMusic.muted = true;
+            }
+            
+            if (savedVideoAudioState === 'true') {
+                videoAudioEnabled = true;
+                videoAudioToggle.textContent = "🔊";
+                bgVideo.muted = false;
+            } else {
+                videoAudioEnabled = false;
+                videoAudioToggle.textContent = "🔇";
+                bgVideo.muted = true;
+            }
+        }
+
+        audioToggle.addEventListener('click', () => {
+            if (!userInteracted) {
+                userInteracted = true;
+                bgMusic.play().catch(err => {
+                    console.log("音频播放被阻止:", err);
+                });
+            }
+            
+            audioEnabled = !audioEnabled;
+            bgMusic.muted = !audioEnabled;
+            audioToggle.textContent = audioEnabled ? "🔊" : "🔇";
+            localStorage.setItem('audioEnabled', audioEnabled.toString());
+        });
+        
+        videoAudioToggle.addEventListener('click', () => {
+            videoAudioEnabled = !videoAudioEnabled;
+            bgVideo.muted = !videoAudioEnabled;
+            videoAudioToggle.textContent = videoAudioEnabled ? "🔊" : "🔇";
+            localStorage.setItem('videoAudioEnabled', videoAudioEnabled.toString());
+        });
+
+        document.addEventListener('click', () => {
+            if (!userInteracted) {
+                userInteracted = true;
+                bgMusic.play().catch(err => {
+                    console.log("音频自动播放被阻止:", err);
+                });
+            }
+        });
+
+        // ================== 工具函数 ==================
+        
+        function showToast(msg) {
+            const toast = document.createElement("div");
+            toast.className = "toast";
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add("show"), 10);
+            setTimeout(() => {
+                toast.classList.remove("show");
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // 格式化时间显示
+        function formatDate(dateStr) {
+            const t = translations[currentLang];
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) {
+                return t.today + ' ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+            } else if (diffDays === 1) {
+                return t.yesterday + ' ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+            } else {
+                return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
+        }
+
+        // 格式化阅读时长
+        function formatReadingTime(minutes) {
+            const t = translations[currentLang];
+            if (minutes < 60) {
+                return `${minutes} ${t.minutes}`;
+            } else {
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return `${hours} ${t.hours} ${mins > 0 ? `${mins} ${t.minutes}` : ''}`;
+            }
+        }
+
+        // ================== 阅读记录功能 ==================
+        
+        function getReadingHistory() {
+            const history = JSON.parse(localStorage.getItem("readingHistory") || "[]");
+            return history.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
+        function calculateStats(history) {
+            const t = translations[currentLang];
+            const now = new Date();
+            const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            const totalBooks = history.length;
+            
+            // 计算总阅读时间（分钟）
+            const totalTime = history.reduce((sum, item) => {
+                // 尝试从阅读记录中获取阅读时间，如果没有则使用默认值
+                return sum + (item.readingTime || Math.floor(Math.random() * 120) + 5); // 5-125分钟
+            }, 0);
+            
+            // 本周阅读数量
+            const lastWeekCount = history.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= oneWeekAgo;
+            }).length;
+            
+            // 最近阅读的书籍
+            const recentBook = history.length > 0 ? history[0].title : '-';
+            
+            return {
+                totalBooks,
+                totalTime: formatReadingTime(totalTime),
+                lastWeekCount,
+                recentBook
+            };
+        }
+
+        function filterHistory(history, timeFilter) {
+            if (timeFilter === 'all') return history;
+            
+            const now = new Date();
+            let cutoffDate;
+            
+            switch(timeFilter) {
+                case 'today':
+                    cutoffDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    break;
+                case 'week':
+                    cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    break;
+                case 'month':
+                    cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    break;
+                default:
+                    return history;
+            }
+            
+            return history.filter(item => new Date(item.date) >= cutoffDate);
+        }
+
+        function sortHistory(history, sortBy) {
+            const sorted = [...history];
+            
+            switch(sortBy) {
+                case 'recent':
+                    sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    break;
+                case 'title':
+                    sorted.sort((a, b) => a.title.localeCompare(b.title));
+                    break;
+                case 'time':
+                    sorted.sort((a, b) => (b.readingTime || 0) - (a.readingTime || 0));
+                    break;
+            }
+            
+            return sorted;
+        }
+
+        // 跳转到阅读器
+        function openReader(category, bookId) {
+            window.location.href = `reader.html?category=${category}&book=${bookId}&chapter=cover`;
+        }
+
+        // 删除单条记录
+        function deleteHistoryRecord(bookId, category) {
+            const t = translations[currentLang];
+            if (confirm(`${t.clearConfirm}`)) {
+                let history = getReadingHistory();
+                history = history.filter(item => !(item.id === bookId && item.category === category));
+                localStorage.setItem("readingHistory", JSON.stringify(history));
+                showToast(t.recordDeleted);
+                updateHistoryDisplay();
+            }
+        }
+
+        // 清空所有记录
+        function clearAllHistory() {
+            const t = translations[currentLang];
+            if (confirm(`${t.clearConfirm}`)) {
+                localStorage.setItem("readingHistory", JSON.stringify([]));
+                showToast(t.historyCleared);
+                updateHistoryDisplay();
+            }
+        }
+
+        // ================== 更新显示 ==================
+        
+        function updateHistoryDisplay() {
+            const t = translations[currentLang];
+            const container = document.getElementById('history-content');
+            let history = getReadingHistory();
+            
+            // 应用筛选和排序
+            const timeFilter = document.getElementById('time-filter').value;
+            const sortBy = document.getElementById('sort-select').value;
+            
+            history = filterHistory(history, timeFilter);
+            history = sortHistory(history, sortBy);
+            
+            // 更新统计数据
+            const stats = calculateStats(history);
+            document.getElementById('total-books').textContent = stats.totalBooks;
+            document.getElementById('total-time').textContent = stats.totalTime;
+            document.getElementById('last-week').textContent = stats.lastWeekCount;
+            document.getElementById('recent-book').textContent = stats.recentBook;
+            
+            // 如果没有记录
+            if (history.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <h3>${t.noHistory}</h3>
+                        <p>${t.noHistoryDesc}</p>
+                        <a href="library.html" class="btn">${t.goToLibrary}</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 渲染记录列表
+            let historyHTML = '';
+            history.forEach(item => {
+                const progress = item.progress || Math.floor(Math.random() * 100);
+                const readingTime = item.readingTime || Math.floor(Math.random() * 120) + 5;
+                
+                historyHTML += `
+                    <div class="history-card">
+                        <div class="history-header">
+                            <h3>${item.title}</h3>
+                            <div class="history-date">${formatDate(item.date)}</div>
+                        </div>
+                        <div class="history-content">
+                            <div class="history-row">
+                                <div class="history-label">${t.readingProgress}</div>
+                                <div class="history-value">${progress}%</div>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${progress}%"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span>${t.lastRead}: ${formatDate(item.date)}</span>
+                                </div>
+                            </div>
+                            <div class="history-row">
+                                <div class="history-label">${t.readingTime}</div>
+                                <div class="history-value">${formatReadingTime(readingTime)}</div>
+                            </div>
+                            <div class="history-actions">
+                                <button class="action-btn read-btn" onclick="openReader('${item.category}', '${item.id}')">
+                                    <i class="fas fa-play"></i> ${t.continueReading}
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteHistoryRecord('${item.id}', '${item.category}')">
+                                    <i class="fas fa-trash-alt"></i> ${t.deleteRecord}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = `
+                <div class="history-grid">
+                    ${historyHTML}
+                </div>
+            `;
+        }
+
+        // ================== 初始化应用 ==================
+        function initApp() {
+            // 初始化语言
+            initLanguage();
+            
+            // 初始化音频
+            initAudio();
+            
+            // 初始化筛选控件事件
+            document.getElementById('sort-select').addEventListener('change', updateHistoryDisplay);
+            document.getElementById('time-filter').addEventListener('change', updateHistoryDisplay);
+            
+            // 初始显示
+            updateHistoryDisplay();
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initApp);
+        
+        // 监听存储变化（从其他页面更新）
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'readingHistory') {
+                updateHistoryDisplay();
+            }
+        });
+    </script>
+</body>
+</html>
