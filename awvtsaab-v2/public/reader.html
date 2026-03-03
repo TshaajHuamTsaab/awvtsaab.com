@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" />
 <title>Awv's奇迹踪印 - 玻璃看窗阅读机</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -820,7 +820,7 @@ body {
 
 <body class="theme-default">
 <!-- 量子玻璃视频背景 -->
-<video id="quantum-video-background" autoplay muted loop playsinline>
+<video id="quantum-video-background" autoplay muted loop playsinline preload="auto" webkit-playsinline x5-playsinline>
     <source src="../database/homeicon/background.MP4" type="video/mp4">
     您的浏览器不支持视频标签。
 </video>
@@ -955,7 +955,7 @@ body {
     </div>
     
     <!-- Audio Element -->
-    <audio id="audio" controls></audio>
+    <audio id="audio" controls preload="metadata"></audio>
 </div>
 
 <!-- Persistent Control Toggle Button -->
@@ -964,837 +964,891 @@ body {
 </button>
 
 <script>
-// ==================== 玻璃看窗增强系统 ====================
-
-// 视频控制状态
-const glassState = {
-    videoEnabled: true,
-    audioEnabled: false,
-    glassEffects: true
-};
-
-// 初始化玻璃看窗系统
-function initGlassSystem() {
-    console.log('🔮 初始化玻璃看窗系统...');
-    
-    // 设置视频控制
-    setupVideoControls();
-    
-    // 设置玻璃效果
-    setupGlassEffects();
-    
-    // 预加载视频
-    preloadVideo();
-}
-
-// 设置视频控制
-function setupVideoControls() {
-    const videoToggle = document.getElementById('video-toggle');
-    const audioToggle = document.getElementById('audio-toggle');
-    const glassEffectToggle = document.getElementById('glass-effect-toggle');
-    const video = document.getElementById('quantum-video-background');
-    
-    // 视频开关
-    videoToggle.addEventListener('click', () => {
-        glassState.videoEnabled = !glassState.videoEnabled;
-        video.style.opacity = glassState.videoEnabled ? '0.7' : '0';
-        videoToggle.innerHTML = glassState.videoEnabled ? 
-            '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
-        playGlassSound(glassState.videoEnabled);
-    });
-    
-    // 音频开关
-    audioToggle.addEventListener('click', () => {
-        glassState.audioEnabled = !glassState.audioEnabled;
-        video.muted = !glassState.audioEnabled;
-        audioToggle.innerHTML = glassState.audioEnabled ? 
-            '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
-        playGlassSound(glassState.audioEnabled);
-    });
-    
-    // 玻璃效果开关
-    glassEffectToggle.addEventListener('click', () => {
-        glassState.glassEffects = !glassState.glassEffects;
-        const frostLayer = document.querySelector('.glass-frost-layer');
-        const refraction = document.querySelector('.glass-refraction');
-        
-        if (glassState.glassEffects) {
-            frostLayer.style.display = 'block';
-            refraction.style.display = 'block';
-            glassEffectToggle.innerHTML = '<i class="fas fa-cube"></i>';
-        } else {
-            frostLayer.style.display = 'none';
-            refraction.style.display = 'none';
-            glassEffectToggle.innerHTML = '<i class="fas fa-cube"></i>';
-        }
-        playGlassSound(glassState.glassEffects);
-    });
-    
-    // 初始设置
-    videoToggle.title = glassState.videoEnabled ? '关闭视频背景' : '开启视频背景';
-    audioToggle.title = glassState.audioEnabled ? '关闭背景音乐' : '开启背景音乐';
-    glassEffectToggle.title = glassState.glassEffects ? '关闭玻璃效果' : '开启玻璃效果';
-}
-
-// 播放玻璃音效
-function playGlassSound(enabled) {
-    try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = enabled ? 600 : 300;
-        oscillator.type = 'triangle';
-        
-        const now = audioContext.currentTime;
-        gainNode.gain.setValueAtTime(0.3, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-        
-        oscillator.start(now);
-        oscillator.stop(now + 0.3);
-    } catch (error) {
-        console.log('玻璃音效播放失败:', error);
-    }
-}
-
-// 设置玻璃效果
-function setupGlassEffects() {
-    // 添加段落悬停效果增强
-    const segments = document.querySelectorAll('.segment');
-    segments.forEach(segment => {
-        segment.addEventListener('mouseenter', () => {
-            if (glassState.glassEffects) {
-                segment.style.transform = 'translateY(-3px) translateX(5px)';
-                segment.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-            }
-        });
-        
-        segment.addEventListener('mouseleave', () => {
-            if (!segment.classList.contains('highlight')) {
-                segment.style.transform = '';
-            }
-        });
-    });
-    
-    // 添加内容区入场动画
-    const content = document.getElementById('content');
-    content.style.opacity = '0';
-    content.style.transform = 'translateY(20px)';
-    
-    setTimeout(() => {
-        content.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-        content.style.opacity = '1';
-        content.style.transform = 'translateY(0)';
-    }, 100);
-}
-
-// 预加载视频
-function preloadVideo() {
-    const video = document.getElementById('quantum-video-background');
-    
-    video.addEventListener('loadeddata', () => {
-        console.log('🎥 玻璃背景视频加载完成');
-        // 视频加载完成后轻微增强效果
-        if (glassState.glassEffects) {
-            setTimeout(() => {
-                video.style.filter = 
-                    'brightness(1.4) contrast(1.3) saturate(1.5)';
-                setTimeout(() => {
-                    video.style.filter = 
-                        'brightness(1.3) contrast(1.2) saturate(1.4)';
-                }, 1000);
-            }, 500);
-        }
-    });
-    
-    // 处理视频错误
-    video.addEventListener('error', () => {
-        console.error('视频加载失败，使用默认背景');
-        // 可以在这里添加备选背景
-    });
-}
-
-// ==================== 原有逻辑保持不变 ====================
-
-// --- Global Constants and State Management ---
-const params = new URLSearchParams(window.location.search);
-const category = params.get("category");
-const bookId = params.get("book");
-let chapter = params.get("chapter") || "cover";
-
-// State
-let chapterPlainText = "";
-let isPlayingSequence = false;
-let currentSegmentIndex = 0;
-let playbackRate = 1.0;
-let controlsVisible = true;
-
-// 搜索相关状态
-let searchMatches = [];
-let currentMatchIndex = -1;
-let lastSearchTerm = "";
-
-// Theme list
-const themes = [
-    { name: 'default', display: '默认' },
-    { name: 'dark', display: '暗黑' },
-    { name: 'sepia', display: '护眼' },
-];
-let currentThemeIndex = 0;
-
-if (!category || !bookId) {
-    document.getElementById("chapter-body").innerHTML =
-    '<div class="error"><b>Error:</b> Missing URL parameters (category/book).</div>';
-    throw new Error("Missing params");
-}
-
-// --- 搜索功能函数 ---
-
-function searchInChapter() {
-    const searchInput = document.getElementById('searchInput');
-    const searchTerm = searchInput.value.trim();
-    const searchStatsOutput = document.getElementById('search-stats-output');
-    const searchStatsText = document.getElementById('search-stats-text');
-    const searchNavigation = document.getElementById('search-navigation');
-    const searchBtn = document.querySelector('.btn-search');
-    
-    if (!searchTerm) {
-        searchStatsText.innerHTML = '<p class="text-red-500">请输入要搜索的关键词。</p>';
-        searchStatsOutput.classList.remove('hidden');
-        return;
-    }
-    
-    clearSearchHighlights();
-    lastSearchTerm = searchTerm;
-    
-    searchBtn.disabled = true;
-    searchInput.disabled = true;
-    searchStatsOutput.classList.remove('hidden');
-    searchStatsText.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> 正在搜索 "${searchTerm}"...`;
-    
-    setTimeout(() => {
-        performSearch(searchTerm);
-        searchBtn.disabled = false;
-        searchInput.disabled = false;
-    }, 100);
-}
-
-function performSearch(searchTerm) {
-    const segments = document.querySelectorAll("#chapter-body .segment");
-    const searchStatsText = document.getElementById('search-stats-text');
-    const searchNavigation = document.getElementById('search-navigation');
-    
-    searchMatches = [];
-    currentMatchIndex = -1;
-    
-    segments.forEach((segment, index) => {
-        const text = segment.textContent || segment.innerText;
-        const regex = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-        const matches = [...text.matchAll(regex)];
-        
-        if (matches.length > 0) {
-            searchMatches.push({
-                segmentIndex: index,
-                segment: segment,
-                matches: matches.length
-            });
-            segment.classList.add('search-match');
-        }
-    });
-    
-    if (searchMatches.length > 0) {
-        const totalMatches = searchMatches.reduce((sum, match) => sum + match.matches, 0);
-        searchStatsText.innerHTML = `
-            <p>搜索 "<span class="font-bold text-blue-600">${searchTerm}</span>" 的结果：</p>
-            <p class="mt-2">• 匹配段落数: <span class="font-bold">${searchMatches.length}</span></p>
-            <p>• 总匹配次数: <span class="font-bold">${totalMatches}</span></p>
-            <p class="mt-2 text-sm text-gray-600">使用下方按钮在匹配结果间导航</p>
-        `;
-        searchNavigation.classList.remove('hidden');
-        navigateToNextMatch();
-    } else {
-        searchStatsText.innerHTML = `
-            <p>未找到包含 "<span class="font-bold text-red-600">${searchTerm}</span>" 的段落。</p>
-            <p class="mt-2 text-sm text-gray-600">请尝试其他关键词。</p>
-        `;
-        searchNavigation.classList.add('hidden');
-    }
-}
-
-function navigateToPrevMatch() {
-    if (searchMatches.length === 0) return;
-    
-    if (currentMatchIndex >= 0 && currentMatchIndex < searchMatches.length) {
-        searchMatches[currentMatchIndex].segment.classList.remove('current-search-match');
-    }
-    
-    currentMatchIndex--;
-    if (currentMatchIndex < 0) {
-        currentMatchIndex = searchMatches.length - 1;
-    }
-    
-    searchMatches[currentMatchIndex].segment.classList.add('current-search-match');
-    searchMatches[currentMatchIndex].segment.scrollIntoView({ 
-        behavior: "smooth", 
-        block: "center"
-    });
-    updateSearchNavButtons();
-}
-
-function navigateToNextMatch() {
-    if (searchMatches.length === 0) return;
-    
-    if (currentMatchIndex >= 0 && currentMatchIndex < searchMatches.length) {
-        searchMatches[currentMatchIndex].segment.classList.remove('current-search-match');
-    }
-    
-    currentMatchIndex++;
-    if (currentMatchIndex >= searchMatches.length) {
-        currentMatchIndex = 0;
-    }
-    
-    searchMatches[currentMatchIndex].segment.classList.add('current-search-match');
-    searchMatches[currentMatchIndex].segment.scrollIntoView({ 
-        behavior: "smooth", 
-        block: "center"
-    });
-    updateSearchNavButtons();
-}
-
-function updateSearchNavButtons() {
-    const prevMatchBtn = document.getElementById('prev-match-btn');
-    const nextMatchBtn = document.getElementById('next-match-btn');
-    
-    if (searchMatches.length > 1) {
-        prevMatchBtn.disabled = false;
-        nextMatchBtn.disabled = false;
-    } else {
-        prevMatchBtn.disabled = true;
-        nextMatchBtn.disabled = true;
-    }
-}
-
-function clearSearch() {
-    clearSearchHighlights();
-    searchMatches = [];
-    currentMatchIndex = -1;
-    lastSearchTerm = "";
-    document.getElementById('search-stats-output').classList.add('hidden');
-    document.getElementById('searchInput').value = "";
-}
-
-function clearSearchHighlights() {
-    const segments = document.querySelectorAll("#chapter-body .segment");
-    segments.forEach(segment => {
-        segment.classList.remove('search-match');
-        segment.classList.remove('current-search-match');
-    });
-}
-
-// --- 章节摘要功能 ---
-
-async function generateSummary() {
-    const summaryOutput = document.getElementById('llm-summary-output');
-    const summaryTextEl = document.getElementById('summary-text');
-    const summaryBtn = document.getElementById('summaryBtn');
-    
-    if (chapterPlainText.trim().length < 50) {
-        summaryTextEl.innerHTML = "章节内容过短，无法生成摘要。";
-        summaryOutput.classList.remove('hidden');
-        return;
-    }
-    
-    summaryOutput.classList.remove('hidden');
-    summaryTextEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> 正在生成章节摘要，请稍候...';
-    summaryBtn.disabled = true;
-
-    setTimeout(() => {
-        const sentences = chapterPlainText.split(/[。！？.!?]/).filter(s => s.trim().length > 0);
-        let summary = "";
-        
-        if (sentences.length > 5) {
-            summary += sentences[0] + "。";
-            const middleIndex = Math.floor(sentences.length / 2);
-            summary += sentences[middleIndex] + "。";
-            summary += sentences[sentences.length - 1] + "。";
-        } else if (sentences.length > 0) {
-            for (let i = 0; i < Math.min(3, sentences.length); i++) {
-                summary += sentences[i] + "。";
-            }
-        } else {
-            summary = "无法从当前内容生成摘要。";
-        }
-        
-        // 添加玻璃效果到摘要文本
-        summaryTextEl.innerHTML = `<div class="p-3 bg-white/10 backdrop-blur-sm rounded-lg">${summary}</div>`;
-        summaryBtn.disabled = false;
-    }, 1500);
-}
-
-// --- Utility Functions ---
-
-function getPaths() {
-    const base = `database/${category}/${bookId}`;
-    const chapterName = chapter === "cover" ? "cover" : `chapter${chapter}`;
-    return {
-        html: `${base}/${chapterName}.html`,
-        audio: `${base}/audio/${chapterName}.mp3`
+(function() {
+    // ==================== 玻璃看窗增强系统 (完全保留，增加手机兼容) ====================
+    const glassState = {
+        videoEnabled: true,
+        audioEnabled: false,
+        glassEffects: true
     };
-}
 
-function redirect(shouldContinuePlay = false) {
-    let url = `reader.html?category=${category}&book=${bookId}&chapter=${chapter}`;
-    if (shouldContinuePlay) {
-        url += '&continueplay=true';
+    function initGlassSystem() {
+        console.log('🔮 初始化玻璃看窗系统...');
+        setupVideoControls();
+        setupGlassEffects();
+        preloadVideo();
     }
-    location.href = url;
-}
 
-async function chapterExists(chNum) {
-    const chapterName = chNum === "cover" ? "cover" : `chapter${chNum}`;
-    const testPath = `database/${category}/${bookId}/${chapterName}.html`;
-    try {
-        const resp = await fetch(testPath, { method: 'HEAD' });
-        return resp.ok;
-    } catch {
-        return false;
-    }
-}
-
-async function audioExists(audioPath) {
-    try {
-        const resp = await fetch(audioPath, { method: 'HEAD' });
-        return resp.ok;
-    } catch {
-        return false;
-    }
-}
-
-// --- Audio and Player Functions ---
-
-async function loadChapter() {
-    const { html, audio } = getPaths();
-    const audioEl = document.getElementById("audio");
-    const titleEl = document.getElementById("chapter-title");
-    const bodyEl = document.getElementById("chapter-body");
-    const summaryOutput = document.getElementById('llm-summary-output');
-    const searchStatsOutput = document.getElementById('search-stats-output');
-
-    summaryOutput.classList.add('hidden');
-    searchStatsOutput.classList.add('hidden');
-    document.getElementById('summary-text').textContent = '点击下方的 "✨ 总结章节" 按钮来生成摘要。';
-    clearSearchHighlights();
-    
-    titleEl.innerText = chapter === "cover" ? "封面" : `第 ${chapter} 页`;
-    bodyEl.innerHTML = '<div class="loading">📖 正在加载章节内容...</div>';
-
-    try {
-        const resp = await fetch(html);
-        if (!resp.ok) throw new Error("Chapter content not found.");
-
-        const text = await resp.text();
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = text;
-        chapterPlainText = tempDiv.textContent || tempDiv.innerText || "";
+    function setupVideoControls() {
+        const videoToggle = document.getElementById('video-toggle');
+        const audioToggle = document.getElementById('audio-toggle');
+        const glassEffectToggle = document.getElementById('glass-effect-toggle');
+        const video = document.getElementById('quantum-video-background');
         
-        const segmentedText = text.replace(/<p>/g, '<p class="segment" onclick="seekToSegment(this)">');
-        bodyEl.innerHTML = segmentedText;
-        document.getElementById('summaryBtn').disabled = false;
-
-        // 添加玻璃效果到新加载的段落
-        setTimeout(() => {
-            const segments = document.querySelectorAll("#chapter-body .segment");
-            segments.forEach(segment => {
-                segment.style.opacity = '0';
-                segment.style.transform = 'translateY(10px)';
-                setTimeout(() => {
-                    segment.style.transition = 'all 0.5s ease';
-                    segment.style.opacity = '1';
-                    segment.style.transform = 'translateY(0)';
-                }, 100);
+        if (videoToggle) {
+            videoToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                glassState.videoEnabled = !glassState.videoEnabled;
+                if (video) video.style.opacity = glassState.videoEnabled ? '0.7' : '0';
+                videoToggle.innerHTML = glassState.videoEnabled ? 
+                    '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
+                playGlassSound(glassState.videoEnabled);
             });
-        }, 100);
-
-    } catch (e) {
-        bodyEl.innerHTML =
-        `<div class="error"><b>⚠️ 内容加载错误:</b> 找不到章节文件 ${html}</div>`;
-        console.error(e);
-        document.getElementById('summaryBtn').disabled = true;
-        return;
-    }
-
-    const audioPath = `database/${category}/${bookId}/audio/${chapter === "cover" ? "cover" : `chapter${chapter}`}.mp3`;
-    const audioAvailable = await audioExists(audioPath);
-
-    if (audioAvailable) {
-        audioEl.src = audio;
-        audioEl.load();
-        audioEl.playbackRate = playbackRate;
-        setupAudioEvents();
-    } else {
-        audioEl.src = "";
-        audioEl.pause();
-        document.getElementById("playBtn").disabled = true;
-        bodyEl.insertAdjacentHTML('beforebegin', 
-            '<div class="error" id="audio-error"><b>注意:</b> 找不到本章音频。仅提供文字阅读。</div>');
-    }
-
-    currentSegmentIndex = 0;
-    updateNavigationButtons();
-    updateContinuousStatus();
-    saveProgress();
-}
-
-function setupAudioEvents() {
-    const audioEl = document.getElementById("audio");
-    audioEl.onended = null;
-    audioEl.ontimeupdate = null;
-    audioEl.onended = handleAudioEnded;
-    audioEl.ontimeupdate = highlightSegment;
-    document.getElementById("playBtn").disabled = false;
-    const errorEl = document.getElementById("audio-error");
-    if (errorEl) errorEl.remove();
-}
-
-async function togglePlay(forcePlay = false) {
-    const audioEl = document.getElementById("audio");
-    const playBtn = document.getElementById("playBtn");
-    
-    if (audioEl.disabled || !audioEl.src) return;
-    
-    if (audioEl.paused || forcePlay) {
-        if (!forcePlay && !isPlayingSequence) {
-             isPlayingSequence = true;
-             localStorage.setItem('isPlayingSequence', true);
-             updateContinuousStatus();
         }
         
+        if (audioToggle) {
+            audioToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                glassState.audioEnabled = !glassState.audioEnabled;
+                if (video) video.muted = !glassState.audioEnabled;
+                audioToggle.innerHTML = glassState.audioEnabled ? 
+                    '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+                playGlassSound(glassState.audioEnabled);
+            });
+        }
+        
+        if (glassEffectToggle) {
+            glassEffectToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                glassState.glassEffects = !glassState.glassEffects;
+                const frostLayer = document.querySelector('.glass-frost-layer');
+                const refraction = document.querySelector('.glass-refraction');
+                
+                if (frostLayer) frostLayer.style.display = glassState.glassEffects ? 'block' : 'none';
+                if (refraction) refraction.style.display = glassState.glassEffects ? 'block' : 'none';
+                glassEffectToggle.innerHTML = '<i class="fas fa-cube"></i>';
+                playGlassSound(glassState.glassEffects);
+            });
+        }
+        
+        if (videoToggle) videoToggle.title = glassState.videoEnabled ? '关闭视频背景' : '开启视频背景';
+        if (audioToggle) audioToggle.title = glassState.audioEnabled ? '关闭背景音乐' : '开启背景音乐';
+        if (glassEffectToggle) glassEffectToggle.title = glassState.glassEffects ? '关闭玻璃效果' : '开启玻璃效果';
+    }
+
+    function playGlassSound(enabled) {
         try {
-            await audioEl.play();
-            playBtn.innerHTML = '<i class="fas fa-pause"></i><span>暂停</span>';
-            playBtn.classList.add('playing');
-        } catch (e) {
-            playBtn.innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
-            playBtn.classList.remove('playing');
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = enabled ? 600 : 300;
+            oscillator.type = 'triangle';
+            
+            const now = audioContext.currentTime;
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            
+            oscillator.start(now);
+            oscillator.stop(now + 0.3);
+        } catch (error) {
+            // 静默失败，不影响主要功能
         }
-    } else {
-        audioEl.pause();
-        playBtn.innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
-        playBtn.classList.remove('playing');
-    }
-}
-
-async function nextChapter(isAuto = false) {
-    if (isAuto && !isPlayingSequence) return;
-    
-    let nextChapterNum;
-    if (chapter === "cover") {
-        nextChapterNum = 1;
-    } else {
-        nextChapterNum = parseInt(chapter) + 1;
     }
 
-    if (!(await chapterExists(nextChapterNum))) {
-        alert("🎉 本书已读完!");
-        isPlayingSequence = false;
-        localStorage.setItem('isPlayingSequence', false);
-        updateContinuousStatus();
-        document.getElementById("playBtn").innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
-        document.getElementById("playBtn").classList.remove('playing');
-        return;
-    }
-
-    chapter = nextChapterNum.toString();
-    redirect(isPlayingSequence);
-}
-
-function prevChapter() {
-    if (chapter === "cover") return;
-    const prev = Number(chapter) - 1;
-    chapter = prev <= 0 ? "cover" : prev.toString();
-    redirect(isPlayingSequence);
-}
-
-async function handleAudioEnded() {
-    if (isPlayingSequence) {
-        await nextChapter(true); 
-    } else {
-        document.getElementById("playBtn").innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
-        document.getElementById("playBtn").classList.remove('playing');
-    }
-}
-
-function highlightSegment() {
-    const audioEl = document.getElementById("audio");
-    const paragraphs = document.querySelectorAll("#chapter-body .segment");
-    
-    if (!paragraphs.length || !audioEl.duration) return;
-
-    const duration = audioEl.duration;
-    const segmentDuration = duration / paragraphs.length;
-    let index = Math.floor(audioEl.currentTime / segmentDuration);
-    index = Math.max(0, Math.min(index, paragraphs.length - 1));
-
-    if (index !== currentSegmentIndex) {
-        paragraphs.forEach(p => p.classList.remove("highlight"));
-        if (paragraphs[index]) {
-            paragraphs[index].classList.add("highlight");
-            paragraphs[index].scrollIntoView({ 
-                behavior: "smooth", 
-                block: "center",
-                inline: "nearest"
+    function setupGlassEffects() {
+        const segments = document.querySelectorAll('.segment');
+        segments.forEach(segment => {
+            segment.addEventListener('mouseenter', () => {
+                if (glassState.glassEffects) {
+                    segment.style.transform = 'translateY(-3px) translateX(5px)';
+                    segment.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                }
             });
-        }
-        currentSegmentIndex = index;
-    }
-}
-
-function seekToSegment(p) {
-    const audioEl = document.getElementById("audio");
-    const paragraphs = Array.from(document.querySelectorAll("#chapter-body .segment"));
-    const index = paragraphs.indexOf(p);
-    
-    if (index === -1 || !audioEl.duration) return;
-
-    const duration = audioEl.duration;
-    const segmentDuration = duration / paragraphs.length;
-    audioEl.currentTime = index * segmentDuration;
-    
-    if (audioEl.paused) {
-        togglePlay(true);
-    }
-}
-
-function changeSpeed(delta) {
-    const audioEl = document.getElementById("audio");
-    playbackRate = Math.max(0.5, Math.min(2.0, playbackRate + delta));
-    playbackRate = Math.round(playbackRate * 100) / 100;
-    
-    if (audioEl) {
-        audioEl.playbackRate = playbackRate;
-    }
-    
-    document.getElementById('currentSpeed').textContent = playbackRate.toFixed(2) + 'x';
-    localStorage.setItem('playbackRate', playbackRate);
-}
-
-// --- UI and Settings Functions ---
-
-async function updateNavigationButtons() {
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    
-    prevBtn.disabled = chapter === "cover";
-    let nextNum = chapter === "cover" ? 1 : Number(chapter) + 1;
-    nextBtn.disabled = !(await chapterExists(nextNum));
-}
-
-function updateContinuousStatus() {
-    document.getElementById('continuousStatus').textContent = isPlayingSequence ? '已开启' : '已关闭';
-    const playlistBtn = document.getElementById("playlistBtn");
-    if (isPlayingSequence) {
-        playlistBtn.classList.add('active');
-        playlistBtn.style.background = 'linear-gradient(45deg, rgba(29, 233, 182, 0.8), rgba(0, 166, 138, 0.8))';
-    } else {
-        playlistBtn.classList.remove('active');
-        playlistBtn.style.background = '';
-    }
-}
-
-function toggleContinuousPlay() {
-    isPlayingSequence = !isPlayingSequence;
-    localStorage.setItem('isPlayingSequence', isPlayingSequence);
-    updateContinuousStatus();
-    
-    if (!isPlayingSequence) {
-        const audioEl = document.getElementById("audio");
-        if (!audioEl.paused) {
-             togglePlay(); 
+            
+            segment.addEventListener('mouseleave', () => {
+                if (!segment.classList.contains('highlight')) {
+                    segment.style.transform = '';
+                }
+            });
+        });
+        
+        const content = document.getElementById('content');
+        if (content) {
+            content.style.opacity = '0';
+            content.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                content.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                content.style.opacity = '1';
+                content.style.transform = 'translateY(0)';
+            }, 100);
         }
     }
-}
 
-function toggleControls() {
-    controlsVisible = !controlsVisible;
-    document.body.classList.toggle('controls-hidden', !controlsVisible);
-    localStorage.setItem('controlsVisible', controlsVisible);
-
-    const toggleBtn = document.getElementById('persistent-toggle-btn');
-    if (toggleBtn) {
-        const icon = toggleBtn.querySelector('i');
-        if (controlsVisible) {
-            icon.className = 'fas fa-eye-slash';
-            toggleBtn.style.background = 'linear-gradient(45deg, rgba(156, 39, 176, 0.5), rgba(186, 104, 200, 0.5))';
-        } else {
-            icon.className = 'fas fa-eye';
-            toggleBtn.style.background = 'linear-gradient(45deg, rgba(255, 111, 97, 0.5), rgba(255, 153, 102, 0.5))';
-        }
-    }
-}
-
-function cycleTheme() {
-    currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-    const theme = themes[currentThemeIndex];
-    changeTheme(theme.name);
-}
-
-function changeTheme(themeName) {
-    document.body.className = 'theme-' + themeName;
-    const theme = themes.find(t => t.name === themeName) || themes[0];
-    document.getElementById('currentTheme').textContent = theme.display;
-    currentThemeIndex = themes.findIndex(t => t.name === themeName);
-    localStorage.setItem('readerTheme', themeName);
-}
-
-function goHome() {
-    window.location.href = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')) + '/library.html';
-}
-
-// --- Initialization and State Restoration ---
-
-function initSettings() {
-    const savedSpeed = localStorage.getItem('playbackRate');
-    if (savedSpeed) {
-        playbackRate = parseFloat(savedSpeed);
-        document.getElementById('currentSpeed').textContent = playbackRate.toFixed(2) + 'x';
-    }
-    
-    const savedTheme = localStorage.getItem('readerTheme') || 'default';
-    changeTheme(savedTheme);
-    
-    const savedControls = localStorage.getItem('controlsVisible');
-    if (savedControls === 'false') {
-        controlsVisible = false;
-        document.body.classList.add('controls-hidden');
-    }
-    
-    const toggleBtn = document.getElementById('persistent-toggle-btn');
-    if (toggleBtn) {
-        const icon = toggleBtn.querySelector('i');
-        if (controlsVisible) {
-            icon.className = 'fas fa-eye-slash';
-            toggleBtn.style.background = 'linear-gradient(45deg, rgba(156, 39, 176, 0.5), rgba(186, 104, 200, 0.5))';
-        } else {
-            icon.className = 'fas fa-eye';
-            toggleBtn.style.background = 'linear-gradient(45deg, rgba(255, 111, 97, 0.5), rgba(255, 153, 102, 0.5))';
-        }
-    }
-    
-    const savedSequence = localStorage.getItem('isPlayingSequence');
-    const urlContinue = params.get("continueplay") === "true";
-
-    if (savedSequence === 'true' || urlContinue) {
-        isPlayingSequence = true;
-    } else {
-         isPlayingSequence = false;
-    }
-    updateContinuousStatus();
-}
-
-function saveProgress() {
-    localStorage.setItem(`progress_${category}_${bookId}`, chapter);
-}
-
-// --- Main Application Initializer ---
-
-async function initApp() {
-    // 初始化设置
-    initSettings();
-    
-    // 初始化玻璃看窗系统
-    initGlassSystem();
-    
-    // 加载章节内容
-    await loadChapter();
-    
-    // 处理自动连续播放
-    const urlContinue = params.get("continueplay") === "true";
-    const audioEl = document.getElementById("audio");
-    const audioAvailable = !!audioEl.src;
-
-    if (urlContinue && audioAvailable && isPlayingSequence) {
-        const url = new URL(window.location);
-        url.searchParams.delete('continueplay');
-        window.history.replaceState({}, '', url.toString());
-        togglePlay(true);
-    }
-}
-
-// --- Event Listeners ---
-
-document.addEventListener('keydown', function(e) {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-    switch(e.key) {
-        case "ArrowLeft":
-            e.preventDefault();
-            prevChapter();
-            break;
-        case "ArrowRight":
-            e.preventDefault();
-            nextChapter();
-            break;
-        case " ":
-            e.preventDefault();
-            togglePlay();
-            break;
-        case "[":
-            e.preventDefault();
-            changeSpeed(-0.25);
-            break;
-        case "]":
-            e.preventDefault();
-            changeSpeed(0.25);
-            break;
-        case "/":
-            e.preventDefault();
-            document.getElementById('searchInput').focus();
-            break;
-        case "F3":
-            e.preventDefault();
-            if (lastSearchTerm) {
-                navigateToNextMatch();
+    function preloadVideo() {
+        const video = document.getElementById('quantum-video-background');
+        if (!video) return;
+        
+        video.addEventListener('loadeddata', () => {
+            console.log('🎥 玻璃背景视频加载完成');
+            if (glassState.glassEffects) {
+                setTimeout(() => {
+                    video.style.filter = 'brightness(1.4) contrast(1.3) saturate(1.5)';
+                    setTimeout(() => {
+                        video.style.filter = 'brightness(1.3) contrast(1.2) saturate(1.4)';
+                    }, 1000);
+                }, 500);
             }
-            break;
-        case "Escape":
-            e.preventDefault();
-            clearSearch();
-            break;
+        });
+        
+        video.addEventListener('error', () => {
+            console.error('视频加载失败，使用默认背景');
+        });
+        
+        // 手机端自动播放策略
+        document.addEventListener('touchstart', function enableVideo() {
+            if (video.paused) {
+                video.play().catch(() => {});
+            }
+            document.removeEventListener('touchstart', enableVideo);
+        }, { once: true });
     }
-});
 
-document.getElementById('searchInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        searchInChapter();
-    }
-});
+    // ==================== 原有逻辑保持不变，增加安全防护 ====================
+    const params = new URLSearchParams(window.location.search);
+    const category = params.get("category");
+    const bookId = params.get("book");
+    let chapter = params.get("chapter") || "cover";
 
-// 添加玻璃系统键盘快捷键
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey) {
-        switch(e.key) {
-            case 'v':
-                e.preventDefault();
-                document.getElementById('video-toggle').click();
-                break;
-            case 'a':
-                e.preventDefault();
-                document.getElementById('audio-toggle').click();
-                break;
-            case 'g':
-                e.preventDefault();
-                document.getElementById('glass-effect-toggle').click();
-                break;
+    let chapterPlainText = "";
+    let isPlayingSequence = false;
+    let currentSegmentIndex = 0;
+    let playbackRate = 1.0;
+    let controlsVisible = true;
+
+    let searchMatches = [];
+    let currentMatchIndex = -1;
+    let lastSearchTerm = "";
+
+    const themes = [
+        { name: 'default', display: '默认' },
+        { name: 'dark', display: '暗黑' },
+        { name: 'sepia', display: '护眼' },
+    ];
+    let currentThemeIndex = 0;
+
+    // 参数缺失处理
+    if (!category || !bookId) {
+        const bodyEl = document.getElementById("chapter-body");
+        if (bodyEl) {
+            bodyEl.innerHTML = '<div class="error"><b>Error:</b> Missing URL parameters (category/book).</div>';
         }
     }
-});
 
-// --- Start Application ---
-initApp();
+    // --- 补全 redirect 函数 ---
+    function redirect(shouldContinuePlay = false) {
+        if (!category || !bookId) {
+            console.error("redirect: missing category or bookId");
+            return;
+        }
+        let url = `reader.html?category=${category}&book=${bookId}&chapter=${chapter}`;
+        if (shouldContinuePlay) {
+            url += '&continueplay=true';
+        }
+        location.href = url;
+    }
+
+    // --- 工具函数 ---
+    function getPaths() {
+        const base = `database/${category}/${bookId}`;
+        const chapterName = chapter === "cover" ? "cover" : `chapter${chapter}`;
+        return {
+            html: `${base}/${chapterName}.html`,
+            audio: `${base}/audio/${chapterName}.mp3`
+        };
+    }
+
+    async function chapterExists(chNum) {
+        if (!category || !bookId) return false;
+        const chapterName = chNum === "cover" ? "cover" : `chapter${chNum}`;
+        const testPath = `database/${category}/${bookId}/${chapterName}.html`;
+        try {
+            const resp = await fetch(testPath, { method: 'HEAD' });
+            return resp.ok;
+        } catch {
+            return false;
+        }
+    }
+
+    async function audioExists(audioPath) {
+        try {
+            const resp = await fetch(audioPath, { method: 'HEAD' });
+            return resp.ok;
+        } catch {
+            return false;
+        }
+    }
+
+    // --- 搜索功能 (完全保留，增加元素存在性检查) ---
+    function searchInChapter() {
+        const searchInput = document.getElementById('searchInput');
+        if (!searchInput) return;
+        const searchTerm = searchInput.value.trim();
+        const searchStatsOutput = document.getElementById('search-stats-output');
+        const searchStatsText = document.getElementById('search-stats-text');
+        const searchNavigation = document.getElementById('search-navigation');
+        const searchBtn = document.querySelector('.btn-search');
+        
+        if (!searchTerm) {
+            if (searchStatsText) searchStatsText.innerHTML = '<p class="text-red-500">请输入要搜索的关键词。</p>';
+            if (searchStatsOutput) searchStatsOutput.classList.remove('hidden');
+            return;
+        }
+        
+        clearSearchHighlights();
+        lastSearchTerm = searchTerm;
+        
+        if (searchBtn) searchBtn.disabled = true;
+        if (searchInput) searchInput.disabled = true;
+        if (searchStatsOutput) searchStatsOutput.classList.remove('hidden');
+        if (searchStatsText) searchStatsText.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> 正在搜索 "${searchTerm}"...`;
+        
+        setTimeout(() => {
+            performSearch(searchTerm);
+            if (searchBtn) searchBtn.disabled = false;
+            if (searchInput) searchInput.disabled = false;
+        }, 100);
+    }
+
+    function performSearch(searchTerm) {
+        const segments = document.querySelectorAll("#chapter-body .segment");
+        const searchStatsText = document.getElementById('search-stats-text');
+        const searchNavigation = document.getElementById('search-navigation');
+        
+        searchMatches = [];
+        currentMatchIndex = -1;
+        
+        segments.forEach((segment, index) => {
+            const text = segment.textContent || segment.innerText;
+            const regex = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+            const matches = [...text.matchAll(regex)];
+            
+            if (matches.length > 0) {
+                searchMatches.push({
+                    segmentIndex: index,
+                    segment: segment,
+                    matches: matches.length
+                });
+                segment.classList.add('search-match');
+            }
+        });
+        
+        if (searchMatches.length > 0) {
+            const totalMatches = searchMatches.reduce((sum, match) => sum + match.matches, 0);
+            if (searchStatsText) {
+                searchStatsText.innerHTML = `
+                    <p>搜索 "<span class="font-bold text-blue-600">${searchTerm}</span>" 的结果：</p>
+                    <p class="mt-2">• 匹配段落数: <span class="font-bold">${searchMatches.length}</span></p>
+                    <p>• 总匹配次数: <span class="font-bold">${totalMatches}</span></p>
+                    <p class="mt-2 text-sm text-gray-600">使用下方按钮在匹配结果间导航</p>
+                `;
+            }
+            if (searchNavigation) searchNavigation.classList.remove('hidden');
+            navigateToNextMatch();
+        } else {
+            if (searchStatsText) {
+                searchStatsText.innerHTML = `
+                    <p>未找到包含 "<span class="font-bold text-red-600">${searchTerm}</span>" 的段落。</p>
+                    <p class="mt-2 text-sm text-gray-600">请尝试其他关键词。</p>
+                `;
+            }
+            if (searchNavigation) searchNavigation.classList.add('hidden');
+        }
+    }
+
+    function navigateToPrevMatch() {
+        if (searchMatches.length === 0) return;
+        
+        if (currentMatchIndex >= 0 && currentMatchIndex < searchMatches.length) {
+            searchMatches[currentMatchIndex].segment.classList.remove('current-search-match');
+        }
+        
+        currentMatchIndex--;
+        if (currentMatchIndex < 0) {
+            currentMatchIndex = searchMatches.length - 1;
+        }
+        
+        searchMatches[currentMatchIndex].segment.classList.add('current-search-match');
+        searchMatches[currentMatchIndex].segment.scrollIntoView({ 
+            behavior: "smooth", 
+            block: "center"
+        });
+        updateSearchNavButtons();
+    }
+
+    function navigateToNextMatch() {
+        if (searchMatches.length === 0) return;
+        
+        if (currentMatchIndex >= 0 && currentMatchIndex < searchMatches.length) {
+            searchMatches[currentMatchIndex].segment.classList.remove('current-search-match');
+        }
+        
+        currentMatchIndex++;
+        if (currentMatchIndex >= searchMatches.length) {
+            currentMatchIndex = 0;
+        }
+        
+        searchMatches[currentMatchIndex].segment.classList.add('current-search-match');
+        searchMatches[currentMatchIndex].segment.scrollIntoView({ 
+            behavior: "smooth", 
+            block: "center"
+        });
+        updateSearchNavButtons();
+    }
+
+    function updateSearchNavButtons() {
+        const prevMatchBtn = document.getElementById('prev-match-btn');
+        const nextMatchBtn = document.getElementById('next-match-btn');
+        if (!prevMatchBtn || !nextMatchBtn) return;
+        
+        if (searchMatches.length > 1) {
+            prevMatchBtn.disabled = false;
+            nextMatchBtn.disabled = false;
+        } else {
+            prevMatchBtn.disabled = true;
+            nextMatchBtn.disabled = true;
+        }
+    }
+
+    function clearSearch() {
+        clearSearchHighlights();
+        searchMatches = [];
+        currentMatchIndex = -1;
+        lastSearchTerm = "";
+        const statsOutput = document.getElementById('search-stats-output');
+        if (statsOutput) statsOutput.classList.add('hidden');
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) searchInput.value = "";
+    }
+
+    function clearSearchHighlights() {
+        const segments = document.querySelectorAll("#chapter-body .segment");
+        segments.forEach(segment => {
+            segment.classList.remove('search-match');
+            segment.classList.remove('current-search-match');
+        });
+    }
+
+    // --- 章节摘要功能 ---
+    async function generateSummary() {
+        const summaryOutput = document.getElementById('llm-summary-output');
+        const summaryTextEl = document.getElementById('summary-text');
+        const summaryBtn = document.getElementById('summaryBtn');
+        
+        if (!summaryOutput || !summaryTextEl || !summaryBtn) return;
+        
+        if (chapterPlainText.trim().length < 50) {
+            summaryTextEl.innerHTML = "章节内容过短，无法生成摘要。";
+            summaryOutput.classList.remove('hidden');
+            return;
+        }
+        
+        summaryOutput.classList.remove('hidden');
+        summaryTextEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> 正在生成章节摘要，请稍候...';
+        summaryBtn.disabled = true;
+
+        setTimeout(() => {
+            try {
+                const sentences = chapterPlainText.split(/[。！？.!?]/).filter(s => s.trim().length > 0);
+                let summary = "";
+                
+                if (sentences.length > 5) {
+                    summary += sentences[0] + "。";
+                    const middleIndex = Math.floor(sentences.length / 2);
+                    summary += sentences[middleIndex] + "。";
+                    summary += sentences[sentences.length - 1] + "。";
+                } else if (sentences.length > 0) {
+                    for (let i = 0; i < Math.min(3, sentences.length); i++) {
+                        summary += sentences[i] + "。";
+                    }
+                } else {
+                    summary = "无法从当前内容生成摘要。";
+                }
+                
+                summaryTextEl.innerHTML = `<div class="p-3 bg-white/10 backdrop-blur-sm rounded-lg">${summary}</div>`;
+            } catch (e) {
+                summaryTextEl.innerHTML = "摘要生成失败。";
+            } finally {
+                summaryBtn.disabled = false;
+            }
+        }, 1500);
+    }
+
+    // --- 音频和播放功能 (完全保留，增加null检查) ---
+    async function loadChapter() {
+        if (!category || !bookId) return;
+        
+        const { html, audio } = getPaths();
+        const audioEl = document.getElementById("audio");
+        const titleEl = document.getElementById("chapter-title");
+        const bodyEl = document.getElementById("chapter-body");
+        const summaryOutput = document.getElementById('llm-summary-output');
+        const searchStatsOutput = document.getElementById('search-stats-output');
+        const summaryText = document.getElementById('summary-text');
+
+        if (summaryOutput) summaryOutput.classList.add('hidden');
+        if (searchStatsOutput) searchStatsOutput.classList.add('hidden');
+        if (summaryText) summaryText.textContent = '点击下方的 "✨ 总结章节" 按钮来生成摘要。';
+        clearSearchHighlights();
+        
+        if (titleEl) titleEl.innerText = chapter === "cover" ? "封面" : `第 ${chapter} 页`;
+        if (bodyEl) bodyEl.innerHTML = '<div class="loading">📖 正在加载章节内容...</div>';
+
+        try {
+            const resp = await fetch(html);
+            if (!resp.ok) throw new Error("Chapter content not found.");
+
+            const text = await resp.text();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = text;
+            chapterPlainText = tempDiv.textContent || tempDiv.innerText || "";
+            
+            const segmentedText = text.replace(/<p>/g, '<p class="segment" onclick="seekToSegment(this)">');
+            if (bodyEl) bodyEl.innerHTML = segmentedText;
+            
+            const summaryBtn = document.getElementById('summaryBtn');
+            if (summaryBtn) summaryBtn.disabled = false;
+
+            setTimeout(() => {
+                const segments = document.querySelectorAll("#chapter-body .segment");
+                segments.forEach(segment => {
+                    segment.style.opacity = '0';
+                    segment.style.transform = 'translateY(10px)';
+                    setTimeout(() => {
+                        segment.style.transition = 'all 0.5s ease';
+                        segment.style.opacity = '1';
+                        segment.style.transform = 'translateY(0)';
+                    }, 100);
+                });
+            }, 100);
+
+        } catch (e) {
+            if (bodyEl) {
+                bodyEl.innerHTML = `<div class="error"><b>⚠️ 内容加载错误:</b> 找不到章节文件 ${html}</div>`;
+            }
+            console.error(e);
+            const summaryBtn = document.getElementById('summaryBtn');
+            if (summaryBtn) summaryBtn.disabled = true;
+            return;
+        }
+
+        const audioPath = `database/${category}/${bookId}/audio/${chapter === "cover" ? "cover" : `chapter${chapter}`}.mp3`;
+        const audioAvailable = await audioExists(audioPath);
+
+        if (audioAvailable && audioEl) {
+            audioEl.src = audio;
+            audioEl.load();
+            audioEl.playbackRate = playbackRate;
+            setupAudioEvents();
+        } else {
+            if (audioEl) {
+                audioEl.src = "";
+                audioEl.pause();
+            }
+            const playBtn = document.getElementById("playBtn");
+            if (playBtn) playBtn.disabled = true;
+            if (bodyEl && !document.getElementById('audio-error')) {
+                bodyEl.insertAdjacentHTML('beforebegin', 
+                    '<div class="error" id="audio-error"><b>注意:</b> 找不到本章音频。仅提供文字阅读。</div>');
+            }
+        }
+
+        currentSegmentIndex = 0;
+        updateNavigationButtons();
+        updateContinuousStatus();
+        saveProgress();
+    }
+
+    function setupAudioEvents() {
+        const audioEl = document.getElementById("audio");
+        if (!audioEl) return;
+        audioEl.onended = null;
+        audioEl.ontimeupdate = null;
+        audioEl.onended = handleAudioEnded;
+        audioEl.ontimeupdate = highlightSegment;
+        const playBtn = document.getElementById("playBtn");
+        if (playBtn) playBtn.disabled = false;
+        const errorEl = document.getElementById("audio-error");
+        if (errorEl) errorEl.remove();
+    }
+
+    async function togglePlay(forcePlay = false) {
+        const audioEl = document.getElementById("audio");
+        const playBtn = document.getElementById("playBtn");
+        
+        if (!audioEl || audioEl.disabled || !audioEl.src) return;
+        
+        if (audioEl.paused || forcePlay) {
+            if (!forcePlay && !isPlayingSequence) {
+                isPlayingSequence = true;
+                localStorage.setItem('isPlayingSequence', 'true');
+                updateContinuousStatus();
+            }
+            
+            try {
+                // 手机自动播放策略
+                await audioEl.play();
+                if (playBtn) {
+                    playBtn.innerHTML = '<i class="fas fa-pause"></i><span>暂停</span>';
+                    playBtn.classList.add('playing');
+                }
+            } catch (e) {
+                console.log('播放失败，可能需要用户交互', e);
+                if (playBtn) {
+                    playBtn.innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
+                    playBtn.classList.remove('playing');
+                }
+            }
+        } else {
+            audioEl.pause();
+            if (playBtn) {
+                playBtn.innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
+                playBtn.classList.remove('playing');
+            }
+        }
+    }
+
+    async function nextChapter(isAuto = false) {
+        if (isAuto && !isPlayingSequence) return;
+        
+        let nextChapterNum;
+        if (chapter === "cover") {
+            nextChapterNum = 1;
+        } else {
+            nextChapterNum = parseInt(chapter) + 1;
+        }
+
+        if (!(await chapterExists(nextChapterNum))) {
+            alert("🎉 本书已读完!");
+            isPlayingSequence = false;
+            localStorage.setItem('isPlayingSequence', 'false');
+            updateContinuousStatus();
+            const playBtn = document.getElementById("playBtn");
+            if (playBtn) {
+                playBtn.innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
+                playBtn.classList.remove('playing');
+            }
+            return;
+        }
+
+        chapter = nextChapterNum.toString();
+        redirect(isPlayingSequence);
+    }
+
+    function prevChapter() {
+        if (chapter === "cover") return;
+        const prev = Number(chapter) - 1;
+        chapter = prev <= 0 ? "cover" : prev.toString();
+        redirect(isPlayingSequence);
+    }
+
+    async function handleAudioEnded() {
+        if (isPlayingSequence) {
+            await nextChapter(true); 
+        } else {
+            const playBtn = document.getElementById("playBtn");
+            if (playBtn) {
+                playBtn.innerHTML = '<i class="fas fa-play"></i><span>播放</span>';
+                playBtn.classList.remove('playing');
+            }
+        }
+    }
+
+    function highlightSegment() {
+        const audioEl = document.getElementById("audio");
+        const paragraphs = document.querySelectorAll("#chapter-body .segment");
+        
+        if (!paragraphs.length || !audioEl || !audioEl.duration) return;
+
+        const duration = audioEl.duration;
+        const segmentDuration = duration / paragraphs.length;
+        let index = Math.floor(audioEl.currentTime / segmentDuration);
+        index = Math.max(0, Math.min(index, paragraphs.length - 1));
+
+        if (index !== currentSegmentIndex) {
+            paragraphs.forEach(p => p.classList.remove("highlight"));
+            if (paragraphs[index]) {
+                paragraphs[index].classList.add("highlight");
+                paragraphs[index].scrollIntoView({ 
+                    behavior: "smooth", 
+                    block: "center",
+                    inline: "nearest"
+                });
+            }
+            currentSegmentIndex = index;
+        }
+    }
+
+    function seekToSegment(p) {
+        const audioEl = document.getElementById("audio");
+        const paragraphs = Array.from(document.querySelectorAll("#chapter-body .segment"));
+        const index = paragraphs.indexOf(p);
+        
+        if (index === -1 || !audioEl || !audioEl.duration) return;
+
+        const duration = audioEl.duration;
+        const segmentDuration = duration / paragraphs.length;
+        audioEl.currentTime = index * segmentDuration;
+        
+        if (audioEl.paused) {
+            togglePlay(true);
+        }
+    }
+
+    function changeSpeed(delta) {
+        const audioEl = document.getElementById("audio");
+        playbackRate = Math.max(0.5, Math.min(2.0, playbackRate + delta));
+        playbackRate = Math.round(playbackRate * 100) / 100;
+        
+        if (audioEl) {
+            audioEl.playbackRate = playbackRate;
+        }
+        
+        const speedSpan = document.getElementById('currentSpeed');
+        if (speedSpan) speedSpan.textContent = playbackRate.toFixed(2) + 'x';
+        localStorage.setItem('playbackRate', playbackRate.toString());
+    }
+
+    // --- UI 功能 (完全保留) ---
+    async function updateNavigationButtons() {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        if (prevBtn) prevBtn.disabled = chapter === "cover";
+        let nextNum = chapter === "cover" ? 1 : Number(chapter) + 1;
+        const exists = await chapterExists(nextNum).catch(() => false);
+        if (nextBtn) nextBtn.disabled = !exists;
+    }
+
+    function updateContinuousStatus() {
+        const statusSpan = document.getElementById('continuousStatus');
+        if (statusSpan) statusSpan.textContent = isPlayingSequence ? '已开启' : '已关闭';
+        const playlistBtn = document.getElementById("playlistBtn");
+        if (playlistBtn) {
+            if (isPlayingSequence) {
+                playlistBtn.classList.add('active');
+                playlistBtn.style.background = 'linear-gradient(45deg, rgba(29, 233, 182, 0.8), rgba(0, 166, 138, 0.8))';
+            } else {
+                playlistBtn.classList.remove('active');
+                playlistBtn.style.background = '';
+            }
+        }
+    }
+
+    function toggleContinuousPlay() {
+        isPlayingSequence = !isPlayingSequence;
+        localStorage.setItem('isPlayingSequence', isPlayingSequence ? 'true' : 'false');
+        updateContinuousStatus();
+        
+        if (!isPlayingSequence) {
+            const audioEl = document.getElementById("audio");
+            if (audioEl && !audioEl.paused) {
+                togglePlay();
+            }
+        }
+    }
+
+    function toggleControls() {
+        controlsVisible = !controlsVisible;
+        document.body.classList.toggle('controls-hidden', !controlsVisible);
+        localStorage.setItem('controlsVisible', controlsVisible ? 'true' : 'false');
+
+        const toggleBtn = document.getElementById('persistent-toggle-btn');
+        if (toggleBtn) {
+            const icon = toggleBtn.querySelector('i');
+            if (controlsVisible) {
+                icon.className = 'fas fa-eye-slash';
+                toggleBtn.style.background = 'linear-gradient(45deg, rgba(156, 39, 176, 0.5), rgba(186, 104, 200, 0.5))';
+            } else {
+                icon.className = 'fas fa-eye';
+                toggleBtn.style.background = 'linear-gradient(45deg, rgba(255, 111, 97, 0.5), rgba(255, 153, 102, 0.5))';
+            }
+        }
+    }
+
+    function cycleTheme() {
+        currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+        const theme = themes[currentThemeIndex];
+        changeTheme(theme.name);
+    }
+
+    function changeTheme(themeName) {
+        document.body.className = 'theme-' + themeName;
+        const theme = themes.find(t => t.name === themeName) || themes[0];
+        const themeSpan = document.getElementById('currentTheme');
+        if (themeSpan) themeSpan.textContent = theme.display;
+        currentThemeIndex = themes.findIndex(t => t.name === themeName);
+        localStorage.setItem('readerTheme', themeName);
+    }
+
+    function goHome() {
+        window.location.href = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')) + '/library.html';
+    }
+
+    function saveProgress() {
+        if (category && bookId && chapter) {
+            localStorage.setItem(`progress_${category}_${bookId}`, chapter);
+        }
+    }
+
+    // --- 初始化设置 ---
+    function initSettings() {
+        const savedSpeed = localStorage.getItem('playbackRate');
+        if (savedSpeed) {
+            playbackRate = parseFloat(savedSpeed);
+            const speedSpan = document.getElementById('currentSpeed');
+            if (speedSpan) speedSpan.textContent = playbackRate.toFixed(2) + 'x';
+        }
+        
+        const savedTheme = localStorage.getItem('readerTheme') || 'default';
+        changeTheme(savedTheme);
+        
+        const savedControls = localStorage.getItem('controlsVisible');
+        if (savedControls === 'false') {
+            controlsVisible = false;
+            document.body.classList.add('controls-hidden');
+        } else {
+            controlsVisible = true;
+            document.body.classList.remove('controls-hidden');
+        }
+        
+        const toggleBtn = document.getElementById('persistent-toggle-btn');
+        if (toggleBtn) {
+            const icon = toggleBtn.querySelector('i');
+            if (controlsVisible) {
+                icon.className = 'fas fa-eye-slash';
+                toggleBtn.style.background = 'linear-gradient(45deg, rgba(156, 39, 176, 0.5), rgba(186, 104, 200, 0.5))';
+            } else {
+                icon.className = 'fas fa-eye';
+                toggleBtn.style.background = 'linear-gradient(45deg, rgba(255, 111, 97, 0.5), rgba(255, 153, 102, 0.5))';
+            }
+        }
+        
+        const savedSequence = localStorage.getItem('isPlayingSequence');
+        const urlContinue = params.get("continueplay") === "true";
+
+        if (savedSequence === 'true' || urlContinue) {
+            isPlayingSequence = true;
+        } else {
+            isPlayingSequence = false;
+        }
+        updateContinuousStatus();
+    }
+
+    // --- 主初始化 ---
+    async function initApp() {
+        initSettings();
+        initGlassSystem();
+        await loadChapter();
+        
+        const urlContinue = params.get("continueplay") === "true";
+        const audioEl = document.getElementById("audio");
+        const audioAvailable = audioEl && audioEl.src;
+
+        if (urlContinue && audioAvailable && isPlayingSequence) {
+            const url = new URL(window.location);
+            url.searchParams.delete('continueplay');
+            window.history.replaceState({}, '', url.toString());
+            togglePlay(true);
+        }
+    }
+
+    // --- 事件绑定 ---
+    document.addEventListener('keydown', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        switch(e.key) {
+            case "ArrowLeft":
+                e.preventDefault();
+                prevChapter();
+                break;
+            case "ArrowRight":
+                e.preventDefault();
+                nextChapter();
+                break;
+            case " ":
+                e.preventDefault();
+                togglePlay();
+                break;
+            case "[":
+                e.preventDefault();
+                changeSpeed(-0.25);
+                break;
+            case "]":
+                e.preventDefault();
+                changeSpeed(0.25);
+                break;
+            case "/":
+                e.preventDefault();
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) searchInput.focus();
+                break;
+            case "F3":
+                e.preventDefault();
+                if (lastSearchTerm) {
+                    navigateToNextMatch();
+                }
+                break;
+            case "Escape":
+                e.preventDefault();
+                clearSearch();
+                break;
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey) {
+            switch(e.key) {
+                case 'v':
+                    e.preventDefault();
+                    document.getElementById('video-toggle')?.click();
+                    break;
+                case 'a':
+                    e.preventDefault();
+                    document.getElementById('audio-toggle')?.click();
+                    break;
+                case 'g':
+                    e.preventDefault();
+                    document.getElementById('glass-effect-toggle')?.click();
+                    break;
+            }
+        }
+    });
+
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchInChapter();
+            }
+        });
+    }
+
+    // 挂载全局函数
+    window.prevChapter = prevChapter;
+    window.nextChapter = nextChapter;
+    window.goHome = goHome;
+    window.togglePlay = togglePlay;
+    window.changeSpeed = changeSpeed;
+    window.toggleContinuousPlay = toggleContinuousPlay;
+    window.cycleTheme = cycleTheme;
+    window.searchInChapter = searchInChapter;
+    window.navigateToPrevMatch = navigateToPrevMatch;
+    window.navigateToNextMatch = navigateToNextMatch;
+    window.clearSearch = clearSearch;
+    window.generateSummary = generateSummary;
+    window.seekToSegment = seekToSegment;
+    window.toggleControls = toggleControls;
+
+    // 启动
+    if (category && bookId) {
+        initApp().catch(e => console.error("启动失败", e));
+    }
+})();
 </script>
-
 </body>
 </html>
