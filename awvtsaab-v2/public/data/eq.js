@@ -83,5 +83,12 @@ window.bookCategories.eq = [
     author: "比约恩·纳提科·林多夫（Bjorn Natiko Lindof）",
     cover: "../database/logo/eqlogo.gif",
     basePath: "database/eq/dev12/"
+  },
+  {
+    id: "dev13",
+    title: "被讨厌的勇气",
+    author: "由岸见一郎（Ichiro Kishimi）",
+    cover: "../database/logo/eqlogo.gif",
+    basePath: "database/eq/dev12/"
   }
 ];
