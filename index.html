@@ -1,299 +1,580 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Awvtsaab's漆书 Login</title>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-  <style>
-    .rainbow-header {
-      text-align: center;
-      margin-bottom: 12px;
-      /* optional: give a little backdrop glow to match hacker theme */
-      filter: drop-shadow(0 0 12px rgba(0,255,128,0.06));
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Awv · 奇迹踪印 ｜ 竖屏玻璃 · 完整视频</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ========== 全局重置 & 移动优先 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* 大字样式 */
-    .rainbow-header h1 {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 32px;             /* 根据需要调整大小 */
-      letter-spacing: 1px;
-      font-weight: 700;
+        body {
+            font-family: 'Segoe UI', 'Arial', 'Microsoft YaHei', sans-serif;
+            color: #fff;
+            background: #0a0a1a;  /* 深色基底 (视频容器黑色会覆盖) */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-      /* 关键：用线性渐变并裁剪到文字上 */
-      background: linear-gradient(90deg,
-        #ff3b3b,
-        #ff903b,
-        #ffd93b,
-        #7fff3b,
-        #3bffdf,
-        #3b8bff,
-        #8b3bff,
-        #ff3bcf,
-        #ff3b3b
-      );
-      background-size: 300% 300%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+        /* ---------- 玻璃视频容器 - 修改为居中contain，黑底 ---------- */
+        .quantum-glass-container {
+            position: fixed;
+            inset: 0;                /* top:0; right:0; bottom:0; left:0; */
+            z-index: -2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: black;        /* 纯黑底，露出黑边 */
+            pointer-events: none;     /* 点击穿透 */
+        }
 
-      /* 平滑移动渐变 */
-      animation: rainbowShift 6s linear infinite, neonFlicker 3s infinite;
+        /* 视频本身：contain + 比例限制 (竖屏友好) */
+        #quantum-video-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;      /* 🔥 完整显示，不裁剪，上下/左右留黑 */
+            max-width: 480px;         /* 防止过宽，竖屏视频在宽手机上也居中 */
+            background-color: black;  /* 确保黑边纯黑 */
+            opacity: 0.85;            /* 轻微通透，保留玻璃感 */
+            filter: brightness(1.05) contrast(1.05);  /* 柔和 */
+        }
 
-      /* optional subtle glow behind text for contrast on dark bg */
-      text-shadow:
-        0 0 6px rgba(255,255,255,0.03),
-        0 0 12px rgba(0,255,128,0.08),
-        0 0 24px rgba(0,255,128,0.06);
-    }
+        /* 磨砂层 — 极简模糊，覆盖整个屏幕，但保留视频可见 */
+        .glass-frost-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: -1;
+        }
 
-    /* 渐变移动动画（左右流动） */
-    @keyframes rainbowShift {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+        /* 完全移除折射光效动画 (手机不加载) */
+        .glass-refraction {
+            display: none;
+        }
 
-    /* 轻微闪烁/呼吸效果，增强黑科技感 */
-    @keyframes neonFlicker {
-      0%, 100% { opacity: 1; transform: translateY(0); }
-      45% { opacity: 0.95; transform: translateY(-1px); }
-      50% { opacity: 1; transform: translateY(0); }
-      80% { opacity: 0.98; transform: translateY(-0.5px); }
-    }
+        /* ========== 主内容区：弹性列 ========== */
+        .main-content {
+            width: 100%;
+            max-width: 480px;           /* 限制最大宽度，居中留白自然 */
+            padding: 20px 18px 90px;     /* 底部留出固定按钮空间 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 2;
+            position: relative;
+        }
 
-    /* 小屏幕缩小文字 */
-    @media (max-width: 420px) {
-      .rainbow-header h1 { font-size: 22px; }
-    }
-    * {margin:0;padding:0;box-sizing:border-box;font-family:'Share Tech Mono', monospace;}
-    body {
-      height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      background:black;
-      color:white;
-      overflow:hidden;
-    }
+        /* ---------- 标题卡片 (轻玻璃) ---------- */
+        .title-container {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 28px;
+            padding: 22px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);  /* 单一柔和阴影 */
+            text-align: center;
+        }
 
-    canvas#matrix {
-      position:fixed;
-      top:0;left:0;
-      width:100%;height:100%;
-      z-index:-1;
-    }
+        .quantum-fire-text {
+            font-size: clamp(1.8rem, 10vw, 2.2rem);  /* 最大2.2rem */
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(145deg, #00ffcc, #00ff88);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 8px rgba(0, 255, 200, 0.4);
+        }
 
-    .container {
-      background:rgba(0,0,0,0.85);
-      padding:30px;
-      border-radius:12px;
-      box-shadow:0 0 20px rgba(0,255,100,0.5);
-      text-align:center;
-      width:280px;
-    }
+        .quantum-subtitle {
+            font-size: 1.1rem;
+            margin-top: 8px;
+            opacity: 0.9;
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 1px;
+        }
 
-    .logo {margin-bottom:15px;}
-    .logo img {width:70px;}
+        /* ---------- 倒计时卡片 (大数字但克制) ---------- */
+        .quantum-countdown-container {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 40px;
+            padding: 25px 15px;
+            border: 1px solid rgba(0, 255, 200, 0.2);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+            text-align: center;
+        }
 
-    h2 {margin-bottom:15px;color:#0f0;}
+        .quantum-countdown-number {
+            font-size: 4rem;          /* 固定4rem */
+            font-weight: 900;
+            font-family: 'Arial Black', sans-serif;
+            background: linear-gradient(145deg, #00ffcc, #00ff66);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px #00ffcc55;
+            line-height: 1.2;
+        }
 
-    input, select {
-      width:100%;
-      padding:10px;
-      margin:8px 0;
-      border:none;
-      border-radius:6px;
-      outline:none;
-      background:#111;
-      color:#0f0;
-    }
-    input::placeholder {color:#555;}
+        /* 保留色相旋转类名，但不加动画 */
+        .quantum-countdown-number.color-12 { filter: hue-rotate(0deg); }
+        .quantum-countdown-number.color-11 { filter: hue-rotate(-30deg); }
+        .quantum-countdown-number.color-10 { filter: hue-rotate(-60deg); }
+        .quantum-countdown-number.color-9 { filter: hue-rotate(-90deg); }
+        .quantum-countdown-number.color-8 { filter: hue-rotate(-120deg); }
+        .quantum-countdown-number.color-7 { filter: hue-rotate(-150deg); }
+        .quantum-countdown-number.color-6 { filter: hue-rotate(-180deg); }
+        .quantum-countdown-number.color-5 { filter: hue-rotate(-210deg); }
+        .quantum-countdown-number.color-4 { filter: hue-rotate(-240deg); }
+        .quantum-countdown-number.color-3 { filter: hue-rotate(-270deg); }
+        .quantum-countdown-number.color-2 { filter: hue-rotate(-300deg); }
+        .quantum-countdown-number.color-1 { filter: hue-rotate(-330deg); }
+        .quantum-countdown-number.color-0 { filter: hue-rotate(-360deg) brightness(1.2); }
 
-    .btn {
-      width:100%;
-      padding:10px;
-      margin:8px 0;
-      font-size:14px;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-      font-weight:bold;
-      text-transform:uppercase;
-    }
+        .quantum-countdown-label {
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            margin-top: 5px;
+            color: #00ffccbb;
+        }
 
-    .btn-login {
-      background:#111;
-      color:white;
-      border:1px solid white;
-      box-shadow:0 0 10px white;
-      transition:0.3s;
-    }
-    .btn-login:hover {background:white;color:black;box-shadow:0 0 20px white;}
+        /* ---------- 进度条 (轻量) ---------- */
+        .quantum-loader {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
 
-    .btn-create {
-      background:#111;
-      color:red;
-      border:1px solid red;
-      box-shadow:0 0 10px red;
-      transition:0.3s;
-    }
-    .btn-create:hover {background:red;color:white;box-shadow:0 0 20px red;}
+        .loader-text {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.8);
+            letter-spacing: 0.5px;
+        }
 
-    #createForm {display:none;margin-top:20px;}
-  </style>
+        .glass-progress {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(4px);
+        }
+
+        .glass-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00ffcc, #00ff99);
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+        /* 移除环形loader，避免多余渲染 */
+        .loader-ring {
+            display: none;
+        }
+
+        /* ---------- 阅读机卡片 (底部卡片化) ---------- */
+        .reader-preview {
+            width: 100%;
+            background: rgba(10, 10, 30, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 26px;
+            padding: 22px 20px;
+            margin-top: 10px;
+            border: 1px solid rgba(0, 255, 200, 0.25);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            transition: none;
+            opacity: 1;
+        }
+
+        .reader-preview h3 {
+            color: #00ffcc;
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reader-preview p {
+            margin-bottom: 16px;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .reader-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .feature-tag {
+            background: rgba(0, 255, 200, 0.1);
+            border: 1px solid #00ffcc33;
+            border-radius: 30px;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            color: #00ffcc;
+        }
+
+        /* ---------- 底部固定按钮面板 ---------- */
+        .bottom-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 16px 12px;
+            z-index: 10;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.4);
+        }
+
+        .control-btn {
+            background: transparent;
+            border: none;
+            width: 56px;
+            height: 56px;
+            border-radius: 40px;
+            background: rgba(20, 20, 40, 0.6);
+            backdrop-filter: blur(5px);
+            color: #00ffcc;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: background 0.2s;
+        }
+
+        .control-btn:active {
+            background: rgba(0, 255, 200, 0.2);
+            transform: scale(0.95);
+        }
+
+        /* 全宽跳过按钮 (固定底部，但位于控制条上方) */
+        .skip-fixed {
+            position: fixed;
+            bottom: 80px;        /* 刚好在控制条上方 */
+            left: 18px;
+            right: 18px;
+            width: auto;
+            z-index: 9;
+        }
+
+        .glass-skip-btn {
+            width: 100%;
+            background: rgba(255, 100, 10, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 160, 0, 0.5);
+            color: #ffcc88;
+            padding: 16px 0;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 6px 20px rgba(255,100,0,0.2);
+            border: 1px solid #ffaa33;
+        }
+
+        .glass-skip-btn:active {
+            background: rgba(255, 120, 0, 0.4);
+            transform: scale(0.98);
+        }
+
+        /* 底部版权信息 (自然流) */
+        .quantum-footer {
+            width: 100%;
+            text-align: center;
+            padding: 15px 0 5px;
+            margin-top: 5px;
+        }
+
+        .footer-text {
+            font-size: 1.2rem;
+            background: linear-gradient(145deg, #00ffcc, #66ff99);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .copyright {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            color: #ccc;
+        }
+
+        /* 隐藏桌面控制面板 */
+        .quantum-control-panel {
+            display: none;
+        }
+
+        /* 禁用所有高强度动画 (保留极简过渡) */
+        * {
+            animation: none !important;
+            transition: opacity 0.2s ease, background 0.2s ease;
+        }
+
+        /* 小屏边距优化 */
+        @media (max-width: 380px) {
+            .main-content {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+            .quantum-fire-text {
+                font-size: 1.9rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <canvas id="matrix"></canvas>
 
-  <div class="container">
-    <div class="logo">
-      <img src="https://i.postimg.cc/DwzYYTWD/logo.webp" alt="Logo">
-    </div>
-      
-    <!-- 登录区域 -->
-    <div id="loginSection">
-      <div class="rainbow-header">
-        <h1>Awvtsaab's 漆书</h1>
-      </div>
-      <h2>Login</h2>
-      <input type="email" id="loginEmail" placeholder="Email">
-      <input type="password" id="loginPassword" placeholder="Password">
-      <button class="btn btn-login" onclick="login()">登录</button>
-      <button class="btn btn-create" onclick="promptCreate()">创建新用户</button>
+    <!-- 🌌 玻璃背景 - 竖屏contain版本 (黑底+完整视频) -->
+    <div class="quantum-glass-container">
+        <!-- 直接用video，object-fit: contain 实现短剧效果 -->
+        <video id="quantum-video-bg" autoplay loop playsinline muted>
+            <source src="./awvtsaab-v2/database/videos/Heaven fall to Lucifa.mp4" type="video/mp4">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-geometric-pattern-loop-3495-large.mp4" type="video/mp4">
+        </video>
+        <!-- 磨砂层仍然覆盖整个屏幕，保留玻璃质感，但透过视频看到 -->
+        <div class="glass-frost-layer"></div>
+        <div class="glass-refraction"></div>
     </div>
 
-    <!-- 创建用户表单 -->
-    <div id="createForm">
-      <h2>确保隐私安全，随便即可！</h2>
-      <input type="text" id="signupName" placeholder="姓名">
-      <input type="email" id="signupEmail" placeholder="邮箱">
-      <input type="password" id="signupPassword" placeholder="密码">
-      <input type="number" id="signupAge" placeholder="年龄">
-      <select id="signupGender">
-        <option value="" disabled selected>请选择性别</option>
-        <option value="male">男</option>
-        <option value="female">女</option>
-        <option value="other">其他</option>
-      </select>
-      <input type="tel" id="signupPhone" placeholder="手机号码">
-      <button class="btn btn-create" onclick="confirmSignup()">确认</button>
+    <!-- 主内容垂直流 (移动) -->
+    <div class="main-content">
+        <!-- 标题卡片 -->
+        <div class="title-container">
+            <h1 class="quantum-fire-text">Awv's奇迹踪印</h1>
+            <p class="quantum-subtitle">量子图书馆 · 完整视频</p>
+        </div>
+
+        <!-- 倒计时卡片 -->
+        <div class="quantum-countdown-container">
+            <div class="quantum-countdown-number color-12" id="countdown">12</div>
+            <div class="quantum-countdown-label">维度同步倒计时</div>
+        </div>
+
+        <!-- 加载进度条 -->
+        <div class="quantum-loader">
+            <div class="loader-text">
+                <i class="fas fa-atom"></i> 初始化量子图书馆...
+            </div>
+            <div class="glass-progress">
+                <div class="glass-progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+
+        <!-- 阅读机预览卡片 -->
+        <div class="reader-preview" id="readerPreview">
+            <h3><i class="fas fa-book-open"></i> Awv智慧阅读机</h3>
+            <p>超越维度的阅读体验 · 竖屏完整视频</p>
+            <div class="reader-features">
+                <span class="feature-tag">玻璃看窗</span>
+                <span class="feature-tag">AI语音</span>
+                <span class="feature-tag">量子搜索</span>
+                <span class="feature-tag">智能摘要</span>
+                <span class="feature-tag">全息书签</span>
+                <span class="feature-tag">多维注释</span>
+            </div>
+        </div>
+
+        <!-- 底部版权信息 -->
+        <div class="quantum-footer">
+            <div class="footer-text">Awvtsaab 2026 · 无限智慧</div>
+            <div class="copyright">每一本书都是一个宇宙</div>
+        </div>
     </div>
-  </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <!-- 全宽跳过按钮 (fixed) -->
+    <div class="skip-fixed">
+        <button id="skipButton" class="glass-skip-btn">
+            <i class="fas fa-rocket"></i>
+            <span>量子跃迁 · 进入图书馆</span>
+        </button>
+    </div>
 
-  <script>
-    // ✅ Your Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyBCIVYd8e5vBeGRz-H12Nj9hd5dyqnZCDI",
-      authDomain: "guardiangate-7xkgi.firebaseapp.com",
-      projectId: "guardiangate-7xkgi",
-      storageBucket: "guardiangate-7xkgi.firebasestorage.app",
-      messagingSenderId: "133766737758",
-      appId: "1:133766737758:web:38de135254fef4664769cf"
-    };
+    <!-- 底部固定控制面板 三个按钮横排 -->
+    <div class="bottom-controls">
+        <button id="audioToggle" class="control-btn" title="音频控制">
+            <i class="fas fa-volume-mute"></i>
+        </button>
+        <button id="videoToggle" class="control-btn" title="视频效果">
+            <i class="fas fa-film"></i>
+        </button>
+        <button id="effectsToggle" class="control-btn" title="特效开关">
+            <i class="fas fa-magic"></i>
+        </button>
+    </div>
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    <script>
+        (function() {
+            // 移动版轻量量子系统 —— 保留基本控制
+            const quantumState = {
+                countdown: 12,
+                audioEnabled: false,
+                videoEffects: true,
+                specialEffects: true,
+                readerPreviewShown: true
+            };
 
-    // 🔹 点击创建新用户按钮时
-    function promptCreate() {
-      if (confirm("⚡ 你确定要创建一个新用户吗？")) {
-        document.getElementById("loginSection").style.display = "none"; // 隐藏登录
-        document.getElementById("createForm").style.display = "block"; // 显示注册
-      }
-    }
+            const elements = {
+                countdown: document.getElementById('countdown'),
+                quantumVideoBg: document.getElementById('quantum-video-bg'),
+                progressBar: document.getElementById('progressBar'),
+                audioToggle: document.getElementById('audioToggle'),
+                videoToggle: document.getElementById('videoToggle'),
+                effectsToggle: document.getElementById('effectsToggle'),
+                skipButton: document.getElementById('skipButton'),
+                readerPreview: document.getElementById('readerPreview')
+            };
 
-    // 🔹 二次确认提交
-    function confirmSignup() {
-      const name = document.getElementById("signupName").value;
-      const email = document.getElementById("signupEmail").value;
-      const password = document.getElementById("signupPassword").value;
-      const age = document.getElementById("signupAge").value;
-      const gender = document.getElementById("signupGender").value;
-      const phone = document.getElementById("signupPhone").value;
+            let countdownInterval;
 
-      if (!name || !email || !password || !age || !gender || !phone) {
-        alert("⚠️ 保护您的隐私安全，随便填写即可🔐💡");
-        return;
-      }
+            function initMobileQuantum() {
+                console.log('📱 移动玻璃模式 (竖屏contain)');
 
-      const confirmText =
-        "请确认以下信息:\n\n" +
-        "👤 姓名: " + name + "\n" +
-        "📧 邮箱: " + email + "\n" +
-        "🔑 密码: " + "*".repeat(password.length) + "\n" +
-        "🎂 年龄: " + age + "\n" +
-        "⚧ 性别: " + gender + "\n" +
-        "📱 手机: " + phone + "\n\n" +
-        "是否确认创建新用户？";
+                if (elements.quantumVideoBg) {
+                    elements.quantumVideoBg.play().catch(() => {});
+                    // 确保filter简单
+                    elements.quantumVideoBg.style.filter = 'brightness(1.05) contrast(1.05)';
+                }
 
-      if (confirm(confirmText)) {
-        signup(name, email, password, age, gender, phone);
-      }
-    }
+                startCountdown();
+                bindControls();
+                elements.skipButton.addEventListener('click', quantumJump);
+            }
 
-    // 🔹 Firebase 创建账号
-    async function signup(name, email, password, age, gender, phone) {
-      try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
+            function startCountdown() {
+                updateCountdownDisplay();
+                countdownInterval = setInterval(() => {
+                    quantumState.countdown--;
+                    if (quantumState.countdown < 0) quantumState.countdown = 0;
+                    updateCountdownDisplay();
+                    updateProgress();
 
-        await db.collection("users").doc(user.uid).set({
-          name, email, age, gender, phone,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+                    if (quantumState.countdown === 0) {
+                        clearInterval(countdownInterval);
+                        delayedJump();
+                    }
+                }, 1000);
+            }
 
-        alert("✅ 新用户创建成功！");
-        window.location.href = "home.html"; // 跳转主页
-      } catch (error) {
-        alert("❌ " + error.message);
-      }
-    }
+            function updateCountdownDisplay() {
+                if (!elements.countdown) return;
+                const sec = quantumState.countdown;
+                elements.countdown.textContent = sec;
+                elements.countdown.className = 'quantum-countdown-number';
+                elements.countdown.classList.add(`color-${sec}`);
+            }
 
-    // 🔹 Firebase 登录
-    async function login() {
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        alert("✅ 登录成功！");
-        window.location.href = "home.html";
-      } catch (error) {
-        alert("❌ " + error.message);
-      }
-    }
+            function updateProgress() {
+                const progress = (12 - quantumState.countdown) / 12 * 100;
+                if (elements.progressBar) {
+                    elements.progressBar.style.width = `${progress}%`;
+                }
+            }
 
-    // 🔹 矩阵黑客背景
-    const canvas = document.getElementById("matrix");
-    const ctx = canvas.getContext("2d");
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
+            function bindControls() {
+                // 音频开关
+                elements.audioToggle.addEventListener('click', () => {
+                    quantumState.audioEnabled = !quantumState.audioEnabled;
+                    if (elements.quantumVideoBg) {
+                        elements.quantumVideoBg.muted = !quantumState.audioEnabled;
+                    }
+                    const icon = elements.audioToggle.querySelector('i');
+                    icon.className = quantumState.audioEnabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+                });
 
-    function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#0f0";
-      ctx.font = fontSize + "px monospace";
-      for (let i = 0; i < drops.length; i++) {
-        const text = letters.charAt(Math.floor(Math.random() * letters.length));
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
-    }
-    setInterval(draw, 33);
-  </script>
+                // 视频效果：切换filter
+                elements.videoToggle.addEventListener('click', () => {
+                    quantumState.videoEffects = !quantumState.videoEffects;
+                    const icon = elements.videoToggle.querySelector('i');
+                    if (quantumState.videoEffects) {
+                        elements.quantumVideoBg.style.filter = 'brightness(1.05) contrast(1.05)';
+                        icon.className = 'fas fa-film';
+                    } else {
+                        elements.quantumVideoBg.style.filter = 'none';
+                        icon.className = 'fas fa-film-slash';
+                    }
+                });
+
+                // 特效开关（移动版仅降低玻璃模糊）
+                elements.effectsToggle.addEventListener('click', () => {
+                    quantumState.specialEffects = !quantumState.specialEffects;
+                    const icon = elements.effectsToggle.querySelector('i');
+                    if (quantumState.specialEffects) {
+                        document.body.classList.remove('effects-off');
+                        icon.className = 'fas fa-magic';
+                        // 恢复默认模糊
+                        document.querySelectorAll('.title-container, .quantum-countdown-container, .reader-preview').forEach(el => {
+                            el.style.backdropFilter = ''; 
+                        });
+                    } else {
+                        document.body.classList.add('effects-off');
+                        icon.className = 'fas fa-magic-slash';
+                        document.querySelectorAll('.title-container, .quantum-countdown-container, .reader-preview').forEach(el => {
+                            el.style.backdropFilter = 'blur(2px)';
+                        });
+                    }
+                });
+            }
+
+            function quantumJump() {
+                if (countdownInterval) clearInterval(countdownInterval);
+                document.body.style.opacity = '0.6';
+                setTimeout(() => {
+                    window.location.href = './awvtsaab-v2/public/login.html';
+                }, 400);
+            }
+
+            function delayedJump() {
+                quantumJump();
+            }
+
+            window.addEventListener('DOMContentLoaded', initMobileQuantum);
+        })();
+    </script>
+    <!-- 初始静音 -->
+    <script>
+        (function() {
+            const video = document.getElementById('quantum-video-bg');
+            if (video) video.muted = true;
+        })();
+    </script>
 </body>
 </html>

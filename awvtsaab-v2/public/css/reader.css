@@ -1,0 +1,362 @@
+/* ================== 全局样式 ================== */
+:root {
+  --primary-color: #96dd13;
+  --primary-dark: #7bbd0f;
+  --text-color: #333;
+  --bg-color: #fdf6e3;
+  --header-bg: rgba(253, 246, 227, 0.9);
+  --footer-bg: rgba(253, 246, 227, 0.9);
+  --btn-bg: rgba(255, 255, 255, 0.25);
+  --btn-border: rgba(255, 255, 255, 0.6);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+[data-theme="dark"] {
+  --text-color: #e0e0e0;
+  --bg-color: #1a1a1a;
+  --header-bg: rgba(26, 26, 26, 0.9);
+  --footer-bg: rgba(26, 26, 26, 0.9);
+  --btn-bg: rgba(255, 255, 255, 0.15);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  transition: var(--transition);
+  overflow-x: hidden;
+}
+
+/* ================== 阅读器布局 ================== */
+.reader-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* 顶部栏 */
+.reader-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--header-bg);
+  backdrop-filter: blur(10px);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.book-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.header-right {
+  display: flex;
+  gap: 10px;
+}
+
+/* 内容区域 */
+.content-area {
+  flex: 1;
+  padding: 100px 20px 180px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  font-size: 18px;
+  line-height: 1.8;
+  transition: var(--transition);
+}
+
+/* 底部栏 */
+.reader-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--footer-bg);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  z-index: 1000;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  transition: var(--transition);
+}
+
+.footer-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 15px;
+}
+
+.footer-utils {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* ================== 按钮样式 ================== */
+.btn-icon {
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: var(--transition);
+  backdrop-filter: blur(10px);
+}
+
+.btn-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-control {
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  border-radius: 25px;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: var(--transition);
+  backdrop-filter: blur(10px);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-control:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.btn-play-pause {
+  background: var(--primary-color);
+  border-color: var(--primary-dark);
+  color: #191f1a;
+  font-weight: 600;
+  padding: 12px 30px;
+}
+
+.btn-play-pause:hover {
+  background: var(--primary-dark);
+  box-shadow: 0 0 25px rgba(150, 221, 19, 0.4);
+}
+
+.btn-util {
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: var(--transition);
+  backdrop-filter: blur(10px);
+  font-size: 14px;
+}
+
+.btn-util:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ================== 隐藏UI模式 ================== */
+.reader-header.hidden,
+.reader-footer.hidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.restore-ui-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 25px;
+  padding: 15px 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  transition: var(--transition);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.restore-ui-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* ================== 朗读高亮效果 ================== */
+.segment {
+  transition: all 0.3s ease;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.segment.highlight {
+  background-color: rgba(0, 200, 0, 0.2);
+  color: #2e7d32;
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 0 15px rgba(46, 125, 50, 0.3);
+  animation: highlightPulse 2s infinite;
+}
+
+@keyframes highlightPulse {
+  0%, 100% { background-color: rgba(0, 200, 0, 0.2); }
+  50% { background-color: rgba(0, 200, 0, 0.3); }
+}
+
+/* ================== 字体大小控制 ================== */
+.font-small { font-size: 16px; }
+.font-medium { font-size: 18px; }
+.font-large { font-size: 20px; }
+.font-xlarge { font-size: 22px; }
+
+/* ================== 响应式设计 ================== */
+@media (max-width: 768px) {
+  .reader-header {
+    padding: 12px 15px;
+  }
+  
+  .book-title {
+    font-size: 16px;
+  }
+  
+  .content-area {
+    padding: 80px 15px 150px;
+    font-size: 16px;
+  }
+  
+  .reader-footer {
+    padding: 15px;
+  }
+  
+  .footer-controls {
+    gap: 15px;
+  }
+  
+  .btn-control {
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+  
+  .btn-control span {
+    display: none;
+  }
+  
+  .footer-utils {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-area {
+    padding: 70px 12px 140px;
+    font-size: 15px;
+  }
+  
+  .footer-controls {
+    gap: 10px;
+  }
+  
+  .btn-control {
+    padding: 8px 15px;
+  }
+}
+
+/* ================== 动画效果 ================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reader-header,
+.content-area,
+.reader-footer {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* ================== 实用类 ================== */
+.hidden {
+  display: none !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ================== 滚动条样式 ================== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--btn-bg);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--btn-border);
+}

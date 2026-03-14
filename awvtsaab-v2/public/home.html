@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Awvtsaab's 漆书</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Swift Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swift-icons@1.0.0/css/swift-icons.min.css">
+
+  <style>
+    /* 自定义变量 */
+    :root {
+      --primary-color: #00ff99;
+      --primary-glow: rgba(0, 255, 153, 0.7);
+      --bg-dark: #0d0d0d;
+      --bg-darker: #050505;
+      --text-light: #aaffd5;
+    }
+    
+    /* 全局背景样式 */
+    body {
+      font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      background: radial-gradient(circle at top, var(--bg-dark) 0%, var(--bg-darker) 100%);
+      color: var(--text-light);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* ====== 雷电背景视频 ====== */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -2;
+      opacity: 0.55;
+      filter: blur(1px) brightness(0.95) contrast(1.1);
+    }
+    
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: -1;
+      pointer-events: none;
+    }
+    
+    /* ====== 音频控制按钮 ====== */
+    .audio-controls {
+      position: fixed;
+      top: 10px;
+      right: 60px;
+      z-index: 1000;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .audio-toggle, .video-audio-toggle {
+      background: rgba(0, 255, 153, 0.8);
+      color: #000;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px rgba(0, 255, 153, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+    }
+    
+    .audio-toggle:hover, .video-audio-toggle:hover {
+      background: rgba(0, 255, 153, 1);
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(0, 255, 153, 0.8);
+    }
+    
+    /* ====== SVG雷电滤镜 ====== */
+    .svg-filters {
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+    }
+    
+    /* 自定义样式 */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 16px;
+    }
+    
+    .grid-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 12px;
+      background: rgba(13, 13, 13, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      border: 1px solid rgba(0, 255, 153, 0.2);
+      color: var(--text-light);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      text-align: center;
+      min-height: 100px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .grid-btn:hover {
+      background: rgba(0, 255, 153, 0.2);
+      transform: translateY(-3px);
+      border-color: var(--primary-color);
+      box-shadow: 0 10px 25px rgba(0, 255, 153, 0.3);
+    }
+    
+    .grid-btn i {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+    }
+    
+    .swift-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+    }
+    
+    .navbar {
+      background: rgba(10, 10, 10, 0.7);
+      backdrop-filter: blur(15px);
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(0, 255, 153, 0.2);
+    }
+    
+    .hero {
+      padding: 40px 16px;
+      text-align: center;
+    }
+    
+    .hero-title {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #00ff99, #00ff66, #00ccff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 15px rgba(0, 255, 153, 0.3);
+    }
+    
+    .hero-subtitle {
+      color: #88ccaa;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* 按钮样式 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* 推荐书籍卡片 */
+    .book-card {
+      background: rgba(18, 18, 18, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid rgba(0, 255, 153, 0.2);
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .book-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary-color);
+      box-shadow: 0 10px 25px rgba(0, 255, 153, 0.3);
+    }
+    
+    /* 响应式调整 */
+    @media (min-width: 768px) {
+      .grid-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      
+      .grid-btn {
+        padding: 24px 16px;
+        min-height: 120px;
+      }
+      
+      .grid-btn i, .swift-icon {
+        font-size: 28px;
+      }
+      
+      .hero-title {
+        font-size: 2.5rem;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .grid-container {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 1000px;
+      }
+    }
+    
+    /* 动画效果 */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .delay-1 { animation-delay: 0.1s; opacity: 0; }
+    .delay-2 { animation-delay: 0.2s; opacity: 0; }
+    .delay-3 { animation-delay: 0.3s; opacity: 0; }
+    .delay-4 { animation-delay: 0.4s; opacity: 0; }
+    .delay-5 { animation-delay: 0.5s; opacity: 0; }
+    .delay-6 { animation-delay: 0.6s; opacity: 0; }
+    .delay-7 { animation-delay: 0.7s; opacity: 0; }
+    
+    /* 雷电光条效果 */
+    @keyframes electricPulse {
+      0% {
+        box-shadow: 0 0 10px rgba(0, 255, 153, 0.3),
+                   inset 0 0 5px rgba(0, 255, 153, 0.2);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(0, 255, 153, 0.6),
+                   inset 0 0 10px rgba(0, 255, 153, 0.4);
+      }
+      100% {
+        box-shadow: 0 0 10px rgba(0, 255, 153, 0.3),
+                   inset 0 0 5px rgba(0, 255, 153, 0.2);
+      }
+    }
+    
+    .electric-highlight {
+      animation: electricPulse 2s infinite;
+    }
+    
+    /* 底部导航 */
+    footer {
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(15px);
+      border-top: 1px solid rgba(0, 255, 153, 0.2);
+    }
+    
+    footer a {
+      color: var(--text-light);
+      transition: all 0.3s ease;
+    }
+    
+    footer a:hover {
+      color: var(--primary-color);
+    }
+    
+    footer a.active {
+      color: var(--primary-color);
+    }
+    
+    footer a i {
+      font-size: 20px;
+    }
+    
+    /* Toast提示 */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      color: #00ff00;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 1px solid #00ff00;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+      z-index: 10000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      font-size: 14px;
+      max-width: 300px;
+    }
+    
+    .toast.show {
+      transform: translateX(0);
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- 🎥 雷电背景视频 -->
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="../database/homeicon/background.MP4" type="video/mp4" />
+  </video>
+  
+  <!-- 🎵 背景音乐 -->
+  <audio id="bg-music" loop>
+    <source src="https://res.cloudinary.com/dpw8l6gk2/video/upload/v1762597601/angel_pygqtw.mp4" type="audio/mp4">
+    <source src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" type="audio/mp3">
+  </audio>
+  
+  <!-- 🔥 SVG雷电滤镜 -->
+  <svg class="svg-filters" width="0" height="0" aria-hidden="true">
+    <defs>
+      <filter id="turbulent-displace" colorInterpolationFilters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise1" seed="1" />
+        <feOffset in="noise1" dx="0" dy="0" result="offsetNoise1">
+          <animate attributeName="dy" values="700; 0" dur="6s" repeatCount="indefinite" calcMode="linear" />
+        </feOffset>
+
+        <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise2" seed="1" />
+        <feOffset in="noise2" dx="0" dy="0" result="offsetNoise2">
+          <animate attributeName="dy" values="0; -700" dur="6s" repeatCount="indefinite" calcMode="linear" />
+        </feOffset>
+
+        <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise3" seed="2" />
+        <feOffset in="noise3" dx="0" dy="0" result="offsetNoise3">
+          <animate attributeName="dx" values="490; 0" dur="6s" repeatCount="indefinite" calcMode="linear" />
+        </feOffset>
+
+        <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise4" seed="2" />
+        <feOffset in="noise4" dx="0" dy="0" result="offsetNoise4">
+          <animate attributeName="dx" values="0; -490" dur="6s" repeatCount="indefinite" calcMode="linear" />
+        </feOffset>
+
+        <feComposite in="offsetNoise1" in2="offsetNoise2" result="part1" />
+        <feComposite in="offsetNoise3" in2="offsetNoise4" result="part2" />
+        <feBlend in="part1" in2="part2" mode="color-dodge" result="combinedNoise" />
+
+        <feDisplacementMap in="SourceGraphic" in2="combinedNoise" scale="30" xChannelSelector="R" yChannelSelector="B" />
+      </filter>
+    </defs>
+  </svg>
+  
+  <!-- 🔊 音频控制 -->
+  <div class="audio-controls">
+    <button id="audioToggle" class="audio-toggle">🔇</button>
+    <button id="videoAudioToggle" class="video-audio-toggle">🔇</button>
+  </div>
+
+  <!-- 导航栏 -->
+  <nav class="navbar flex justify-between items-center sticky top-0 z-50">
+    <a href="../public/home.html">
+      <img src="../database/homeicon/awvtsaab2.gif" alt="Hmoobtsaab's漆书" class="h-12 w-12 rounded-full border-2 border-white/30">
+    </a>
+    <div class="text-white font-bold text-lg">Awv's漆书</div>
+    <a href="../public/profile.html" class="text-white text-xl">
+      <i class="fa-solid fa-user"></i>
+    </a>
+  </nav>
+
+  <!-- 主要内容区域 -->
+  <main class="pb-20">
+    <!-- Hero Section -->
+    <header class="hero flex flex-col justify-center items-center text-center">
+      <h1 class="hero-title mb-4">
+        真相比现实更现实
+      </h1>
+      <p class="hero-subtitle mb-6">
+        欢迎来到 Awvtsaab's 知识图书馆
+      </p>
+      <div class="flex gap-4 flex-wrap justify-center">
+        <!-- 主书库按钮 -->
+        <a href="../public/library.html" class="btn flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+          <i class="fa-solid fa-book-open"></i> 进入主书库
+        </a>
+
+        <!-- 富书库按钮 -->
+        <a href="../static/library.html" class="btn flex items-center gap-2 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white">
+          <i class="fa-solid fa-book"></i> 进入富书库
+        </a>
+        
+        <!-- 搜索按钮 -->
+        <a href="search.html" class="btn flex items-center gap-2 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white">
+          <i class="fa-solid fa-search"></i> 搜索书籍
+        </a>
+      </div>
+    </header>
+
+    <!-- 网格按钮区域 -->
+    <div class="grid-container">
+      <a href="home.html" class="grid-btn fade-in-up delay-1">
+        <i class="fa-solid fa-house"></i>
+        <span>首页</span>
+      </a>
+      
+      <a href="library.html" class="grid-btn fade-in-up delay-2">
+        <i class="fa-solid fa-book-open"></i>
+        <span>开发中</span>
+        <small class="text-xs mt-1 text-yellow-300">即将上线</small>
+      </a>
+      
+      <a href="library.html" class="grid-btn fade-in-up delay-3">
+        <i class="fa-solid fa-book"></i>
+        <span>完整书版</span>
+      </a>
+      
+      <a href="family.html" class="grid-btn fade-in-up delay-4">
+        <i class="fa-solid fa-users"></i>
+        <span>家族之书</span>
+      </a>
+      
+      <a href="profile.html" class="grid-btn fade-in-up delay-5">
+        <i class="fa-solid fa-user"></i>
+        <span>我的资料</span>
+      </a>
+      
+      <a href="about.html" class="grid-btn fade-in-up delay-6">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>关于</span>
+      </a>
+      
+      <a href="settings.html" class="grid-btn fade-in-up delay-7">
+        <i class="fa-solid fa-gear"></i>
+        <span>设置</span>
+      </a>
+      
+      <!-- 额外功能按钮 -->
+      <a href="search.html" class="grid-btn fade-in-up delay-1">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span>搜索</span>
+      </a>
+      
+      <a href="favorites.html" class="grid-btn fade-in-up delay-2">
+        <i class="fa-solid fa-heart"></i>
+        <span>收藏</span>
+      </a>
+      
+      <a href="history.html" class="grid-btn fade-in-up delay-3">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <span>历史</span>
+      </a>
+      
+      <a href="database/download.html" class="grid-btn fade-in-up delay-4">
+        <i class="fa-solid fa-download"></i>
+        <span>下载</span>
+      </a>
+    </div>
+
+    <!-- 🌟 特色内容区域 -->
+    <section class="px-4 mt-8">
+      <h2 class="text-white text-xl font-bold mb-4 text-center">今日推荐</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- 📘 Book 1 -->
+        <div class="book-card">
+          <div class="flex items-center gap-3 mb-3">
+            <img src="../database/homeicon/recommending/21lessons.gif" alt="21世纪的21堂课" class="w-12 h-12 rounded-full object-cover border border-white/30">
+            <div>
+              <h3 class="text-white font-bold">《21世纪的21堂课》</h3>
+              <p class="text-gray-300 text-sm">尤瓦尔·赫拉利</p>
+            </div>
+          </div>
+          <p class="text-gray-200 text-sm">探索现代社会面临的重大挑战，从技术颠覆到政治动荡，从真相危机到生存威胁。</p>
+          <a href="../public/reader.html?category=lifemastery&book=dev15&chapter=cover" class="block mt-3 text-center py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all duration-300">
+            立即阅读
+          </a>
+        </div>
+
+        <!-- 📗 Book 2 -->
+        <div class="book-card">
+          <div class="flex items-center gap-3 mb-3">
+            <img src="../database/homeicon/recommending/books 17 64x64.gif" alt="三略" class="w-12 h-12 rounded-full object-cover border border-white/30">
+            <div>
+              <h3 class="text-white font-bold">《三略》</h3>
+              <p class="text-gray-300 text-sm">黄石公</p>
+            </div>
+          </div>
+          <p class="text-gray-200 text-sm">中国古代兵家经典之一，讲述智谋、战略与政治的深刻智慧。</p>
+          <a href="../public/reader.html?category=lifemastery&book=dev13&chapter=cover" class="block mt-3 text-center py-2 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-full text-sm font-medium hover:from-green-700 hover:to-teal-700 transition-all duration-300">
+            立即阅读
+          </a>
+        </div>
+
+        <!-- 📙 Book 3 -->
+        <div class="book-card">
+          <div class="flex items-center gap-3 mb-3">
+            <img src="../database/homeicon/recommending/books 18 64x64.gif" alt="权力的48条法则" class="w-12 h-12 rounded-full object-cover border border-white/30">
+            <div>
+              <h3 class="text-white font-bold">《权力的48条法则》</h3>
+              <p class="text-gray-300 text-sm">Robert Greene（罗伯特·格林）</p>
+            </div>
+          </div>
+          <p class="text-gray-200 text-sm">一本揭示权力游戏与人性策略的现代经典，充满历史与心理洞察。</p>
+          <a href="../public/reader.html?category=business&book=dev11&chapter=cover" class="block mt-3 text-center py-2 bg-gradient-to-r from-pink-600 to-red-600 text-white rounded-full text-sm font-medium hover:from-pink-700 hover:to-red-700 transition-all duration-300">
+            立即阅读
+          </a>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- 底部导航 -->
+  <footer class="fixed bottom-0 left-0 right-0 bg-black/70 backdrop-blur-lg border-t border-white/10 py-3 px-6 z-40">
+    <div class="flex justify-between items-center">
+      <a href="home.html" class="flex flex-col items-center text-white text-xs active">
+        <i class="fa-solid fa-house text-lg mb-1"></i>
+        <span>首页</span>
+      </a>
+      <a href="library.html" class="flex flex-col items-center text-white text-xs">
+        <i class="fa-solid fa-book-open text-lg mb-1"></i>
+        <span>书库</span>
+      </a>
+      <a href="search.html" class="flex flex-col items-center text-white text-xs">
+        <i class="fa-solid fa-search text-lg mb-1"></i>
+        <span>搜索</span>
+      </a>
+      <a href="profile.html" class="flex flex-col items-center text-white text-xs">
+        <i class="fa-solid fa-user text-lg mb-1"></i>
+        <span>我的</span>
+      </a>
+    </div>
+  </footer>
+
+  <script>
+    // ================== 音频控制功能 ==================
+    const bgMusic = document.getElementById('bg-music');
+    const bgVideo = document.getElementById('bg-video');
+    const audioToggle = document.getElementById('audioToggle');
+    const videoAudioToggle = document.getElementById('videoAudioToggle');
+    
+    let audioEnabled = false;
+    let videoAudioEnabled = false;
+    let userInteracted = false;
+
+    function initAudio() {
+        bgMusic.volume = 0.3;
+        bgMusic.muted = true;
+        
+        const savedAudioState = localStorage.getItem('audioEnabled');
+        const savedVideoAudioState = localStorage.getItem('videoAudioEnabled');
+        
+        if (savedAudioState === 'true') {
+            audioEnabled = true;
+            audioToggle.textContent = "🔊";
+            bgMusic.muted = false;
+        } else {
+            audioEnabled = false;
+            audioToggle.textContent = "🔇";
+            bgMusic.muted = true;
+        }
+        
+        if (savedVideoAudioState === 'true') {
+            videoAudioEnabled = true;
+            videoAudioToggle.textContent = "🔊";
+            bgVideo.muted = false;
+        } else {
+            videoAudioEnabled = false;
+            videoAudioToggle.textContent = "🔇";
+            bgVideo.muted = true;
+        }
+    }
+
+    audioToggle.addEventListener('click', () => {
+        if (!userInteracted) {
+            userInteracted = true;
+            bgMusic.play().catch(err => {
+                console.log("音频播放被阻止:", err);
+                showToast("请点击页面任意位置启用音频播放");
+            });
+        }
+        
+        audioEnabled = !audioEnabled;
+        bgMusic.muted = !audioEnabled;
+        audioToggle.textContent = audioEnabled ? "🔊" : "🔇";
+        
+        localStorage.setItem('audioEnabled', audioEnabled.toString());
+        
+        if (audioEnabled) {
+            showToast("🎵 背景音乐已开启");
+        } else {
+            showToast("🔇 背景音乐已关闭");
+        }
+    });
+    
+    videoAudioToggle.addEventListener('click', () => {
+        videoAudioEnabled = !videoAudioEnabled;
+        bgVideo.muted = !videoAudioEnabled;
+        videoAudioToggle.textContent = videoAudioEnabled ? "🔊" : "🔇";
+        
+        localStorage.setItem('videoAudioEnabled', videoAudioEnabled.toString());
+        
+        if (videoAudioEnabled) {
+            showToast("🎥 视频原声已开启");
+        } else {
+            showToast("🔇 视频原声已关闭");
+        }
+    });
+
+    document.addEventListener('click', () => {
+        if (!userInteracted) {
+            userInteracted = true;
+            bgMusic.play().catch(err => {
+                console.log("音频自动播放被阻止:", err);
+            });
+        }
+    });
+
+    // ================== 工具函数 ==================
+    
+    function showToast(msg) {
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.classList.add("show"), 10);
+        setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 300);
+        }, 2000);
+    }
+    
+    function playClickSound() {
+        if (audioEnabled) {
+            try {
+                const clickSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-plastic-bubble-click-1124.mp3');
+                clickSound.volume = 0.2;
+                clickSound.play().catch(e => console.log("点击音效播放失败:", e));
+            } catch (e) {
+                console.log("无法创建点击音效:", e);
+            }
+        }
+    }
+
+    // ================== 页面交互效果 ==================
+    document.addEventListener('DOMContentLoaded', function() {
+        // 初始化音频
+        initAudio();
+        
+        // 为网格按钮添加点击效果和音效
+        const gridButtons = document.querySelectorAll('.grid-btn');
+        gridButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                // 防止链接快速跳转，让音效有足够时间播放
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                
+                // 添加点击效果
+                this.style.transform = 'scale(0.95)';
+                
+                // 播放点击音效
+                playClickSound();
+                
+                // 添加雷电效果
+                this.classList.add('electric-highlight');
+                
+                // 恢复并跳转
+                setTimeout(() => {
+                    this.style.transform = '';
+                    this.classList.remove('electric-highlight');
+                    if (href) {
+                        window.location.href = href;
+                    }
+                }, 300);
+            });
+        });
+        
+        // 为推荐书籍的阅读按钮添加效果
+        const readButtons = document.querySelectorAll('.book-card a');
+        readButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation(); // 防止事件冒泡
+                playClickSound();
+            });
+        });
+        
+        // 为导航按钮添加效果
+        const navButtons = document.querySelectorAll('nav a, footer a');
+        navButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                playClickSound();
+            });
+        });
+        
+        // 添加滚动动画
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // 观察所有需要动画的元素
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // 为英雄区域的按钮添加特殊效果
+        const heroButtons = document.querySelectorAll('.hero .btn');
+        heroButtons.forEach((btn, index) => {
+            // 添加延迟动画
+            btn.style.animationDelay = `${0.3 + index * 0.1}s`;
+            btn.style.opacity = '0';
+            btn.classList.add('fade-in-up');
+            observer.observe(btn);
+            
+            // 添加悬停效果
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px) scale(1.05)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+        
+        // 为推荐书籍卡片添加随机雷电效果
+        const bookCards = document.querySelectorAll('.book-card');
+        setInterval(() => {
+            const randomCard = bookCards[Math.floor(Math.random() * bookCards.length)];
+            randomCard.classList.add('electric-highlight');
+            setTimeout(() => {
+                randomCard.classList.remove('electric-highlight');
+            }, 2000);
+        }, 5000); // 每5秒随机高亮一个卡片
+    });
+  </script>
+</body>
+</html>

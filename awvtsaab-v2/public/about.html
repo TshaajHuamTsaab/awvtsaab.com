@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奇迹踪印 - 书籍介绍</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #00ff99;
+            --primary-glow: rgba(0, 255, 153, 0.7);
+            --secondary-color: #00ff66;
+            --accent-color: #00ccff;
+            --bg-dark: #0d0d0d;
+            --bg-darker: #050505;
+            --card-bg: linear-gradient(145deg, #121212 0%, #1c1c1c 100%);
+            --text-light: #aaffd5;
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+            background: radial-gradient(circle at top, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            color: var(--primary-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+            padding-bottom: 80px;
+            position: relative;
+        }
+        
+        /* Logo 样式 */
+        .logo-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            box-shadow: 0 0 25px rgba(0, 255, 153, 0.5);
+            transition: var(--transition);
+        }
+        
+        .logo:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 35px rgba(0, 255, 153, 0.8);
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* 头部样式 */
+        header {
+            text-align: center;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .app-logo {
+            margin-bottom: 1rem;
+        }
+        
+        .app-logo img {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 153, 0.4);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px var(--primary-glow);
+            background: linear-gradient(90deg, #00ff99, #00ff66, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+        
+        /* 主要内容区域 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0,255,100,0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 255, 153, 0.2);
+            border-color: rgba(0,255,100,0.6);
+        }
+        
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .card-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title i {
+            font-size: 1.5rem;
+        }
+        
+        .card-content {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .card-content p {
+            margin-bottom: 1.2rem;
+        }
+        
+        .card-content ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-content li {
+            margin-bottom: 0.8rem;
+            position: relative;
+        }
+        
+        .card-content li::before {
+            content: '▸';
+            color: var(--primary-color);
+            position: absolute;
+            left: -1.2rem;
+        }
+        
+        /* 特色区域 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+        
+        .feature-card {
+            background: rgba(18, 18, 18, 0.7);
+            border: 1px solid rgba(0,255,100,0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0,255,100,0.4);
+            box-shadow: 0 10px 25px rgba(0, 255, 153, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--secondary-color);
+        }
+        
+        .feature-desc {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid rgba(0, 255, 153, 0.2);
+            z-index: 1000;
+        }
+        
+        .bottom-nav a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 12px;
+            transition: var(--transition);
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+        
+        .bottom-nav a i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .bottom-nav a:hover, .bottom-nav a.active {
+            color: var(--primary-color);
+            background: rgba(0, 255, 153, 0.1);
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card, .feature-card {
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(1) { animation-delay: 0.3s; }
+        .feature-card:nth-child(2) { animation-delay: 0.4s; }
+        .feature-card:nth-child(3) { animation-delay: 0.5s; }
+        .feature-card:nth-child(4) { animation-delay: 0.6s; }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+            
+            .card-title {
+                font-size: 1.5rem;
+            }
+            
+            .logo-container {
+                bottom: 70px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                padding: 1.2rem;
+            }
+            
+            .card-title {
+                font-size: 1.3rem;
+            }
+            
+            .logo {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo -->
+    <div class="logo-container">
+        <img src="../database/homeicon/awvtsaab2.gif" alt="AWV Logo" class="logo">
+    </div>
+
+    <!-- 头部 -->
+    <header>
+        <div class="app-logo">
+            <img src="https://i.postimg.cc/3x3QzSGq/cropped-favicon-180x180.png" alt="App Logo">
+        </div>
+        <h1>奇迹踪印</h1>
+        <p class="subtitle">探索智慧之旅，开启心灵之门。这是一场跨越时空的思想盛宴，一次深入灵魂的阅读体验。</p>
+    </header>
+
+    <!-- 主要内容 -->
+    <div class="container">
+        <div class="content-grid">
+            <!-- 内容介绍卡片 -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-book-open"></i> 内容介绍</h2>
+                <div class="card-content">
+                    <p>《奇迹踪印》是一部融合哲学思辨、心理学洞察与文学美感的独特作品。本书通过精心编织的故事和深刻的思想探讨，引导读者踏上一次探索生命意义与人类潜能的旅程。</p>
+                    
+                    <p>书中内容涵盖：</p>
+                    <ul>
+                        <li><strong>智慧传承</strong> - 汇集古今中外智者思想精华</li>
+                        <li><strong>心灵探索</strong> - 深入剖析人类情感与心理机制</li>
+                        <li><strong>现实应用</strong> - 将抽象哲理转化为生活实践的指南</li>
+                        <li><strong>未来展望</strong> - 探讨科技时代下的人类发展方向</li>
+                    </ul>
+                    
+                    <p>每一章节都如同一扇窗户，透过它您将看到不同的风景，收获独特的感悟。无论您是哲学爱好者、心理学研究者，还是单纯寻求生活智慧的读者，都能在本书中找到共鸣与启发。</p>
+                </div>
+            </div>
+            
+            <!-- 使用指南卡片 -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-compass"></i> 使用指南</h2>
+                <div class="card-content">
+                    <p>为了帮助您获得最佳的阅读体验，请参考以下使用建议：</p>
+                    
+                    <ul>
+                        <li><strong>循序渐进</strong> - 建议按章节顺序阅读，逐步构建完整的知识体系</li>
+                        <li><strong>思考实践</strong> - 每章结尾设有思考题，鼓励您将理论应用于生活</li>
+                        <li><strong>笔记记录</strong> - 使用书中的空白区域记录您的感悟与思考</li>
+                        <li><strong>反复品味</strong> - 经典内容值得多次阅读，每次都会有新的收获</li>
+                    </ul>
+                    
+                    <p>阅读环境建议：</p>
+                    <ul>
+                        <li>选择安静舒适的环境，避免干扰</li>
+                        <li>保持适当的照明，保护视力</li>
+                        <li>准备笔记本，随时记录灵感</li>
+                        <li>与他人分享讨论，深化理解</li>
+                    </ul>
+                    
+                    <p>本书还提供在线资源，扫描书中二维码即可访问扩展内容、作者访谈和读者社区。</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 特色功能区域 -->
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="feature-title">智慧启迪</h3>
+                <p class="feature-desc">融合东西方哲学智慧，激发深度思考与创造力</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3 class="feature-title">情感共鸣</h3>
+                <p class="feature-desc">触及心灵深处的故事与案例，引发强烈情感共鸣</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3 class="feature-title">实践应用</h3>
+                <p class="feature-desc">将抽象理论转化为具体行动，改变思维方式与生活习惯</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="feature-title">社区互动</h3>
+                <p class="feature-desc">加入读者社区，与志同道合者交流心得与感悟</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <a href="home.html"><i class="fa-solid fa-house"></i><span>首页</span></a>
+        <a href="library.html" class="active"><i class="fa-solid fa-book-open"></i><span>书库</span></a>
+        <a href="favorites.html"><i class="fa-solid fa-bookmark"></i><span>收藏</span></a>
+        <a href="history.html"><i class="fa-solid fa-clock"></i><span>阅读记录</span></a>
+        <a href="profile.html"><i class="fa-solid fa-user"></i><span>我</span></a>
+    </div>
+
+    <script>
+        // 添加滚动动画效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为卡片添加延迟动画
+            const cards = document.querySelectorAll('.card, .feature-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            cards.forEach(card => {
+                card.style.animationPlayState = 'paused';
+                observer.observe(card);
+            });
+            
+            console.log('页面加载完成，动画已激活');
+        });
+    </script>
+</body>
