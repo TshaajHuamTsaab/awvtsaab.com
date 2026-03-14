@@ -2,508 +2,378 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" />
-<title>Awv's奇迹踪印 - 玻璃阅读机 · 精简版</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover" />
+<title>Awv's奇迹踪印 - 全平台·会话背景控制</title>
+<!-- 使用 Tailwind 核心库 + 所有设备兼容 -->
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* ==================== 量子玻璃看窗基础效果 ==================== */
+/* ==================== 基础重置 & 全平台适配 ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
 
-/* 玻璃视频背景 - 高级效果 */
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #0a0a1a; /* 默认深色底 */
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    color: #fff;
+    transition: background-color 0.5s ease;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==================== 玻璃视频背景 (全屏覆盖) ==================== */
 #quantum-video-background {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;          /* 保证视频覆盖任何屏幕比例，不产生黑边 */
     z-index: -2;
-    opacity: 0.7;
-    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
-    filter: brightness(1.3) contrast(1.2) saturate(1.4) blur(0px);
-    transform: scale(1.02);
+    opacity: 0.7;                /* 默认半透明 */
+    transition: opacity 0.5s ease, filter 0.5s;
+    filter: brightness(1.2) contrast(1.2) saturate(1.3);
+    pointer-events: none;
+    will-change: transform, opacity;
 }
 
-/* 玻璃磨砂层 */
+/* 玻璃磨砂层 (增强玻璃感) */
 .glass-frost-layer {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.05) 0%,
-        rgba(255, 255, 255, 0.02) 50%,
-        rgba(255, 255, 255, 0.05) 100%);
-    backdrop-filter: blur(25px) saturate(200%);
-    -webkit-backdrop-filter: blur(25px) saturate(200%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 50%, rgba(255,255,255,0.03) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     z-index: -1;
+    pointer-events: none;
 }
 
-/* 动态玻璃折射效果 */
+/* 动态折射 (可选，不影响功能) */
 .glass-refraction {
     position: fixed;
     top: -50%;
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(45deg,
-        transparent 30%,
-        rgba(255, 255, 255, 0.08) 50%,
-        transparent 70%);
-    animation: refraction-flow 20s infinite linear;
+    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.03) 50%, transparent 70%);
+    animation: refraction-flow 25s infinite linear;
     pointer-events: none;
     z-index: -1;
+    opacity: 0.5;
 }
 
 @keyframes refraction-flow {
-    0% { transform: rotate(0deg) translateX(-50%); }
-    100% { transform: rotate(360deg) translateX(-50%); }
+    0% { transform: rotate(0deg) translateX(-30%); }
+    100% { transform: rotate(360deg) translateX(-30%); }
 }
 
-/* ==================== 主内容区玻璃效果 ==================== */
+/* ==================== 主内容卡片 (玻璃效果，完全响应式) ==================== */
 #content {
-    padding: 20px;
-    max-width: 900px;
-    margin: auto;
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 24px;
-    margin-top: 70px;  /* 给左上按钮留空间 */
-    margin-bottom: 90px; /* 给底部固定栏留空间 */
-    
-    backdrop-filter: blur(35px) saturate(200%);
-    -webkit-backdrop-filter: blur(35px) saturate(200%);
-    
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-    
-    background-image: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.15) 0%, 
-            rgba(255, 255, 255, 0.08) 50%, 
-            rgba(255, 255, 255, 0.15) 100%);
-    
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    z-index: 1;
-}
-
-#content::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(45deg, 
-        rgba(0, 255, 204, 0.1), 
-        rgba(0, 255, 153, 0.1), 
-        rgba(0, 255, 102, 0.1));
-    border-radius: 26px;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
-
-#content:hover::before {
-    opacity: 0.3;
-    animation: content-glow 3s infinite alternate;
-}
-
-@keyframes content-glow {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.5; }
-}
-
-/* ==================== 章节标题玻璃特效 ==================== */
-#chapter-title { 
-    font-size: 2.2rem; 
-    font-weight: 800; 
-    margin-bottom: 25px; 
-    color: #1a1a1a;
-    text-align: center;
-    padding: 18px;
-    
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    
-    text-shadow: 0 2px 15px rgba(0, 0, 0, 0.1),
-                 0 0 30px rgba(255, 255, 255, 0.3);
-    
-    position: relative;
-    overflow: hidden;
-}
-
-#chapter-title::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.15), 
-        transparent);
-    animation: title-shine 8s infinite linear;
-}
-
-@keyframes title-shine {
-    0% { left: -100%; }
-    100% { left: 100%; }
-}
-
-/* ==================== 段落玻璃效果 ==================== */
-.segment {
-    line-height: 1.8;
-    margin-bottom: 1.2rem;
-    padding: 16px 20px;
-    border-radius: 16px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    
-    position: relative;
-    overflow: hidden;
-}
-
-.segment::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.12), 
-        transparent);
-    transition: left 0.6s ease;
-    z-index: 0;
-}
-
-.segment:hover {
-    transform: translateY(-3px) translateX(5px);
-    background: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.35);
-}
-
-.segment:hover::before {
-    left: 100%;
-}
-
-.segment.highlight {
-    background: rgba(76, 175, 80, 0.35);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(76, 175, 80, 0.5);
-    box-shadow: 0 0 40px rgba(76, 175, 80, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    font-weight: 600;
-}
-
-.segment.search-match {
-    background: rgba(255, 235, 59, 0.3);
-    backdrop-filter: blur(15px);
-    border-left: 5px solid rgba(255, 152, 0, 0.7);
-}
-
-.segment.current-search-match {
-    background: rgba(255, 152, 0, 0.4);
-    backdrop-filter: blur(20px);
-    border-left: 5px solid rgba(255, 87, 34, 0.9);
-    font-weight: bold;
-}
-
-/* ==================== 搜索区域玻璃效果 ==================== */
-.flex.flex-col.gap-2.p-4.border {
-    background: rgba(239, 246, 255, 0.3) !important;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(59, 130, 246, 0.3) !important;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-
-/* 搜索输出框玻璃效果 */
-.search-output-box {
-    margin-top: 25px;
-    padding: 20px;
-    border-radius: 20px;
-    
-    background: rgba(255, 255, 255, 0.25) !important;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
-.search-results { border-left: 6px solid rgba(14, 165, 233, 0.7); }
-.search-stats { border-left: 6px solid rgba(249, 115, 22, 0.7); }
-
-/* 搜索导航按钮 */
-.search-nav {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.search-nav-btn {
-    padding: 8px 16px;
-    border-radius: 25px;
-    border: none;
-    background: rgba(76, 175, 80, 0.35);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
+    width: 90%;
+    max-width: 1000px;
+    margin: 30px auto 100px auto;  /* 给底部留空间 */
+    padding: clamp(15px, 4vw, 35px);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(30px) saturate(200%);
+    -webkit-backdrop-filter: blur(30px) saturate(200%);
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.15);
     transition: all 0.3s;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 2;
 }
 
-.search-nav-btn:hover { transform: translateY(-3px); background: rgba(76, 175, 80, 0.5); }
-.search-nav-btn:disabled { opacity: 0.4; transform: none; }
-
-/* ==================== 加载和错误提示 ==================== */
-.loading, .error {
+/* 章节标题 */
+#chapter-title {
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    font-weight: 800;
     text-align: center;
-    padding: 40px;
-    font-size: 1.1rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.2);
+    margin-bottom: 25px;
+    padding: 15px 20px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
+    border-radius: 40px;
+    border: 1px solid rgba(255,255,255,0.25);
+    text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    letter-spacing: 1px;
+    color: #fff;
+}
+
+/* 搜索区域 */
+.search-section {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+    border-radius: 28px;
+    padding: 18px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(0,255,200,0.2);
+}
+
+.search-input {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid #00ffcc40;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 40px;
+    width: 100%;
+    font-size: 16px;
+    outline: none;
+}
+.search-input::placeholder { color: rgba(255,255,255,0.5); }
+
+.search-btn {
+    background: linear-gradient(145deg, #00ccaa, #00aa88);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 40px;
+    color: white;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid #ffffff40;
+}
+.search-btn:active { transform: scale(0.96); background: #00bb99; }
+
+/* 搜索统计卡片 */
+.stats-card {
+    background: rgba(30,30,50,0.6);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 28px;
+    padding: 20px;
+    margin: 20px 0;
+    border-left: 6px solid #ffaa33;
 }
 
-.loading { color: #333; }
-.error { color: #dc3545; }
-
-/* ==================== 主题系统 ==================== */
-:root {
-    --bg-color: #fafafa;
-    --text-color: #333333;
+/* 段落卡片 (segment) */
+.segment {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: 18px 22px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    line-height: 1.7;
+    font-size: clamp(15px, 2vw, 18px);
+    color: #f0f0f0;
 }
-
-.theme-dark {
-    --bg-color: #0a0a0a;
-    --text-color: #e8e8e8;
+.segment:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-3px);
+    border-color: #00ffcc80;
 }
-.theme-sepia {
-    --bg-color: #f0e6d2;
-    --text-color: #5c4b37;
+.segment.highlight {
+    background: rgba(0,255,200,0.2);
+    border-left: 8px solid #00ffcc;
+    box-shadow: 0 0 30px #00ffcc30;
 }
+.segment.search-match { border-left: 5px solid #ffaa33; background: rgba(255,170,51,0.15); }
+.segment.current-search-match { border-left: 8px solid #ff5500; background: rgba(255,85,0,0.2); font-weight: 500; }
 
-body { 
-    font-family: 'Inter', 'Segoe UI', sans-serif; 
-    background: var(--bg-color); 
-    margin: 0; 
-    padding: 0; 
-    transition: background 0.5s ease, color 0.5s ease;
-    color: var(--text-color);
-    min-height: 100vh;
-}
-
-/* ==================== 左上角控制按钮 (玻璃) ==================== */
+/* ==================== 左上角控制面板 (玻璃按钮，跨设备) ==================== */
 #video-controls {
     position: fixed;
     top: 20px;
     left: 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    z-index: 950;
+    gap: 12px;
+    z-index: 1000;
 }
 
 .video-control-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: rgba(0, 0, 0, 0.35);
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.25);
     color: #00ffcc;
-    font-size: 1.3rem;
-    cursor: pointer;
-    transition: all 0.3s;
+    font-size: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
 }
+.video-control-btn:active { transform: scale(0.9); background: rgba(0,255,200,0.2); }
+.video-control-btn:hover { transform: translateY(-3px); border-color: #00ffcc; }
 
-.video-control-btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    background: rgba(0, 0, 0, 0.5);
-    border-color: rgba(0, 255, 204, 0.5);
-    box-shadow: 0 10px 25px rgba(0, 255, 204, 0.2);
-}
-
-/* ==================== 底部小按钮栏 (6个紧凑按钮) ==================== */
+/* ==================== 底部固定控制栏 (小尺寸玻璃条) ==================== */
 #bottom-bar {
     position: fixed;
-    bottom: 15px;
-    left: 15px;
-    right: 15px;
+    bottom: 18px;
+    left: 18px;
+    right: 18px;
+    max-width: 650px;
+    margin: 0 auto;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-radius: 60px;
+    padding: 8px 16px;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 40px;
-    padding: 8px 12px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
     z-index: 900;
-    max-width: 500px;
-    margin: 0 auto;
+    gap: 5px;
 }
 
 .bottom-btn {
     background: transparent;
     border: none;
-    color: #00ffcc;
-    font-size: 1.3rem;
     width: 44px;
     height: 44px;
-    border-radius: 30px;
+    border-radius: 40px;
+    color: #00ffcc;
+    font-size: 1.3rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: 0.2s;
+    cursor: pointer;
+    flex-shrink: 0;
 }
-
-.bottom-btn:active {
-    background: rgba(0, 255, 200, 0.2);
-    transform: scale(0.92);
-}
-
-.bottom-btn.special {
-    color: #ffaa33;
-}
+.bottom-btn:active { background: #00ffcc20; transform: scale(0.92); }
+.bottom-btn.special { color: #ffaa33; }
 
 #currentSpeedDisplay {
-    font-size: 0.9rem;
-    font-weight: bold;
     color: #00ffcc;
+    font-weight: 600;
+    font-size: 0.95rem;
     background: rgba(0,0,0,0.3);
-    padding: 4px 8px;
-    border-radius: 20px;
-    min-width: 50px;
+    padding: 6px 10px;
+    border-radius: 40px;
+    min-width: 60px;
     text-align: center;
+    border: 1px solid #00ffcc30;
+    flex-shrink: 0;
 }
 
-/* 持久切换按钮 (右下) */
+/* 持久切换按钮 */
 #persistent-toggle-btn {
     position: fixed;
-    bottom: 85px;
+    bottom: 90px;
     right: 18px;
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
     border-radius: 30px;
     background: rgba(156, 39, 176, 0.5);
-    backdrop-filter: blur(12px);
-    border: 1px solid #ffffff40;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.3);
     color: white;
-    font-size: 1.5rem;
-    z-index: 1000;
+    font-size: 1.6rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 1000;
+    cursor: pointer;
+    box-shadow: 0 10px 30px black;
 }
 
+/* 控制隐藏类 */
 .controls-hidden #bottom-bar {
     transform: translateY(120%);
     opacity: 0;
     pointer-events: none;
 }
 
+/* 音频播放器隐藏 */
 #audio { display: none; }
 
-/* 响应式 */
-@media (max-width: 480px) {
-    #content { padding: 15px; margin-top: 80px; }
-    #chapter-title { font-size: 1.8rem; padding: 12px; }
-    .segment { padding: 12px 16px; }
-    .video-control-btn { width: 42px; height: 42px; font-size: 1.2rem; }
-    .bottom-btn { width: 38px; height: 38px; font-size: 1.1rem; }
-    #currentSpeedDisplay { font-size: 0.8rem; padding: 3px 6px; }
+/* ==================== 主题支持 (浅色文字适配) ==================== */
+.theme-dark { color: #eee; }
+.theme-sepia { color: #3e2e1f; }
+.theme-sepia .segment { color: #2c1e0e; }
+
+/* 平板/桌面适配 */
+@media (min-width: 768px) {
+    #bottom-bar { padding: 10px 25px; }
+    .bottom-btn { width: 50px; height: 50px; font-size: 1.4rem; }
+    #currentSpeedDisplay { font-size: 1rem; padding: 8px 15px; }
+    .video-control-btn { width: 58px; height: 58px; font-size: 1.6rem; }
+}
+
+@media (min-width: 1200px) {
+    #content { max-width: 1100px; }
+    .segment { font-size: 18px; }
+}
+
+/* 横屏手机优化 */
+@media (orientation: landscape) and (max-height: 500px) {
+    #bottom-bar { bottom: 10px; padding: 5px 15px; }
+    .bottom-btn { width: 40px; height: 40px; }
+    #content { margin-bottom: 70px; }
 }
 </style>
 </head>
 
 <body class="theme-default">
-<!-- 量子玻璃视频背景 -->
-<video id="quantum-video-background" autoplay muted loop playsinline preload="auto">
+<!-- 量子玻璃视频背景 (自动播放、静音、循环，兼容所有设备) -->
+<video id="quantum-video-background" autoplay muted loop playsinline preload="auto" webkit-playsinline x5-playsinline>
     <source src="../database/homeicon/background.MP4" type="video/mp4">
-    您的浏览器不支持视频标签。
+    <!-- 备用视频链接（保证在任何设备上都有内容） -->
+    <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-geometric-pattern-loop-3495-large.mp4" type="video/mp4">
 </video>
 <div class="glass-frost-layer"></div>
 <div class="glass-refraction"></div>
 
-<!-- 左上角控制按钮 (4个) -->
+<!-- 左上角永久控制面板 (背景控制开关，仅当前会话有效，翻页保持) -->
 <div id="video-controls">
-    <button id="video-toggle" class="video-control-btn" title="视频开关"><i class="fas fa-video"></i></button>
-    <button id="audio-toggle" class="video-control-btn" title="背景音乐"><i class="fas fa-volume-mute"></i></button>
-    <button id="glass-effect-toggle" class="video-control-btn" title="玻璃效果"><i class="fas fa-cube"></i></button>
-    <button id="bg-color-toggle" class="video-control-btn" title="背景颜色"><i class="fas fa-paint-brush"></i></button>
+    <button id="video-toggle" class="video-control-btn" title="视频背景开关"><i class="fas fa-video"></i></button>
+    <button id="audio-toggle" class="video-control-btn" title="背景音乐开关"><i class="fas fa-volume-mute"></i></button>
+    <button id="glass-effect-toggle" class="video-control-btn" title="玻璃效果开关"><i class="fas fa-cube"></i></button>
+    <button id="bg-color-toggle" class="video-control-btn" title="背景颜色切换"><i class="fas fa-paint-brush"></i></button>
 </div>
 
-<!-- 主内容区 -->
+<!-- 主内容卡片 -->
 <div id="content">
-    <div id="chapter-title">加载中...</div>
+    <div id="chapter-title">📖 加载中...</div>
     
-    <!-- 搜索区域 -->
-    <div class="flex flex-col gap-2 p-4 border border-blue-200 bg-blue-50 rounded-xl mb-4">
-        <h3 class="text-md font-semibold text-blue-700">🔍 搜索</h3>
-        <div class="flex flex-col md:flex-row gap-2">
-            <input type="text" id="searchInput" placeholder="关键词..." class="flex-grow p-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition bg-white/50 backdrop-blur-sm" />
-            <button class="control-btn btn-search" onclick="searchInChapter()" style="height: 48px; background: linear-gradient(45deg, rgba(16,185,129,0.7), rgba(6,182,212,0.7));">
-                <i class="fas fa-search"></i><span class="text-xs font-bold ml-1">搜索</span>
-            </button>
-        </div>
+    <!-- 搜索区域 (简洁) -->
+    <div class="search-section flex flex-col md:flex-row gap-3 items-center">
+        <input type="text" id="searchInput" placeholder="输入关键词搜索..." class="search-input flex-1">
+        <button class="search-btn" onclick="window.searchInChapter()"><i class="fas fa-search"></i> 搜索</button>
     </div>
 
-    <!-- 搜索统计和导航 -->
-    <div id="search-stats-output" class="search-output-box search-stats hidden">
-        <h3 class="text-lg font-bold text-orange-700 mb-2 flex items-center"><i class="fas fa-chart-bar mr-2"></i>搜索结果</h3>
-        <div id="search-stats-content"><p id="search-stats-text" class="text-gray-800 mb-3">等待搜索...</p></div>
-        <div id="search-navigation" class="search-nav hidden">
-            <button class="search-nav-btn" onclick="navigateToPrevMatch()"><i class="fas fa-arrow-left mr-1"></i>上一个</button>
-            <button class="search-nav-btn" onclick="navigateToNextMatch()">下一个 <i class="fas fa-arrow-right ml-1"></i></button>
-            <button class="search-nav-btn" onclick="clearSearch()" style="background: linear-gradient(45deg, rgba(255,107,107,0.7), rgba(255,142,142,0.7));"><i class="fas fa-times mr-1"></i>清除</button>
+    <!-- 搜索统计与导航 (动态隐藏/显示) -->
+    <div id="search-stats-output" class="stats-card hidden">
+        <div class="flex justify-between items-center flex-wrap gap-3">
+            <span id="search-stats-text" class="text-lg">等待搜索...</span>
+            <div id="search-navigation" class="flex gap-2 hidden">
+                <button class="search-nav-btn" onclick="navigateToPrevMatch()"><i class="fas fa-arrow-left"></i> 上一个</button>
+                <button class="search-nav-btn" onclick="navigateToNextMatch()">下一个 <i class="fas fa-arrow-right"></i></button>
+                <button class="search-nav-btn" onclick="clearSearch()" style="background:#ff5555;"><i class="fas fa-times"></i> 清除</button>
+            </div>
         </div>
     </div>
     
-    <!-- 章节内容 -->
-    <div id="chapter-body" class="loading">请稍候…</div>
+    <!-- 章节内容容器 -->
+    <div id="chapter-body" class="loading">✨ 正在打开量子图书馆...</div>
 </div>
 
-<!-- 底部小按钮栏 (6个) 播放/暂停, 上一章, 下一章, 速度显示, 减速, 加速, 返回菜单 -->
+<!-- 底部小按钮栏 (全部书籍控制) -->
 <div id="bottom-bar">
     <button class="bottom-btn" onclick="togglePlay()" id="playBtn" title="播放/暂停"><i class="fas fa-play"></i></button>
     <button class="bottom-btn" onclick="prevChapter()" id="prevBtn" title="上一章"><i class="fas fa-backward"></i></button>
@@ -517,19 +387,93 @@ body {
 <!-- 持久切换按钮 (显示/隐藏底部栏) -->
 <button id="persistent-toggle-btn" onclick="toggleControls()"><i class="fas fa-eye-slash"></i></button>
 
+<!-- 隐藏的音频播放器 -->
 <audio id="audio" preload="metadata"></audio>
 
 <script>
 (function() {
-    // ==================== 玻璃系统 ====================
-    const glassState = {
-        videoEnabled: true,
-        audioEnabled: false,
-        glassEffects: true,
-        bgColorIndex: 0
-    };
+    // ==================== 会话级背景状态保持 ====================
+    // 所有状态仅保存在内存中，不写入 localStorage，关闭页面后重置
+    // 但在当前阅读会话中，翻页时状态会通过 URL 参数传递，保持一致性
+
+    // 从 URL 参数读取背景状态（用于翻页后保持）
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // 背景控制状态 (从 URL 获取，若无则使用默认值)
+    let bgVideoEnabled = urlParams.get('bgVideo') !== 'false';   // 默认 true
+    let bgAudioEnabled = urlParams.get('bgAudio') === 'true';    // 默认 false
+    let glassEffectsEnabled = urlParams.get('glassFx') !== 'false'; // 默认 true
+    let bgColorIndex = parseInt(urlParams.get('bgColor') || '0');
 
     const video = document.getElementById('quantum-video-background');
+    const frost = document.querySelector('.glass-frost-layer');
+    const refraction = document.querySelector('.glass-refraction');
+
+    // 应用背景状态
+    if (video) {
+        video.style.opacity = bgVideoEnabled ? '0.7' : '0';
+        video.muted = !bgAudioEnabled;
+    }
+    if (frost) frost.style.display = glassEffectsEnabled ? 'block' : 'none';
+    if (refraction) refraction.style.display = glassEffectsEnabled ? 'block' : 'none';
+
+    // 背景颜色
+    const colors = ['#0a0a1a', '#0a1a2a', '#1a0a2a'];
+    document.body.style.backgroundColor = colors[bgColorIndex] || '#0a0a1a';
+
+    // 更新 UI 图标
+    function updateVideoToggleIcon() {
+        const btn = document.getElementById('video-toggle');
+        if (btn) btn.innerHTML = bgVideoEnabled ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
+    }
+    function updateAudioToggleIcon() {
+        const btn = document.getElementById('audio-toggle');
+        if (btn) btn.innerHTML = bgAudioEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+    }
+    updateVideoToggleIcon();
+    updateAudioToggleIcon();
+
+    // 生成包含当前背景状态的 URL (用于 redirect，保持状态)
+    function buildUrlWithBgState(baseUrl, chapter, continuePlay) {
+        let url = `${baseUrl}?category=${category}&book=${bookId}&chapter=${chapter}`;
+        if (continuePlay) url += '&continueplay=true';
+        url += `&bgVideo=${bgVideoEnabled}`;
+        url += `&bgAudio=${bgAudioEnabled}`;
+        url += `&bgFx=${glassEffectsEnabled}`;
+        url += `&bgColor=${bgColorIndex}`;
+        return url;
+    }
+
+    // 点击事件：视频开关 (仅改变内存状态，不存本地)
+    document.getElementById('video-toggle')?.addEventListener('click', () => {
+        bgVideoEnabled = !bgVideoEnabled;
+        if (video) video.style.opacity = bgVideoEnabled ? '0.7' : '0';
+        updateVideoToggleIcon();
+        playGlassSound(true);
+    });
+
+    // 背景音乐开关
+    document.getElementById('audio-toggle')?.addEventListener('click', () => {
+        bgAudioEnabled = !bgAudioEnabled;
+        if (video) video.muted = !bgAudioEnabled;
+        updateAudioToggleIcon();
+        playGlassSound(true);
+    });
+
+    // 玻璃效果开关
+    document.getElementById('glass-effect-toggle')?.addEventListener('click', () => {
+        glassEffectsEnabled = !glassEffectsEnabled;
+        if (frost) frost.style.display = glassEffectsEnabled ? 'block' : 'none';
+        if (refraction) refraction.style.display = glassEffectsEnabled ? 'block' : 'none';
+        playGlassSound(true);
+    });
+
+    // 背景颜色切换 (循环)
+    document.getElementById('bg-color-toggle')?.addEventListener('click', () => {
+        bgColorIndex = (bgColorIndex + 1) % colors.length;
+        document.body.style.backgroundColor = colors[bgColorIndex];
+        playGlassSound(true);
+    });
 
     function playGlassSound(enabled) {
         try {
@@ -538,63 +482,24 @@ body {
             const gain = actx.createGain();
             osc.connect(gain); gain.connect(actx.destination);
             osc.frequency.value = enabled ? 600 : 300;
-            gain.gain.setValueAtTime(0.2, actx.currentTime);
+            gain.gain.setValueAtTime(0.15, actx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.2);
             osc.start(); osc.stop(actx.currentTime + 0.2);
         } catch (e) {}
     }
 
-    function setupVideoControls() {
-        const videoToggle = document.getElementById('video-toggle');
-        const audioToggle = document.getElementById('audio-toggle');
-        const glassToggle = document.getElementById('glass-effect-toggle');
-        const bgColorToggle = document.getElementById('bg-color-toggle');
-
-        videoToggle?.addEventListener('click', () => {
-            glassState.videoEnabled = !glassState.videoEnabled;
-            if (video) video.style.opacity = glassState.videoEnabled ? '0.7' : '0';
-            videoToggle.innerHTML = glassState.videoEnabled ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
-            playGlassSound(glassState.videoEnabled);
-        });
-
-        audioToggle?.addEventListener('click', () => {
-            glassState.audioEnabled = !glassState.audioEnabled;
-            if (video) video.muted = !glassState.audioEnabled;
-            audioToggle.innerHTML = glassState.audioEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
-            playGlassSound(glassState.audioEnabled);
-        });
-
-        glassToggle?.addEventListener('click', () => {
-            glassState.glassEffects = !glassState.glassEffects;
-            const frost = document.querySelector('.glass-frost-layer');
-            const refrac = document.querySelector('.glass-refraction');
-            if (frost) frost.style.display = glassState.glassEffects ? 'block' : 'none';
-            if (refrac) refrac.style.display = glassState.glassEffects ? 'block' : 'none';
-            glassToggle.innerHTML = '<i class="fas fa-cube"></i>';
-            playGlassSound(glassState.glassEffects);
-        });
-
-        bgColorToggle?.addEventListener('click', () => {
-            glassState.bgColorIndex = (glassState.bgColorIndex + 1) % 3;
-            const colors = ['#0a0a1a', '#0a1a2a', '#1a0a2a'];
-            document.body.style.backgroundColor = colors[glassState.bgColorIndex];
-            playGlassSound(true);
-        });
-    }
-
-    // ==================== 书籍逻辑 ====================
-    const params = new URLSearchParams(window.location.search);
-    const category = params.get("category") || "default";
-    const bookId = params.get("book") || "demo";
-    let chapter = params.get("chapter") || "cover";
+    // ==================== 书籍阅读核心 (完全保留自动播放，从封面到完) ====================
+    const category = urlParams.get("category") || "default";
+    const bookId = urlParams.get("book") || "demo";
+    let chapter = urlParams.get("chapter") || "cover";
 
     let chapterPlainText = "";
-    let isPlayingSequence = true;  // 自动连续播放
+    let isPlayingSequence = true;   // 始终自动连续播放
     let currentSegmentIndex = 0;
-    let playbackRate = 1.0;
-    let controlsVisible = true;
+    let playbackRate = parseFloat(localStorage.getItem('playbackRate')) || 1.0; // 速度可以记忆
+    let controlsVisible = localStorage.getItem('controlsVisible') !== 'false';
 
-    let searchMatches = [], currentMatchIndex = -1, lastSearchTerm = "";
+    let searchMatches = [], currentMatchIndex = -1;
 
     const audioEl = document.getElementById('audio');
     const playBtn = document.getElementById('playBtn');
@@ -603,6 +508,8 @@ body {
     const speedDisplay = document.getElementById('currentSpeedDisplay');
     const chapterTitle = document.getElementById('chapter-title');
     const chapterBody = document.getElementById('chapter-body');
+
+    speedDisplay.innerText = playbackRate.toFixed(2) + 'x';
 
     // 工具函数
     function getPaths() {
@@ -620,17 +527,18 @@ body {
     async function audioExists(p) { try { const r = await fetch(p, { method: 'HEAD' }); return r.ok; } catch { return false; } }
 
     function redirect(cont = true) {
-        window.location.href = `?category=${category}&book=${bookId}&chapter=${chapter}${cont ? '&continueplay=true' : ''}`;
+        // 使用带有背景状态的 URL
+        let url = buildUrlWithBgState('', chapter, cont);
+        window.location.href = url;
     }
 
-    // 搜索相关
+    // 搜索
     window.searchInChapter = function() {
         const input = document.getElementById('searchInput');
         if (!input) return;
         const term = input.value.trim();
         if (!term) return;
         clearSearchHighlights();
-        lastSearchTerm = term;
         performSearch(term);
     };
 
@@ -648,12 +556,12 @@ body {
         const nav = document.getElementById('search-navigation');
         const txt = document.getElementById('search-stats-text');
         if (searchMatches.length) {
-            txt.innerHTML = `<p>找到 ${searchMatches.length} 个匹配段落</p>`;
+            txt.innerHTML = `找到 <strong>${searchMatches.length}</strong> 个匹配段落`;
             nav.classList.remove('hidden');
             out.classList.remove('hidden');
             navigateToNextMatch();
         } else {
-            txt.innerHTML = `<p>未找到 "${term}"</p>`;
+            txt.innerHTML = `未找到 "<em>${term}</em>"`;
             nav.classList.add('hidden');
             out.classList.remove('hidden');
         }
@@ -663,16 +571,18 @@ body {
         if (!searchMatches.length) return;
         if (currentMatchIndex >= 0) searchMatches[currentMatchIndex].segment.classList.remove('current-search-match');
         currentMatchIndex = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length;
-        searchMatches[currentMatchIndex].segment.classList.add('current-search-match');
-        searchMatches[currentMatchIndex].segment.scrollIntoView({ behavior: "smooth", block: "center" });
+        const seg = searchMatches[currentMatchIndex].segment;
+        seg.classList.add('current-search-match');
+        seg.scrollIntoView({ behavior: "smooth", block: "center" });
     };
 
     window.navigateToNextMatch = function() {
         if (!searchMatches.length) return;
         if (currentMatchIndex >= 0) searchMatches[currentMatchIndex].segment.classList.remove('current-search-match');
         currentMatchIndex = (currentMatchIndex + 1) % searchMatches.length;
-        searchMatches[currentMatchIndex].segment.classList.add('current-search-match');
-        searchMatches[currentMatchIndex].segment.scrollIntoView({ behavior: "smooth", block: "center" });
+        const seg = searchMatches[currentMatchIndex].segment;
+        seg.classList.add('current-search-match');
+        seg.scrollIntoView({ behavior: "smooth", block: "center" });
     };
 
     window.clearSearch = function() {
@@ -699,10 +609,10 @@ body {
             if (!resp.ok) throw new Error('Not found');
             const text = await resp.text();
             chapterPlainText = text.replace(/<[^>]*>/g, '').trim();
-            const processed = text.replace(/<p>/g, '<p class="segment" onclick="seekToSegment(this)">');
+            const processed = text.replace(/<p>/g, '<p class="segment" onclick="window.seekToSegment(this)">');
             chapterBody.innerHTML = processed;
         } catch (e) {
-            chapterBody.innerHTML = `<div class="error">加载失败</div>`;
+            chapterBody.innerHTML = `<div class="error">⚠️ 章节加载失败</div>`;
         }
 
         const audioAvailable = await audioExists(audio);
@@ -767,7 +677,7 @@ body {
         if (isAuto && !isPlayingSequence) return;
         let next = chapter === "cover" ? 1 : parseInt(chapter) + 1;
         if (!(await chapterExists(next))) {
-            alert("全书完，返回封面");
+            alert("🎉 全书读完，回到封面");
             chapter = "cover";
             redirect(isPlayingSequence);
             return;
@@ -794,7 +704,8 @@ body {
         playbackRate = Math.max(0.5, Math.min(2.0, playbackRate + delta));
         playbackRate = Math.round(playbackRate * 100) / 100;
         if (audioEl) audioEl.playbackRate = playbackRate;
-        if (speedDisplay) speedDisplay.innerText = playbackRate.toFixed(2) + 'x';
+        speedDisplay.innerText = playbackRate.toFixed(2) + 'x';
+        localStorage.setItem('playbackRate', playbackRate);
     };
 
     window.goHome = function() { window.location.href = 'library.html'; };
@@ -802,42 +713,38 @@ body {
     window.toggleControls = function() {
         controlsVisible = !controlsVisible;
         document.body.classList.toggle('controls-hidden', !controlsVisible);
+        localStorage.setItem('controlsVisible', controlsVisible);
         const icon = document.querySelector('#persistent-toggle-btn i');
         if (icon) icon.className = controlsVisible ? 'fas fa-eye-slash' : 'fas fa-eye';
     };
 
-    // 主题切换 (保留双击标题)
+    // 主题切换 (双击标题)
     window.cycleTheme = function() {
         const themes = ['default', 'dark', 'sepia'];
-        let idx = themes.indexOf(document.body.className.replace('theme-',''));
+        let current = document.body.className.replace('theme-', '') || 'default';
+        let idx = themes.indexOf(current);
         idx = (idx + 1) % themes.length;
         document.body.className = 'theme-' + themes[idx];
         localStorage.setItem('readerTheme', themes[idx]);
     };
-    document.getElementById('chapter-title')?.addEventListener('dblclick', window.cycleTheme);
+    chapterTitle.addEventListener('dblclick', window.cycleTheme);
 
-    // 初始化
-    function initSettings() {
-        const savedRate = localStorage.getItem('playbackRate');
-        if (savedRate) playbackRate = parseFloat(savedRate);
-        if (speedDisplay) speedDisplay.innerText = playbackRate.toFixed(2) + 'x';
-        const savedTheme = localStorage.getItem('readerTheme') || 'default';
-        document.body.className = 'theme-' + savedTheme;
-        const urlContinue = params.get("continueplay");
-        if (urlContinue === 'true' || urlContinue === null) isPlayingSequence = true;
-        else isPlayingSequence = false;
-        if (video) video.muted = true;
-    }
+    // 初始化UI状态
+    document.body.classList.toggle('controls-hidden', !controlsVisible);
+    const persistIcon = document.querySelector('#persistent-toggle-btn i');
+    if (persistIcon) persistIcon.className = controlsVisible ? 'fas fa-eye-slash' : 'fas fa-eye';
 
+    // 启动应用
     async function init() {
-        initSettings();
-        setupVideoControls();
         await loadChapter();
-        if (isPlayingSequence && audioEl?.src) setTimeout(() => togglePlay(true), 600);
+        // 如果 URL 带有 continueplay=true，自动播放
+        if (urlParams.get('continueplay') === 'true' && audioEl?.src) {
+            setTimeout(() => togglePlay(true), 600);
+        }
     }
 
     if (category && bookId) init().catch(console.error);
-    else chapterBody.innerHTML = '<div class="error">缺少参数</div>';
+    else chapterBody.innerHTML = '<div class="error">请通过正确的分类和书籍ID访问</div>';
 })();
 </script>
 </body>
