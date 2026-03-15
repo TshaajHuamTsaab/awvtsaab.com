@@ -3,190 +3,142 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover" />
-<title>Awv's奇迹踪印 - 全平台·会话背景控制</title>
-<!-- 使用 Tailwind 核心库 + 所有设备兼容 -->
+<title>量子有声读物 · 幻景控制</title>
+<!-- Tailwind + Font Awesome -->
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* ==================== 基础重置 & 全平台适配 ==================== */
+/* ==================== 基础重置 ==================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
 }
-
 html, body {
     width: 100%;
     min-height: 100vh;
-    background-color: #0a0a1a; /* 默认深色底 */
-    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    background: #0a0a1a;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     color: #fff;
     transition: background-color 0.5s ease;
     overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
-
-/* ==================== 玻璃视频背景 (全屏覆盖) ==================== */
-#quantum-video-background {
+/* ==================== 视频背景 (全屏) ==================== */
+#quantum-bg-video {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    object-fit: cover;          /* 保证视频覆盖任何屏幕比例，不产生黑边 */
+    object-fit: cover;
     z-index: -2;
-    opacity: 0.7;                /* 默认半透明 */
-    transition: opacity 0.5s ease, filter 0.5s;
-    filter: brightness(1.2) contrast(1.2) saturate(1.3);
+    opacity: 0.7;
+    transition: opacity 0.5s, filter 0.5s;
     pointer-events: none;
-    will-change: transform, opacity;
+    will-change: transform;
 }
-
-/* 玻璃磨砂层 (增强玻璃感) */
-.glass-frost-layer {
+/* 玻璃磨砂层 + 动态折射 (两层效果) */
+.glass-frost {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 50%, rgba(255,255,255,0.03) 100%);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     z-index: -1;
     pointer-events: none;
 }
-
-/* 动态折射 (可选，不影响功能) */
 .glass-refraction {
     position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.03) 50%, transparent 70%);
-    animation: refraction-flow 25s infinite linear;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.05) 0%, transparent 50%);
+    animation: rotateGlow 35s infinite linear;
     pointer-events: none;
     z-index: -1;
     opacity: 0.5;
 }
-
-@keyframes refraction-flow {
-    0% { transform: rotate(0deg) translateX(-30%); }
-    100% { transform: rotate(360deg) translateX(-30%); }
+@keyframes rotateGlow {
+    0% { transform: rotate(0deg) translateX(-10%) translateY(-10%); }
+    100% { transform: rotate(360deg) translateX(-10%) translateY(-10%); }
 }
-
-/* ==================== 主内容卡片 (玻璃效果，完全响应式) ==================== */
+/* ==================== 主内容卡片 ==================== */
 #content {
     width: 90%;
-    max-width: 1000px;
-    margin: 30px auto 100px auto;  /* 给底部留空间 */
-    padding: clamp(15px, 4vw, 35px);
-    background: rgba(255, 255, 255, 0.08);
+    max-width: 950px;
+    margin: 30px auto 120px auto;
+    padding: clamp(16px, 4vw, 32px);
+    background: rgba(255,255,255,0.08);
     backdrop-filter: blur(30px) saturate(200%);
     -webkit-backdrop-filter: blur(30px) saturate(200%);
-    border-radius: 32px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.15);
-    transition: all 0.3s;
+    border-radius: 36px;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
     position: relative;
-    z-index: 2;
+    z-index: 5;
 }
-
-/* 章节标题 */
 #chapter-title {
-    font-size: clamp(1.8rem, 6vw, 3rem);
+    font-size: clamp(1.8rem, 6vw, 2.8rem);
     font-weight: 800;
     text-align: center;
     margin-bottom: 25px;
     padding: 15px 20px;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(15px);
-    border-radius: 40px;
-    border: 1px solid rgba(255,255,255,0.25);
-    text-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    letter-spacing: 1px;
-    color: #fff;
-}
-
-/* 搜索区域 */
-.search-section {
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(12px);
-    border-radius: 28px;
-    padding: 18px;
-    margin-bottom: 25px;
-    border: 1px solid rgba(0,255,200,0.2);
-}
-
-.search-input {
     background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(15px);
+    border-radius: 60px;
     border: 1px solid #00ffcc40;
+    text-shadow: 0 4px 15px #00ffcc60;
+}
+/* 搜索区 */
+.search-section {
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(15px);
+    border-radius: 50px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #00ffcc30;
+}
+#searchInput {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid #00ffcc60;
     color: white;
-    padding: 12px 18px;
+    padding: 12px 20px;
     border-radius: 40px;
     width: 100%;
     font-size: 16px;
-    outline: none;
 }
-.search-input::placeholder { color: rgba(255,255,255,0.5); }
-
-.search-btn {
-    background: linear-gradient(145deg, #00ccaa, #00aa88);
-    border: none;
-    padding: 12px 25px;
-    border-radius: 40px;
-    color: white;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-    border: 1px solid #ffffff40;
-}
-.search-btn:active { transform: scale(0.96); background: #00bb99; }
-
-/* 搜索统计卡片 */
-.stats-card {
+#searchInput::placeholder { color: #ccc; }
+.search-stats {
     background: rgba(30,30,50,0.6);
     backdrop-filter: blur(20px);
-    border-radius: 28px;
-    padding: 20px;
-    margin: 20px 0;
-    border-left: 6px solid #ffaa33;
+    border-radius: 30px;
+    padding: 12px 20px;
+    margin: 15px 0 10px;
+    border-left: 5px solid #ffaa33;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
 }
-
-/* 段落卡片 (segment) */
+/* 段落卡片 */
 .segment {
     background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(8px);
     border-radius: 24px;
     padding: 18px 22px;
     margin-bottom: 16px;
-    border: 1px solid rgba(255,255,255,0.15);
-    transition: all 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.2);
     cursor: pointer;
     line-height: 1.7;
     font-size: clamp(15px, 2vw, 18px);
-    color: #f0f0f0;
+    transition: all 0.2s;
 }
-.segment:hover {
-    background: rgba(255,255,255,0.2);
-    transform: translateY(-3px);
-    border-color: #00ffcc80;
-}
-.segment.highlight {
-    background: rgba(0,255,200,0.2);
-    border-left: 8px solid #00ffcc;
-    box-shadow: 0 0 30px #00ffcc30;
-}
+.segment:hover { background: rgba(255,255,255,0.2); border-color: #00ffcc; }
+.segment.highlight { background: rgba(0,255,200,0.2); border-left: 8px solid #00ffcc; }
 .segment.search-match { border-left: 5px solid #ffaa33; background: rgba(255,170,51,0.15); }
-.segment.current-search-match { border-left: 8px solid #ff5500; background: rgba(255,85,0,0.2); font-weight: 500; }
-
-/* ==================== 左上角控制面板 (玻璃按钮，跨设备) ==================== */
-#video-controls {
+.segment.current-match { border-left: 8px solid #ff5500; background: rgba(255,85,0,0.2); }
+/* ==================== 左上角控制面板 (背景/声音/玻璃) ==================== */
+#video-controls-panel {
     position: fixed;
     top: 20px;
     left: 20px;
@@ -195,93 +147,75 @@ html, body {
     gap: 12px;
     z-index: 1000;
 }
-
-.video-control-btn {
+.control-glass-btn {
     width: 52px;
     height: 52px;
     border-radius: 18px;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0,0,0,0.5);
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.25);
+    border: 1px solid rgba(255,255,255,0.3);
     color: #00ffcc;
     font-size: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.25s;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    transition: 0.2s;
+    box-shadow: 0 10px 20px black;
 }
-.video-control-btn:active { transform: scale(0.9); background: rgba(0,255,200,0.2); }
-.video-control-btn:hover { transform: translateY(-3px); border-color: #00ffcc; }
-
-/* ==================== 底部固定控制栏 (小尺寸玻璃条) ==================== */
+.control-glass-btn:active { transform: scale(0.9); background: #00ffcc30; }
+/* ==================== 底部控制栏 (保留原风格) ==================== */
 #bottom-bar {
     position: fixed;
     bottom: 18px;
-    left: 18px;
-    right: 18px;
-    max-width: 650px;
-    margin: 0 auto;
-    background: rgba(0, 0, 0, 0.5);
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 700px;
+    background: rgba(0,0,0,0.6);
     backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
     border-radius: 60px;
-    padding: 8px 16px;
+    padding: 8px 20px;
     display: flex;
-    justify-content: space-around;
+    gap: 8px;
     align-items: center;
     border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    box-shadow: 0 15px 35px black;
     z-index: 900;
-    gap: 5px;
 }
-
 .bottom-btn {
-    background: transparent;
-    border: none;
-    width: 44px;
-    height: 44px;
+    width: 44px; height: 44px;
     border-radius: 40px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
     color: #00ffcc;
-    font-size: 1.3rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: 0.2s;
+    font-size: 1.3rem;
     cursor: pointer;
+    transition: 0.15s;
     flex-shrink: 0;
 }
-.bottom-btn:active { background: #00ffcc20; transform: scale(0.92); }
-.bottom-btn.special { color: #ffaa33; }
-
-#currentSpeedDisplay {
+.bottom-btn:active { background: #00ffcc30; transform: scale(0.9); }
+#speedDisplay {
     color: #00ffcc;
     font-weight: 600;
-    font-size: 0.95rem;
-    background: rgba(0,0,0,0.3);
-    padding: 6px 10px;
+    background: rgba(0,0,0,0.4);
+    padding: 6px 12px;
     border-radius: 40px;
-    min-width: 60px;
+    min-width: 65px;
     text-align: center;
-    border: 1px solid #00ffcc30;
-    flex-shrink: 0;
+    border: 1px solid #00ffcc40;
 }
-
-/* 持久切换按钮 */
-#persistent-toggle-btn {
+#persistent-toggle {
     position: fixed;
-    bottom: 90px;
-    right: 18px;
-    width: 56px;
-    height: 56px;
+    bottom: 90px; right: 20px;
+    width: 56px; height: 56px;
     border-radius: 30px;
-    background: rgba(156, 39, 176, 0.5);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(156,39,176,0.6);
+    backdrop-filter: blur(15px);
+    border: 1px solid white;
     color: white;
     font-size: 1.6rem;
     display: flex;
@@ -289,462 +223,397 @@ html, body {
     justify-content: center;
     z-index: 1000;
     cursor: pointer;
-    box-shadow: 0 10px 30px black;
 }
-
-/* 控制隐藏类 */
+/* 隐藏底部栏 */
 .controls-hidden #bottom-bar {
-    transform: translateY(120%);
+    transform: translateX(-50%) translateY(120%);
     opacity: 0;
     pointer-events: none;
 }
-
-/* 音频播放器隐藏 */
-#audio { display: none; }
-
-/* ==================== 主题支持 (浅色文字适配) ==================== */
-.theme-dark { color: #eee; }
-.theme-sepia { color: #3e2e1f; }
-.theme-sepia .segment { color: #2c1e0e; }
-
-/* 平板/桌面适配 */
-@media (min-width: 768px) {
-    #bottom-bar { padding: 10px 25px; }
-    .bottom-btn { width: 50px; height: 50px; font-size: 1.4rem; }
-    #currentSpeedDisplay { font-size: 1rem; padding: 8px 15px; }
-    .video-control-btn { width: 58px; height: 58px; font-size: 1.6rem; }
-}
-
-@media (min-width: 1200px) {
-    #content { max-width: 1100px; }
-    .segment { font-size: 18px; }
-}
-
-/* 横屏手机优化 */
-@media (orientation: landscape) and (max-height: 500px) {
-    #bottom-bar { bottom: 10px; padding: 5px 15px; }
-    .bottom-btn { width: 40px; height: 40px; }
-    #content { margin-bottom: 70px; }
-}
+audio { display: none; }
 </style>
 </head>
+<body>
 
-<body class="theme-default">
-<!-- 量子玻璃视频背景 (自动播放、静音、循环，兼容所有设备) -->
-<video id="quantum-video-background" autoplay muted loop playsinline preload="auto" webkit-playsinline x5-playsinline>
+<!-- 量子视频背景 (自动播放、静音、循环) -->
+<video id="quantum-bg-video" autoplay muted loop playsinline preload="auto">
+    <!-- 主视频：如果存在本地背景则用，否则使用mixkit备用 -->
     <source src="../database/homeicon/background.MP4" type="video/mp4">
-    <!-- 备用视频链接（保证在任何设备上都有内容） -->
     <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-geometric-pattern-loop-3495-large.mp4" type="video/mp4">
 </video>
-<div class="glass-frost-layer"></div>
+<!-- 玻璃双层 -->
+<div class="glass-frost"></div>
 <div class="glass-refraction"></div>
 
-<!-- 左上角永久控制面板 (背景控制开关，仅当前会话有效，翻页保持) -->
-<div id="video-controls">
-    <button id="video-toggle" class="video-control-btn" title="视频背景开关"><i class="fas fa-video"></i></button>
-    <button id="audio-toggle" class="video-control-btn" title="背景音乐开关"><i class="fas fa-volume-mute"></i></button>
-    <button id="glass-effect-toggle" class="video-control-btn" title="玻璃效果开关"><i class="fas fa-cube"></i></button>
-    <button id="bg-color-toggle" class="video-control-btn" title="背景颜色切换"><i class="fas fa-paint-brush"></i></button>
+<!-- 左上角控制面板 (背景/音频/玻璃/颜色) 完全保留第二段代码的交互，且仅会话有效 -->
+<div id="video-controls-panel">
+    <button class="control-glass-btn" id="toggleVideoBtn" title="视频背景开关"><i class="fas fa-video"></i></button>
+    <button class="control-glass-btn" id="toggleBgAudioBtn" title="背景音开关"><i class="fas fa-volume-mute"></i></button>
+    <button class="control-glass-btn" id="toggleGlassBtn" title="玻璃效果开关"><i class="fas fa-cube"></i></button>
+    <button class="control-glass-btn" id="cycleColorBtn" title="背景颜色切换"><i class="fas fa-paint-brush"></i></button>
 </div>
 
 <!-- 主内容卡片 -->
 <div id="content">
-    <div id="chapter-title">📖 加载中...</div>
+    <div id="chapter-title">📡 量子载入中...</div>
     
-    <!-- 搜索区域 (简洁) -->
-    <div class="search-section flex flex-col md:flex-row gap-3 items-center">
-        <input type="text" id="searchInput" placeholder="输入关键词搜索..." class="search-input flex-1">
-        <button class="search-btn" onclick="window.searchInChapter()"><i class="fas fa-search"></i> 搜索</button>
+    <!-- 搜索区域 (第二段风格) -->
+    <div class="search-section flex gap-2 items-center">
+        <input type="text" id="searchInput" placeholder="搜索段落..." class="flex-1">
+        <button class="bottom-btn special !w-auto px-5" onclick="performSearch()"><i class="fas fa-search mr-1"></i> 搜</button>
     </div>
-
-    <!-- 搜索统计与导航 (动态隐藏/显示) -->
-    <div id="search-stats-output" class="stats-card hidden">
-        <div class="flex justify-between items-center flex-wrap gap-3">
-            <span id="search-stats-text" class="text-lg">等待搜索...</span>
-            <div id="search-navigation" class="flex gap-2 hidden">
-                <button class="search-nav-btn" onclick="navigateToPrevMatch()"><i class="fas fa-arrow-left"></i> 上一个</button>
-                <button class="search-nav-btn" onclick="navigateToNextMatch()">下一个 <i class="fas fa-arrow-right"></i></button>
-                <button class="search-nav-btn" onclick="clearSearch()" style="background:#ff5555;"><i class="fas fa-times"></i> 清除</button>
-            </div>
+    
+    <!-- 搜索结果统计栏 (动态) 初始隐藏 -->
+    <div id="searchStats" class="search-stats hidden">
+        <span id="statsText">等待搜索</span>
+        <div id="searchNav" class="flex gap-2 hidden">
+            <button class="bottom-btn !w-10 !h-10" onclick="prevMatch()"><i class="fas fa-arrow-left"></i></button>
+            <button class="bottom-btn !w-10 !h-10" onclick="nextMatch()"><i class="fas fa-arrow-right"></i></button>
+            <button class="bottom-btn !w-10 !h-10" onclick="clearSearch()" style="color:#ff5555"><i class="fas fa-times"></i></button>
         </div>
     </div>
     
-    <!-- 章节内容容器 -->
-    <div id="chapter-body" class="loading">✨ 正在打开量子图书馆...</div>
+    <!-- 章节正文容器 -->
+    <div id="chapter-body" class="mt-2">✨ 打开量子图书馆...</div>
 </div>
 
-<!-- 底部小按钮栏 (全部书籍控制) -->
+<!-- 底部控制栏 (原版风格) -->
 <div id="bottom-bar">
-    <button class="bottom-btn" onclick="togglePlay()" id="playBtn" title="播放/暂停"><i class="fas fa-play"></i></button>
-    <button class="bottom-btn" onclick="prevChapter()" id="prevBtn" title="上一章"><i class="fas fa-backward"></i></button>
-    <button class="bottom-btn" onclick="nextChapter()" id="nextBtn" title="下一章"><i class="fas fa-forward"></i></button>
-    <span id="currentSpeedDisplay">1.0x</span>
-    <button class="bottom-btn special" onclick="changeSpeed(-0.25)" title="减速"><i class="fas fa-minus"></i></button>
-    <button class="bottom-btn special" onclick="changeSpeed(0.25)" title="加速"><i class="fas fa-plus"></i></button>
-    <button class="bottom-btn" onclick="goHome()" title="返回菜单"><i class="fas fa-home"></i></button>
+    <button class="bottom-btn" onclick="togglePlay()" id="playBtn"><i class="fas fa-play"></i></button>
+    <button class="bottom-btn" onclick="prevChapter()"><i class="fas fa-backward"></i></button>
+    <button class="bottom-btn" onclick="nextChapter()"><i class="fas fa-forward"></i></button>
+    <span id="speedDisplay">1.0x</span>
+    <button class="bottom-btn" onclick="changeSpeed(-0.25)"><i class="fas fa-minus"></i></button>
+    <button class="bottom-btn" onclick="changeSpeed(0.25)"><i class="fas fa-plus"></i></button>
+    <button class="bottom-btn" onclick="goHome()"><i class="fas fa-home"></i></button>
 </div>
 
 <!-- 持久切换按钮 (显示/隐藏底部栏) -->
-<button id="persistent-toggle-btn" onclick="toggleControls()"><i class="fas fa-eye-slash"></i></button>
+<button id="persistent-toggle" onclick="toggleBottomBar()"><i class="fas fa-eye-slash"></i></button>
 
-<!-- 隐藏的音频播放器 -->
+<!-- 隐藏的audio播放器 (有声读物) -->
 <audio id="audio" preload="metadata"></audio>
 
 <script>
 (function() {
-    // ==================== 会话级背景状态保持 ====================
-    // 所有状态仅保存在内存中，不写入 localStorage，关闭页面后重置
-    // 但在当前阅读会话中，翻页时状态会通过 URL 参数传递，保持一致性
-
-    // 从 URL 参数读取背景状态（用于翻页后保持）
+    // -------------------- 读取URL参数 (用于章节和背景状态保持) --------------------
     const urlParams = new URLSearchParams(window.location.search);
-    
-    // 背景控制状态 (从 URL 获取，若无则使用默认值)
-    let bgVideoEnabled = urlParams.get('bgVideo') !== 'false';   // 默认 true
-    let bgAudioEnabled = urlParams.get('bgAudio') === 'true';    // 默认 false
-    let glassEffectsEnabled = urlParams.get('glassFx') !== 'false'; // 默认 true
-    let bgColorIndex = parseInt(urlParams.get('bgColor') || '0');
+    const category = urlParams.get('category') || 'default';
+    const book = urlParams.get('book') || 'demo';
+    let chapter = urlParams.get('chapter') || 'cover';        // cover or 数字
 
-    const video = document.getElementById('quantum-video-background');
-    const frost = document.querySelector('.glass-frost-layer');
+    // 背景控制状态 —— 从URL获取，仅会话保留 (翻页时通过url传递)
+    let bgVideoEnabled = urlParams.get('bgVideo') !== 'false';      // 默认true
+    let bgAudioEnabled = urlParams.get('bgAudio') === 'true';       // 默认false (视频原声)
+    let glassEnabled = urlParams.get('glassFx') !== 'false';        // 默认true
+    let colorIndex = parseInt(urlParams.get('colorIdx') || '0');
+
+    // DOM 元素
+    const video = document.getElementById('quantum-bg-video');
+    const frost = document.querySelector('.glass-frost');
     const refraction = document.querySelector('.glass-refraction');
+    const toggleVideoBtn = document.getElementById('toggleVideoBtn');
+    const toggleBgAudioBtn = document.getElementById('toggleBgAudioBtn');
+    const toggleGlassBtn = document.getElementById('toggleGlassBtn');
+    const cycleColorBtn = document.getElementById('cycleColorBtn');
 
-    // 应用背景状态
+    // 可用背景色
+    const bgColors = ['#0a0a1a', '#1a2a3a', '#2a1a3a', '#1a3a2a'];
+
+    // 应用初始状态
     if (video) {
         video.style.opacity = bgVideoEnabled ? '0.7' : '0';
-        video.muted = !bgAudioEnabled;
+        video.muted = !bgAudioEnabled;          // muted为true则无背景音，false则放出原声(如果有)
     }
-    if (frost) frost.style.display = glassEffectsEnabled ? 'block' : 'none';
-    if (refraction) refraction.style.display = glassEffectsEnabled ? 'block' : 'none';
+    if (frost) frost.style.display = glassEnabled ? 'block' : 'none';
+    if (refraction) refraction.style.display = glassEnabled ? 'block' : 'none';
+    document.body.style.backgroundColor = bgColors[colorIndex % bgColors.length];
 
-    // 背景颜色
-    const colors = ['#0a0a1a', '#0a1a2a', '#1a0a2a'];
-    document.body.style.backgroundColor = colors[bgColorIndex] || '#0a0a1a';
-
-    // 更新 UI 图标
-    function updateVideoToggleIcon() {
-        const btn = document.getElementById('video-toggle');
-        if (btn) btn.innerHTML = bgVideoEnabled ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
+    // 更新图标
+    function updateVideoIcon() {
+        toggleVideoBtn.innerHTML = bgVideoEnabled ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
     }
-    function updateAudioToggleIcon() {
-        const btn = document.getElementById('audio-toggle');
-        if (btn) btn.innerHTML = bgAudioEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+    function updateAudioIcon() {
+        toggleBgAudioBtn.innerHTML = bgAudioEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
     }
-    updateVideoToggleIcon();
-    updateAudioToggleIcon();
+    updateVideoIcon(); updateAudioIcon();
 
-    // 生成包含当前背景状态的 URL (用于 redirect，保持状态)
-    function buildUrlWithBgState(baseUrl, chapter, continuePlay) {
-        let url = `${baseUrl}?category=${category}&book=${bookId}&chapter=${chapter}`;
-        if (continuePlay) url += '&continueplay=true';
-        url += `&bgVideo=${bgVideoEnabled}`;
-        url += `&bgAudio=${bgAudioEnabled}`;
-        url += `&bgFx=${glassEffectsEnabled}`;
-        url += `&bgColor=${bgColorIndex}`;
-        return url;
+    // 生成带背景状态的URL (用于翻页跳转)
+    function buildPreserveUrl(newChapter) {
+        let base = window.location.pathname + '?';
+        base += `category=${category}&book=${book}&chapter=${newChapter}`;
+        base += `&bgVideo=${bgVideoEnabled}`;
+        base += `&bgAudio=${bgAudioEnabled}`;
+        base += `&glassFx=${glassEnabled}`;
+        base += `&colorIdx=${colorIndex}`;
+        // 如果需要自动续播标记 (保留原逻辑)
+        if (isPlayingSequence) base += '&autoplay=true';
+        return base;
     }
 
-    // 点击事件：视频开关 (仅改变内存状态，不存本地)
-    document.getElementById('video-toggle')?.addEventListener('click', () => {
+    // 切换事件: 视频开关
+    toggleVideoBtn.addEventListener('click', () => {
         bgVideoEnabled = !bgVideoEnabled;
         if (video) video.style.opacity = bgVideoEnabled ? '0.7' : '0';
-        updateVideoToggleIcon();
-        playGlassSound(true);
+        updateVideoIcon();
+        playFeedback();
     });
-
-    // 背景音乐开关
-    document.getElementById('audio-toggle')?.addEventListener('click', () => {
+    // 背景音频开关 (解除静音/静音)
+    toggleBgAudioBtn.addEventListener('click', () => {
         bgAudioEnabled = !bgAudioEnabled;
         if (video) video.muted = !bgAudioEnabled;
-        updateAudioToggleIcon();
-        playGlassSound(true);
+        updateAudioIcon();
+        playFeedback();
     });
-
     // 玻璃效果开关
-    document.getElementById('glass-effect-toggle')?.addEventListener('click', () => {
-        glassEffectsEnabled = !glassEffectsEnabled;
-        if (frost) frost.style.display = glassEffectsEnabled ? 'block' : 'none';
-        if (refraction) refraction.style.display = glassEffectsEnabled ? 'block' : 'none';
-        playGlassSound(true);
+    toggleGlassBtn.addEventListener('click', () => {
+        glassEnabled = !glassEnabled;
+        if (frost) frost.style.display = glassEnabled ? 'block' : 'none';
+        if (refraction) refraction.style.display = glassEnabled ? 'block' : 'none';
+        playFeedback();
+    });
+    // 背景颜色切换
+    cycleColorBtn.addEventListener('click', () => {
+        colorIndex = (colorIndex + 1) % bgColors.length;
+        document.body.style.backgroundColor = bgColors[colorIndex];
+        playFeedback();
     });
 
-    // 背景颜色切换 (循环)
-    document.getElementById('bg-color-toggle')?.addEventListener('click', () => {
-        bgColorIndex = (bgColorIndex + 1) % colors.length;
-        document.body.style.backgroundColor = colors[bgColorIndex];
-        playGlassSound(true);
-    });
-
-    function playGlassSound(enabled) {
+    function playFeedback() {
         try {
-            const actx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = actx.createOscillator();
-            const gain = actx.createGain();
+            let actx = new (window.AudioContext || window.webkitAudioContext)();
+            let osc = actx.createOscillator();
+            let gain = actx.createGain();
             osc.connect(gain); gain.connect(actx.destination);
-            osc.frequency.value = enabled ? 600 : 300;
-            gain.gain.setValueAtTime(0.15, actx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.2);
-            osc.start(); osc.stop(actx.currentTime + 0.2);
-        } catch (e) {}
+            osc.frequency.value = 600;
+            gain.gain.setValueAtTime(0.1, actx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.15);
+            osc.start(); osc.stop(actx.currentTime + 0.15);
+        } catch(e){}
     }
 
-    // ==================== 书籍阅读核心 (完全保留自动播放，从封面到完) ====================
-    const category = urlParams.get("category") || "default";
-    const bookId = urlParams.get("book") || "demo";
-    let chapter = urlParams.get("chapter") || "cover";
-
-    let chapterPlainText = "";
-    let isPlayingSequence = true;   // 始终自动连续播放
-    let currentSegmentIndex = 0;
-    let playbackRate = parseFloat(localStorage.getItem('playbackRate')) || 1.0; // 速度可以记忆
-    let controlsVisible = localStorage.getItem('controlsVisible') !== 'false';
-
-    let searchMatches = [], currentMatchIndex = -1;
-
+    // -------------------- 核心有声读物逻辑 (完全保留第一段代码的自动播放、章节加载、高亮) --------------------
+    const titleEl = document.getElementById('chapter-title');
+    const bodyEl = document.getElementById('chapter-body');
     const audioEl = document.getElementById('audio');
     const playBtn = document.getElementById('playBtn');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const speedDisplay = document.getElementById('currentSpeedDisplay');
-    const chapterTitle = document.getElementById('chapter-title');
-    const chapterBody = document.getElementById('chapter-body');
+    const speedDisplay = document.getElementById('speedDisplay');
+
+    let isPlayingSequence = true;          // 自动连续播放
+    let playbackRate = parseFloat(localStorage.getItem('quantumRate')) || 1.0;
+    let segmentIndex = 0;
+    let searchMatches = [], currentMatchIdx = -1;
 
     speedDisplay.innerText = playbackRate.toFixed(2) + 'x';
+    audioEl.playbackRate = playbackRate;
 
-    // 工具函数
-    function getPaths() {
-        const base = `database/${category}/${bookId}`;
-        const chName = chapter === "cover" ? "cover" : `chapter${chapter}`;
-        return { html: `${base}/${chName}.html`, audio: `${base}/audio/${chName}.mp3` };
+    // 工具: 检查章节是否存在
+    async function chapterExists(num) {
+        let name = (num === 'cover') ? 'cover' : `chapter${num}`;
+        try {
+            let r = await fetch(`database/${category}/${book}/${name}.html`, { method: 'HEAD' });
+            return r.ok;
+        } catch { return false; }
     }
 
-    async function chapterExists(chNum) {
-        if (!category || !bookId) return false;
-        const chName = chNum === "cover" ? "cover" : `chapter${chNum}`;
-        try { const r = await fetch(`database/${category}/${bookId}/${chName}.html`, { method: 'HEAD' }); return r.ok; } catch { return false; }
-    }
-
-    async function audioExists(p) { try { const r = await fetch(p, { method: 'HEAD' }); return r.ok; } catch { return false; } }
-
-    function redirect(cont = true) {
-        // 使用带有背景状态的 URL
-        let url = buildUrlWithBgState('', chapter, cont);
-        window.location.href = url;
-    }
-
-    // 搜索
-    window.searchInChapter = function() {
-        const input = document.getElementById('searchInput');
-        if (!input) return;
-        const term = input.value.trim();
-        if (!term) return;
-        clearSearchHighlights();
-        performSearch(term);
-    };
-
-    function performSearch(term) {
-        const segs = document.querySelectorAll("#chapter-body .segment");
-        searchMatches = []; currentMatchIndex = -1;
-        segs.forEach((s, idx) => {
-            const text = s.textContent || s.innerText;
-            if (text.toLowerCase().includes(term.toLowerCase())) {
-                searchMatches.push({ segmentIndex: idx, segment: s });
-                s.classList.add('search-match');
-            }
-        });
-        const out = document.getElementById('search-stats-output');
-        const nav = document.getElementById('search-navigation');
-        const txt = document.getElementById('search-stats-text');
-        if (searchMatches.length) {
-            txt.innerHTML = `找到 <strong>${searchMatches.length}</strong> 个匹配段落`;
-            nav.classList.remove('hidden');
-            out.classList.remove('hidden');
-            navigateToNextMatch();
-        } else {
-            txt.innerHTML = `未找到 "<em>${term}</em>"`;
-            nav.classList.add('hidden');
-            out.classList.remove('hidden');
-        }
-    }
-
-    window.navigateToPrevMatch = function() {
-        if (!searchMatches.length) return;
-        if (currentMatchIndex >= 0) searchMatches[currentMatchIndex].segment.classList.remove('current-search-match');
-        currentMatchIndex = (currentMatchIndex - 1 + searchMatches.length) % searchMatches.length;
-        const seg = searchMatches[currentMatchIndex].segment;
-        seg.classList.add('current-search-match');
-        seg.scrollIntoView({ behavior: "smooth", block: "center" });
-    };
-
-    window.navigateToNextMatch = function() {
-        if (!searchMatches.length) return;
-        if (currentMatchIndex >= 0) searchMatches[currentMatchIndex].segment.classList.remove('current-search-match');
-        currentMatchIndex = (currentMatchIndex + 1) % searchMatches.length;
-        const seg = searchMatches[currentMatchIndex].segment;
-        seg.classList.add('current-search-match');
-        seg.scrollIntoView({ behavior: "smooth", block: "center" });
-    };
-
-    window.clearSearch = function() {
-        clearSearchHighlights();
-        searchMatches = []; currentMatchIndex = -1;
-        document.getElementById('search-stats-output')?.classList.add('hidden');
-        document.getElementById('search-navigation')?.classList.add('hidden');
-        document.getElementById('searchInput').value = '';
-    };
-
-    function clearSearchHighlights() {
-        document.querySelectorAll("#chapter-body .segment").forEach(s => s.classList.remove('search-match', 'current-search-match'));
-    }
-
-    // 加载章节
+    // 加载章节 (兼容第一段逻辑)
     async function loadChapter() {
-        const { html, audio } = getPaths();
-        chapterTitle.innerText = chapter === "cover" ? "📖 封面" : `第 ${chapter} 页`;
-        chapterBody.innerHTML = '<div class="loading">📖 加载中...</div>';
-        clearSearchHighlights();
+        let chName = (chapter === 'cover') ? 'cover' : `chapter${chapter}`;
+        let htmlPath = `database/${category}/${book}/${chName}.html`;
+        let audioPath = `database/${category}/${book}/audio/${chName}.mp3`;
+
+        titleEl.innerText = (chapter === 'cover') ? '📖 封面' : `第 ${chapter} 章`;
+        bodyEl.innerHTML = '<div class="segment">🌀 加载段落...</div>';
 
         try {
-            const resp = await fetch(html);
-            if (!resp.ok) throw new Error('Not found');
-            const text = await resp.text();
-            chapterPlainText = text.replace(/<[^>]*>/g, '').trim();
-            const processed = text.replace(/<p>/g, '<p class="segment" onclick="window.seekToSegment(this)">');
-            chapterBody.innerHTML = processed;
+            let resp = await fetch(htmlPath);
+            if (!resp.ok) throw new Error('404');
+            let html = await resp.text();
+            // 将<p>转换为带segment类的可点击元素
+            let processed = html.replace(/<p>/g, '<p class="segment" onclick="seekToSegment(this)">');
+            bodyEl.innerHTML = processed;
         } catch (e) {
-            chapterBody.innerHTML = `<div class="error">⚠️ 章节加载失败</div>`;
+            bodyEl.innerHTML = '<div class="segment">❌ 章节缺失</div>';
         }
 
-        const audioAvailable = await audioExists(audio);
-        if (audioAvailable && audioEl) {
-            audioEl.src = audio;
-            audioEl.load();
-            audioEl.playbackRate = playbackRate;
-            setupAudioEvents();
-        } else {
-            if (audioEl) audioEl.src = '';
-            playBtn.disabled = true;
-        }
-        updateNavButtons();
-    }
-
-    function setupAudioEvents() {
-        audioEl.onended = handleAudioEnded;
-        audioEl.ontimeupdate = highlightSegment;
-        playBtn.disabled = false;
-    }
-
-    function handleAudioEnded() {
-        if (isPlayingSequence) nextChapter(true);
-        else playBtn.innerHTML = '<i class="fas fa-play"></i>';
-    }
-
-    function highlightSegment() {
-        if (!audioEl?.duration) return;
-        const paras = document.querySelectorAll("#chapter-body .segment");
-        if (!paras.length) return;
-        const idx = Math.floor((audioEl.currentTime / audioEl.duration) * paras.length);
-        if (idx !== currentSegmentIndex) {
-            paras.forEach(p => p.classList.remove('highlight'));
-            if (paras[idx]) {
-                paras[idx].classList.add('highlight');
-                paras[idx].scrollIntoView({ behavior: "smooth", block: "center" });
+        // 设置音频
+        try {
+            let audioCheck = await fetch(audioPath, { method: 'HEAD' });
+            if (audioCheck.ok) {
+                audioEl.src = audioPath;
+                audioEl.load();
+                audioEl.onended = nextChapterAuto;
+                audioEl.ontimeupdate = highlightCurrentSegment;
+                playBtn.disabled = false;
+            } else {
+                audioEl.src = '';
+                playBtn.disabled = true;
             }
-            currentSegmentIndex = idx;
+        } catch { audioEl.src = ''; playBtn.disabled = true; }
+
+        // 如果URL有autoplay标记，尝试播放
+        if (urlParams.get('autoplay') === 'true' && audioEl.src) {
+            setTimeout(() => { togglePlay(); }, 500);
         }
+        // 重置搜索高亮
+        clearSearch();
     }
 
-    window.seekToSegment = function(p) {
-        if (!audioEl?.duration) return;
-        const paras = Array.from(document.querySelectorAll("#chapter-body .segment"));
-        const idx = paras.indexOf(p);
-        if (idx === -1) return;
-        audioEl.currentTime = (idx / paras.length) * audioEl.duration;
-        if (audioEl.paused) togglePlay(true);
+    // 自动下一章 (模仿第一段nextAuto)
+    async function nextChapterAuto() {
+        if (!isPlayingSequence) return;
+        let next = (chapter === 'cover') ? 1 : parseInt(chapter) + 1;
+        if (!(await chapterExists(next))) {
+            alert('🎉 全书结束，返回封面');
+            chapter = 'cover';
+            window.location.href = buildPreserveUrl('cover');
+            return;
+        }
+        chapter = next.toString();
+        window.location.href = buildPreserveUrl(chapter);
+    }
+
+    // 手动下一章
+    window.nextChapter = async function() {
+        let next = (chapter === 'cover') ? 1 : parseInt(chapter) + 1;
+        if (!(await chapterExists(next))) {
+            alert('没有下一章');
+            return;
+        }
+        chapter = next.toString();
+        window.location.href = buildPreserveUrl(chapter);
     };
 
-    window.togglePlay = function(force = false) {
-        if (!audioEl?.src) return;
-        if (audioEl.paused || force) {
-            audioEl.play().then(() => playBtn.innerHTML = '<i class="fas fa-pause"></i>').catch(() => {});
+    window.prevChapter = async function() {
+        if (chapter === 'cover') return;
+        let prev = parseInt(chapter) - 1;
+        chapter = (prev <= 0) ? 'cover' : prev.toString();
+        window.location.href = buildPreserveUrl(chapter);
+    };
+
+    // 播放/暂停
+    window.togglePlay = function() {
+        if (!audioEl.src) return;
+        if (audioEl.paused) {
+            audioEl.play().then(() => playBtn.innerHTML = '<i class="fas fa-pause"></i>');
         } else {
             audioEl.pause();
             playBtn.innerHTML = '<i class="fas fa-play"></i>';
         }
     };
 
-    window.nextChapter = async function(isAuto = false) {
-        if (isAuto && !isPlayingSequence) return;
-        let next = chapter === "cover" ? 1 : parseInt(chapter) + 1;
-        if (!(await chapterExists(next))) {
-            alert("🎉 全书读完，回到封面");
-            chapter = "cover";
-            redirect(isPlayingSequence);
-            return;
+    // 高亮当前段落 (根据进度)
+    function highlightCurrentSegment() {
+        if (!audioEl.duration) return;
+        let paras = document.querySelectorAll('#chapter-body .segment');
+        if (!paras.length) return;
+        let idx = Math.floor((audioEl.currentTime / audioEl.duration) * paras.length);
+        if (idx !== segmentIndex) {
+            paras.forEach(p => p.classList.remove('highlight'));
+            if (paras[idx]) {
+                paras[idx].classList.add('highlight');
+                paras[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            segmentIndex = idx;
         }
-        chapter = next.toString();
-        redirect(isPlayingSequence);
-    };
-
-    window.prevChapter = async function() {
-        if (chapter === "cover") return;
-        let prev = parseInt(chapter) - 1;
-        chapter = prev <= 0 ? "cover" : prev.toString();
-        redirect(isPlayingSequence);
-    };
-
-    async function updateNavButtons() {
-        if (!prevBtn || !nextBtn) return;
-        prevBtn.disabled = chapter === "cover";
-        let next = chapter === "cover" ? 1 : parseInt(chapter) + 1;
-        nextBtn.disabled = !(await chapterExists(next).catch(() => false));
     }
 
+    // 点击段落跳转
+    window.seekToSegment = function(p) {
+        if (!audioEl.duration) return;
+        let paras = Array.from(document.querySelectorAll('#chapter-body .segment'));
+        let idx = paras.indexOf(p);
+        if (idx === -1) return;
+        audioEl.currentTime = (idx / paras.length) * audioEl.duration;
+        if (audioEl.paused) togglePlay();
+    };
+
+    // 速度调节
     window.changeSpeed = function(delta) {
-        playbackRate = Math.max(0.5, Math.min(2.0, playbackRate + delta));
+        playbackRate = Math.min(2.0, Math.max(0.5, playbackRate + delta));
         playbackRate = Math.round(playbackRate * 100) / 100;
-        if (audioEl) audioEl.playbackRate = playbackRate;
+        audioEl.playbackRate = playbackRate;
         speedDisplay.innerText = playbackRate.toFixed(2) + 'x';
-        localStorage.setItem('playbackRate', playbackRate);
+        localStorage.setItem('quantumRate', playbackRate);
     };
 
     window.goHome = function() { window.location.href = 'library.html'; };
 
-    window.toggleControls = function() {
-        controlsVisible = !controlsVisible;
-        document.body.classList.toggle('controls-hidden', !controlsVisible);
-        localStorage.setItem('controlsVisible', controlsVisible);
-        const icon = document.querySelector('#persistent-toggle-btn i');
-        if (icon) icon.className = controlsVisible ? 'fas fa-eye-slash' : 'fas fa-eye';
+    // 底部栏隐藏/显示
+    window.toggleBottomBar = function() {
+        document.body.classList.toggle('controls-hidden');
+        let icon = document.querySelector('#persistent-toggle i');
+        if (icon) icon.className = document.body.classList.contains('controls-hidden') ? 'fas fa-eye' : 'fas fa-eye-slash';
     };
 
-    // 主题切换 (双击标题)
-    window.cycleTheme = function() {
-        const themes = ['default', 'dark', 'sepia'];
-        let current = document.body.className.replace('theme-', '') || 'default';
-        let idx = themes.indexOf(current);
-        idx = (idx + 1) % themes.length;
-        document.body.className = 'theme-' + themes[idx];
-        localStorage.setItem('readerTheme', themes[idx]);
-    };
-    chapterTitle.addEventListener('dblclick', window.cycleTheme);
-
-    // 初始化UI状态
-    document.body.classList.toggle('controls-hidden', !controlsVisible);
-    const persistIcon = document.querySelector('#persistent-toggle-btn i');
-    if (persistIcon) persistIcon.className = controlsVisible ? 'fas fa-eye-slash' : 'fas fa-eye';
-
-    // 启动应用
-    async function init() {
-        await loadChapter();
-        // 如果 URL 带有 continueplay=true，自动播放
-        if (urlParams.get('continueplay') === 'true' && audioEl?.src) {
-            setTimeout(() => togglePlay(true), 600);
+    // -------------------- 搜索 (第二段精简版) --------------------
+    window.performSearch = function() {
+        let term = document.getElementById('searchInput').value.trim().toLowerCase();
+        if (!term) return;
+        clearSearch();
+        let segs = document.querySelectorAll('#chapter-body .segment');
+        searchMatches = [];
+        segs.forEach((s, i) => {
+            if (s.innerText.toLowerCase().includes(term)) {
+                s.classList.add('search-match');
+                searchMatches.push({ idx: i, el: s });
+            }
+        });
+        let stats = document.getElementById('searchStats');
+        let nav = document.getElementById('searchNav');
+        let statsText = document.getElementById('statsText');
+        if (searchMatches.length) {
+            statsText.innerText = `找到 ${searchMatches.length} 处`;
+            nav.classList.remove('hidden');
+            stats.classList.remove('hidden');
+            currentMatchIdx = -1;
+            nextMatch(); // 跳转到第一个
+        } else {
+            statsText.innerText = `无匹配 “${term}”`;
+            nav.classList.add('hidden');
+            stats.classList.remove('hidden');
         }
+    };
+
+    window.nextMatch = function() {
+        if (!searchMatches.length) return;
+        if (currentMatchIdx >= 0) searchMatches[currentMatchIdx].el.classList.remove('current-match');
+        currentMatchIdx = (currentMatchIdx + 1) % searchMatches.length;
+        let m = searchMatches[currentMatchIdx];
+        m.el.classList.add('current-match');
+        m.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    window.prevMatch = function() {
+        if (!searchMatches.length) return;
+        if (currentMatchIdx >= 0) searchMatches[currentMatchIdx].el.classList.remove('current-match');
+        currentMatchIdx = (currentMatchIdx - 1 + searchMatches.length) % searchMatches.length;
+        let m = searchMatches[currentMatchIdx];
+        m.el.classList.add('current-match');
+        m.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    window.clearSearch = function() {
+        document.querySelectorAll('.segment').forEach(s => s.classList.remove('search-match', 'current-match'));
+        document.getElementById('searchStats')?.classList.add('hidden');
+        document.getElementById('searchNav')?.classList.add('hidden');
+        searchMatches = []; currentMatchIdx = -1;
+    };
+
+    // 双击标题切换主题 (保留趣味)
+    titleEl.addEventListener('dblclick', () => {
+        let themes = ['default', 'sepia', 'dark'];
+        let cur = document.body.className.includes('sepia') ? 'sepia' : (document.body.className.includes('dark')?'dark':'default');
+        let idx = themes.indexOf(cur);
+        idx = (idx + 1) % themes.length;
+        document.body.className = (themes[idx] === 'default') ? '' : 'theme-' + themes[idx];
+    });
+
+    // 初始化加载
+    if (category && book) {
+        loadChapter();
+    } else {
+        bodyEl.innerHTML = '<div class="segment">请提供分类与书籍参数</div>';
     }
 
-    if (category && bookId) init().catch(console.error);
-    else chapterBody.innerHTML = '<div class="error">请通过正确的分类和书籍ID访问</div>';
 })();
 </script>
 </body>
