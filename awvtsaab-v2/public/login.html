@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Awvtsaab's 漆书 — Login</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+<style>
+  /* ---------- 视觉样式（简洁版，保留动感背景） ---------- */
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Share Tech Mono", monospace, Arial;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    overflow: hidden;
+  }
+
+  /* 🎥 背景视频：在手机和PC上完整显示原比例，无滤镜 */
+  .card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  #bg-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;   /* 保持完整比例 */
+    z-index: 0;
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 2;
+    background: rgba(0,0,0,0.4); /* 半透明遮罩 */
+    padding: 32px;
+    border-radius: 16px;
+  }
+  /* logo */
+  .logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .logo img {
+    width: 96px;
+    filter: drop-shadow(0 4px 16px rgba(0,180,255,0.15));
+  }
+
+  h1 {
+    text-align: center;
+    margin: 8px 0 20px;
+    font-size: 22px;
+    letter-spacing: 1px;
+  }
+
+  .field { margin-bottom: 12px; }
+
+  input, select {
+    width: 100%;
+    padding: 13px 14px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    outline: none;
+    font-size: 15px;
+  }
+  input::placeholder {
+    color: rgba(255,255,255,0.6);
+    font-size: 14px;
+  }
+
+  /* select 单独设置 */
+  select {
+    background: rgba(0,150,255,0.15);
+    color: #fff;
+  }
+
+  /* 按钮 */
+  .row { display: flex; gap: 10px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    width: 100%;
+    padding: 13px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    background: linear-gradient(90deg, #00e0ff, #0078ff);
+    transition: transform 0.18s, box-shadow 0.18s;
+    color: #031018;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(0,200,255,0.15);
+  }
+
+  .link-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+  }
+
+  /* 提示/状态信息 */
+  .status {
+    margin-top: 14px;
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.5);
+    font-size: 14px;
+    min-height: 38px;
+  }
+  .status.success { border-left: 4px solid #3be37a; }
+  .status.error { border-left: 4px solid #ff6b6b; }
+
+  .hidden { display: none; }
+
+  /* small / muted */
+  .small {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+    text-align: center;
+    margin-top: 12px;
+  }
+  .muted { color: rgba(255,255,255,0.65); font-size: 13px; }
+
+  /* 语言选择器样式 */
+  .lang-selector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .lang-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(0,150,255,0.15);
+    border: 1px solid rgba(0,200,255,0.3);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .lang-btn:hover {
+    background: rgba(0,150,255,0.25);
+  }
+  .lang-btn.active {
+    background: rgba(0,200,255,0.4);
+    border-color: #00e0ff;
+  }
+
+  /* 欢迎页面样式 */
+  .welcome-container {
+    text-align: center;
+  }
+  .welcome-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #00e0ff;
+  }
+  .welcome-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  /* 📱 responsive */
+  @media (max-width: 420px) {
+    .card { padding: 24px; width: 90vw; }
+    h1 { font-size: 20px; }
+    input, select { padding: 11px; font-size: 14px; }
+    .btn { padding: 11px; font-size: 14px; }
+    .welcome-buttons { flex-direction: column; }
+  }
+</style>
+
+</head>
+<body>
+  <!-- 背景视频 -->
+  <video id="bg-video" autoplay loop playsinline muted>
+    <source src="../database/videos/天使.mp4" type="video/mp4">
+    您的浏览器不支持视频播放。
+  </video>
+
+  <div class="card" role="region" aria-label="登录卡片">
+    <!-- 语言选择器 -->
+    <div class="lang-selector">
+      <button class="lang-btn" data-lang="en">English</button>
+      <button class="lang-btn" data-lang="zh">中文</button>
+      <button class="lang-btn" data-lang="mm">မြန်မာ</button>
+    </div>
+
+    <!-- 欢迎页面 -->
+    <div id="welcomeView" class="welcome-container">
+      <div class="welcome-icon">
+        <i class="fa-solid fa-book"></i>
+      </div>
+      <h1 id="welcomeTitle">Welcome to Awvtsaab's 漆书</h1>
+      <p class="muted" id="welcomeSubtitle">Please select your preferred language to continue</p>
+    </div>
+
+    <div id="authViews" class="hidden">
+      <!-- ===== LOGIN VIEW ===== -->
+      <div id="loginView">
+        <div class="logo"><img src="/awvtsaab-v2/database/homeicon/awvtsaab2.gif" alt="logo"></div>
+        <h1 id="loginTitle">Login</h1>
+
+        <div class="field"><input id="loginEmail" type="email" placeholder="Email"></div>
+        <div class="field"><input id="loginPassword" type="password" placeholder="Password"></div>
+
+        <button class="btn" id="btnLogin" onclick="login()" aria-live="polite">
+          <i class="fa-solid fa-right-to-bracket"></i><span id="btnLoginText">Login</span>
+        </button>
+
+        <button class="link-btn" onclick="showSignup()">
+          <i class="fa-solid fa-user-plus"></i> <span id="createAccountText">Create account</span>
+        </button>
+
+        <div class="small" id="loginFooter">Select a different language above</div>
+      </div>
+
+      <!-- ===== SIGNUP VIEW ===== -->
+      <div id="signupView" class="hidden">
+        <h1 id="signupTitle">Create Account</h1>
+
+        <div class="field"><input id="signupName" type="text" placeholder="Name"></div>
+        <div class="field"><input id="signupEmail" type="email" placeholder="Email"></div>
+        <div class="field"><input id="signupPassword" type="password" placeholder="Password (min 6)"></div>
+        <div class="field"><input id="signupAge" type="number" min="1" placeholder="Age"></div>
+        <div class="field">
+          <select id="signupGender">
+            <option value="">Select Gender</option>
+            <option value="male">Male</option><option value="female">Female</option><option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field"><input id="signupPhone" type="tel" placeholder="Phone (optional)"></div>
+
+        <button class="btn" id="btnSignup" onclick="signup()"><i class="fa-solid fa-check"></i> <span id="confirmText">Confirm</span></button>
+        <button class="link-btn" onclick="showLogin()"><i class="fa-solid fa-arrow-left"></i> <span id="backToLoginText">Back to login</span></button>
+      </div>
+    </div>
+
+    <!-- ===== Logged-in Panel ===== -->
+    <div id="userView" class="hidden">
+      <h1 id="welcomeUserTitle">Welcome</h1>
+      <div class="muted" id="userInfo">Loading user...</div>
+
+      <div style="margin-top:12px;" class="row">
+        <button class="btn" onclick="continueToApp()"><i class="fa-solid fa-check"></i> <span id="readyText">Ready</span></button>
+        <button class="link-btn" onclick="signout()"><i class="fa-solid fa-right-from-bracket"></i> <span id="signoutText">Sign out</span></button>
+      </div>
+      <div style="margin-top:8px;" class="small">Presence: <strong id="presenceText">—</strong></div>
+    </div>
+
+    <div id="statusBox" class="status muted">Ready</div>
+  </div>
+
+  <!-- Firebase compat libs (easy to integrate with existing code) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+  /*********************** REPLACE THIS WITH YOUR FIREBASE CONFIG ***********************/
+      const firebaseConfig = {
+      apiKey: "AIzaSyBCIVYd8e5vBeGRz-H12Nj9hd5dyqnZCDI",
+      authDomain: "guardiangate-7xkgi.firebaseapp.com",
+      databaseURL: "https://guardiangate-7xkgi-default-rtdb.firebaseio.com",
+      projectId: "guardiangate-7xkgi",
+      storageBucket: "guardiangate-7xkgi.firebasestorage.appspot.com",
+      messagingSenderId: "133766737758",
+      appId: "1:133766737758:web:38de135254fef4664769cf"
+    };
+  /***************************************************************************************/
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
+
+  // ---------- 背景视频和音频控制 ----------
+  const bgVideo = document.getElementById('bg-video');
+
+  // 初始化视频播放
+  function initVideo() {
+    bgVideo.muted = false; // 直接启用声音
+    bgVideo.volume = 0.3; // 设置适当音量
+    
+    // 尝试播放视频和音频
+    bgVideo.play().catch(err => {
+      console.log("视频自动播放被阻止:", err);
+      // 如果自动播放被阻止，等待用户交互
+      document.body.addEventListener('click', () => {
+        bgVideo.play().catch(e => console.log("用户交互后播放失败:", e));
+      }, { once: true });
+    });
+  }
+
+  // 页面加载完成后初始化视频
+  window.addEventListener('load', initVideo);
+
+  // 处理页面可见性变化
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      bgVideo.pause();
+    } else {
+      bgVideo.play().catch(err => console.log("恢复播放失败:", err));
+    }
+  });
+
+  // ---------- 语言管理系统 ----------
+  let currentLang = localStorage.getItem('preferredLang') || 'en';
+
+  // 完整翻译字典
+  const translations = {
+    en: {
+      welcomeTitle: "Welcome to Awvtsaab's 漆书",
+      welcomeSubtitle: "Please select your preferred language to continue",
+      loginTitle: "Login",
+      signupTitle: "Create Account",
+      btnLoginText: "Login",
+      createAccountText: "Create account",
+      confirmText: "Confirm",
+      backToLoginText: "Back to login",
+      welcomeUserTitle: "Welcome",
+      readyText: "Ready",
+      signoutText: "Sign out",
+      loginFooter: "Select a different language above",
+      emailPlaceholder: "Email",
+      passwordPlaceholder: "Password",
+      namePlaceholder: "Name",
+      agePlaceholder: "Age",
+      phonePlaceholder: "Phone (optional)",
+      selectGender: "Select Gender",
+      male: "Male",
+      female: "Female",
+      other: "Other",
+      statusReady: "Ready",
+      statusLoginSuccess: "Login successful",
+      statusSignupSuccess: "Account created successfully",
+      statusLoggingIn: "Logging in...",
+      statusCreatingAccount: "Creating account...",
+      statusSigningOut: "Signing out...",
+      statusSignedOut: "Signed out",
+      statusEnterCredentials: "Please enter email and password",
+      statusFillRequired: "Please fill name, email and password (min 6)",
+      statusAuthError: "Authentication error"
+    },
+    zh: {
+      welcomeTitle: "欢迎来到 Awvtsaab's 漆书",
+      welcomeSubtitle: "请选择您偏好的语言继续",
+      loginTitle: "登录",
+      signupTitle: "创建账户",
+      btnLoginText: "登录",
+      createAccountText: "创建账户",
+      confirmText: "确认",
+      backToLoginText: "返回登录",
+      welcomeUserTitle: "欢迎",
+      readyText: "准备就绪",
+      signoutText: "退出登录",
+      loginFooter: "在上方选择其他语言",
+      emailPlaceholder: "电子邮件",
+      passwordPlaceholder: "密码",
+      namePlaceholder: "姓名",
+      agePlaceholder: "年龄",
+      phonePlaceholder: "电话 (可选)",
+      selectGender: "选择性别",
+      male: "男性",
+      female: "女性",
+      other: "其他",
+      statusReady: "准备就绪",
+      statusLoginSuccess: "登录成功",
+      statusSignupSuccess: "账户创建成功",
+      statusLoggingIn: "登录中...",
+      statusCreatingAccount: "创建账户中...",
+      statusSigningOut: "退出登录中...",
+      statusSignedOut: "已退出登录",
+      statusEnterCredentials: "请输入电子邮件和密码",
+      statusFillRequired: "请填写姓名、电子邮件和密码 (最少6位)",
+      statusAuthError: "认证错误"
+    },
+    mm: {
+      welcomeTitle: "Awvtsaab's 漆書 မှကြိုဆိုပါတယ်",
+      welcomeSubtitle: "ကျေးဇူးပြု၍ ဆက်လက်ရန် သင့်နှစ်သက်ရာဘာသာစကားကို ရွေးချယ်ပါ",
+      loginTitle: "လော့ဂ်အင်",
+      signupTitle: "အကောင့်ဖန်တီးရန်",
+      btnLoginText: "လော့ဂ်အင်",
+      createAccountText: "အကောင့်ဖန်တီးရန်",
+      confirmText: "အတည်ပြုရန်",
+      backToLoginText: "လော့ဂ်အင်သို့ ပြန်သွားရန်",
+      welcomeUserTitle: "ကြိုဆိုပါတယ်",
+      readyText: "အဆင်သင့်",
+      signoutText: "ထွက်ရန်",
+      loginFooter: "အထက်တွင် အခြားဘာသာစကားကို ရွေးချယ်ပါ",
+      emailPlaceholder: "အီးမေးလ်",
+      passwordPlaceholder: "စကားဝှက်",
+      namePlaceholder: "အမည်",
+      agePlaceholder: "အသက်",
+      phonePlaceholder: "ဖုန်းနံပါတ် (ချန်လှပ်ထားနိုင်သည်)",
+      selectGender: "လိင် ရွေးချယ်ပါ",
+      male: "ကျား",
+      female: "မ",
+      other: "အခြား",
+      statusReady: "အဆင်သင့်",
+      statusLoginSuccess: "လော့ဂ်အင်အောင်မြင်ပါသည်",
+      statusSignupSuccess: "အကောင့်ဖန်တီးခြင်းအောင်မြင်ပါသည်",
+      statusLoggingIn: "လော့ဂ်အင်ဝင်နေပါသည်...",
+      statusCreatingAccount: "အကောင့်ဖန်တီးနေပါသည်...",
+      statusSigningOut: "ထွက်နေပါသည်...",
+      statusSignedOut: "ထွက်ပြီးပါပြီ",
+      statusEnterCredentials: "ကျေးဇူးပြု၍ အီးမေးလ်နှင့် စကားဝှက်ကိုထည့်ပါ",
+      statusFillRequired: "ကျေးဇူးပြု၍ အမည်၊ အီးမေးလ်နှင့် စကားဝှက် (အနည်းဆုံး ၆ လုံး) ကိုဖြည့်ပါ",
+      statusAuthError: "ခွင့်ပြုချက်အမှား"
+    }
+  };
+
+  // 应用语言翻译
+  function applyTranslations(lang) {
+    const t = translations[lang] || translations.en;
+    
+    // 更新所有文本元素
+    document.getElementById('welcomeTitle').textContent = t.welcomeTitle;
+    document.getElementById('welcomeSubtitle').textContent = t.welcomeSubtitle;
+    document.getElementById('loginTitle').textContent = t.loginTitle;
+    document.getElementById('signupTitle').textContent = t.signupTitle;
+    document.getElementById('btnLoginText').textContent = t.btnLoginText;
+    document.getElementById('createAccountText').textContent = t.createAccountText;
+    document.getElementById('confirmText').textContent = t.confirmText;
+    document.getElementById('backToLoginText').textContent = t.backToLoginText;
+    document.getElementById('welcomeUserTitle').textContent = t.welcomeUserTitle;
+    document.getElementById('readyText').textContent = t.readyText;
+    document.getElementById('signoutText').textContent = t.signoutText;
+    document.getElementById('loginFooter').textContent = t.loginFooter;
+    
+    // 更新输入框占位符
+    document.getElementById('loginEmail').placeholder = t.emailPlaceholder;
+    document.getElementById('loginPassword').placeholder = t.passwordPlaceholder;
+    document.getElementById('signupName').placeholder = t.namePlaceholder;
+    document.getElementById('signupEmail').placeholder = t.emailPlaceholder;
+    document.getElementById('signupPassword').placeholder = t.passwordPlaceholder + " (min 6)";
+    document.getElementById('signupAge').placeholder = t.agePlaceholder;
+    document.getElementById('signupPhone').placeholder = t.phonePlaceholder;
+    
+    // 更新选择框选项
+    const genderSelect = document.getElementById('signupGender');
+    genderSelect.options[0].text = t.selectGender;
+    genderSelect.options[1].text = t.male;
+    genderSelect.options[2].text = t.female;
+    genderSelect.options[3].text = t.other;
+    
+    // 更新状态信息
+    if (document.getElementById('statusBox').textContent === 'Ready') {
+      setStatus(t.statusReady, null);
+    }
+  }
+
+  // 切换语言
+  function changeLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('preferredLang', lang);
+    
+    // 更新按钮激活状态
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+    
+    // 应用翻译
+    applyTranslations(lang);
+    
+    // 如果当前在欢迎页面，切换到登录页面
+    if (!document.getElementById('welcomeView').classList.contains('hidden')) {
+      showLogin();
+    }
+  }
+
+  // 初始化语言
+  function initLanguage() {
+    // 设置初始语言按钮状态
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === currentLang);
+      btn.addEventListener('click', () => changeLanguage(btn.dataset.lang));
+    });
+    
+    // 应用初始语言
+    applyTranslations(currentLang);
+  }
+
+  // ---------- UI helpers ----------
+  const statusBox = document.getElementById('statusBox');
+  function setStatus(msg, type) {
+    statusBox.className = 'status';
+    if (type === 'success') { statusBox.classList.add('success'); }
+    else if (type === 'error') { statusBox.classList.add('error'); }
+    else { /* neutral */ }
+    statusBox.textContent = msg;
+  }
+
+  function showWelcome() {
+    document.getElementById('welcomeView').classList.remove('hidden');
+    document.getElementById('authViews').classList.add('hidden');
+    document.getElementById('userView').classList.add('hidden');
+  }
+
+  function showLogin() {
+    document.getElementById('welcomeView').classList.add('hidden');
+    document.getElementById('authViews').classList.remove('hidden');
+    document.getElementById('loginView').classList.remove('hidden');
+    document.getElementById('signupView').classList.add('hidden');
+    document.getElementById('userView').classList.add('hidden');
+  }
+
+  function showSignup() {
+    document.getElementById('welcomeView').classList.add('hidden');
+    document.getElementById('authViews').classList.remove('hidden');
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('signupView').classList.remove('hidden');
+    document.getElementById('userView').classList.add('hidden');
+  }
+
+  // ---------- Auth logic ----------
+  async function signup(){
+    const t = translations[currentLang];
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const age = document.getElementById('signupAge').value;
+    const gender = document.getElementById('signupGender').value;
+    const phone = document.getElementById('signupPhone').value.trim();
+
+    if (!name || !email || password.length < 6) {
+      setStatus(t.statusFillRequired, 'error'); return;
+    }
+
+    setStatus(t.statusCreatingAccount, null);
+    try {
+      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+      const uid = userCredential.user.uid;
+
+      // Save profile to Realtime Database
+      const profile = {
+        name,
+        email,
+        age: age? Number(age) : null,
+        gender: gender || null,
+        phone: phone || null,
+        preferredLang: currentLang,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      };
+
+      await db.ref('users/' + uid).set(profile);
+
+      setStatus(t.statusSignupSuccess, 'success');
+
+      // Optionally send email verification
+      // await userCredential.user.sendEmailVerification();
+    } catch (err) {
+      console.error(err);
+      setStatus(t.statusAuthError + ': ' + (err.message || err), 'error');
+    }
+  }
+
+  async function login() {
+    const t = translations[currentLang];
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) { 
+      setStatus(t.statusEnterCredentials, 'error'); 
+      return; 
+    }
+
+    setStatus(t.statusLoggingIn, null);
+    try {
+      const userCredential = await auth.signInWithEmailAndPassword(email, password);
+      setStatus(t.statusLoginSuccess, 'success');
+
+      // 🔑 Redirect to home.html after login
+      window.location.href = 'home.html';
+    } catch (err) {
+      console.error(err);
+      setStatus(t.statusAuthError + ': ' + (err.message || err), 'error');
+    }
+  }
+
+  function signout(){
+    const t = translations[currentLang];
+    setStatus(t.statusSigningOut, null);
+    auth.signOut().then(()=>{ 
+      setStatus(t.statusSignedOut, null); 
+      showWelcome();
+    }).catch(err=>{
+      setStatus(t.statusAuthError + ': ' + err.message, 'error');
+    });
+  }
+
+  function continueToApp() {
+    window.location.href = 'home.html';
+  }
+
+  // ---------- Presence (Realtime) ----------
+  function setUserPresence(user) {
+    if (!user) return;
+    const uid = user.uid;
+    const userStatusRef = db.ref('/status/' + uid);
+
+    const isOfflineForDatabase = {
+      state: 'offline',
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    };
+    const isOnlineForDatabase = {
+      state: 'online',
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    const connectedRef = db.ref('.info/connected');
+    connectedRef.on('value', snap => {
+      if (snap.val() === true) {
+        userStatusRef.onDisconnect().set(isOfflineForDatabase).then(() => {
+          userStatusRef.set(isOnlineForDatabase);
+        });
+      }
+    });
+  }
+
+  // ---------- Auth state listener ----------
+  auth.onAuthStateChanged(async user => {
+    if (user) {
+      // Show user view
+      document.getElementById('welcomeView').classList.add('hidden');
+      document.getElementById('authViews').classList.add('hidden');
+      document.getElementById('userView').classList.remove('hidden');
+
+      const t = translations[currentLang];
+      setStatus(t.statusReady, null);
+
+      // load profile from DB
+      const profileSnap = await db.ref('users/' + user.uid).once('value');
+      const profile = profileSnap.val() || {};
+      document.getElementById('welcomeUserTitle').textContent = `${t.welcomeUserTitle}, ${profile.name || (user.email || 'User')}`;
+      document.getElementById('userInfo').textContent = `Email: ${user.email}  ·  Age: ${profile.age || '—'}  ·  Gender: ${profile.gender || '—'}`;
+
+      // Set presence
+      setUserPresence(user);
+
+      // Listen to presence changes for this user and show them
+      const presRef = db.ref('status/' + user.uid);
+      presRef.on('value', snap => {
+        const v = snap.val();
+        document.getElementById('presenceText').textContent = v ? v.state + ' (updated ' + (v.last_changed ? new Date(v.last_changed).toLocaleString() : '—') + ')' : '—';
+      });
+
+      setStatus(t.statusReady, 'success');
+    } else {
+      // Not logged in: show welcome page
+      document.getElementById('userView').classList.add('hidden');
+      document.getElementById('authViews').classList.add('hidden');
+      document.getElementById('welcomeView').classList.remove('hidden');
+      
+      const t = translations[currentLang];
+      setStatus(t.statusReady, null);
+      document.getElementById('presenceText').textContent = '—';
+    }
+  });
+
+  // 初始化页面
+  window.addEventListener('load', () => {
+    initLanguage();
+    initVideo();
+  });
+
+  </script>
+</body>
+</html>

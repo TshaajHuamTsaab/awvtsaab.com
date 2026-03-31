@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover" />
+<title>量子有声读物 · 幻景控制</title>
+<!-- Tailwind + Font Awesome -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* ==================== 基础重置 ==================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    background: #0a0a1a;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #fff;
+    transition: background-color 0.5s ease;
+    overflow-x: hidden;
+}
+/* ==================== 视频背景 (全屏) ==================== */
+#quantum-bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -2;
+    opacity: 0.7;
+    transition: opacity 0.5s, filter 0.5s;
+    pointer-events: none;
+    will-change: transform;
+}
+/* 玻璃磨砂层 + 动态折射 (两层效果) */
+.glass-frost {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 50%, rgba(255,255,255,0.03) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    z-index: -1;
+    pointer-events: none;
+}
+.glass-refraction {
+    position: fixed;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.05) 0%, transparent 50%);
+    animation: rotateGlow 35s infinite linear;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.5;
+}
+@keyframes rotateGlow {
+    0% { transform: rotate(0deg) translateX(-10%) translateY(-10%); }
+    100% { transform: rotate(360deg) translateX(-10%) translateY(-10%); }
+}
+/* ==================== 主内容卡片 ==================== */
+#content {
+    width: 90%;
+    max-width: 950px;
+    margin: 30px auto 120px auto;
+    padding: clamp(16px, 4vw, 32px);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(30px) saturate(200%);
+    -webkit-backdrop-filter: blur(30px) saturate(200%);
+    border-radius: 36px;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+    position: relative;
+    z-index: 5;
+}
+#chapter-title {
+    font-size: clamp(1.8rem, 6vw, 2.8rem);
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 25px;
+    padding: 15px 20px;
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(15px);
+    border-radius: 60px;
+    border: 1px solid #00ffcc40;
+    text-shadow: 0 4px 15px #00ffcc60;
+}
+/* 搜索区 */
+.search-section {
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(15px);
+    border-radius: 50px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #00ffcc30;
+}
+#searchInput {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid #00ffcc60;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 40px;
+    width: 100%;
+    font-size: 16px;
+}
+#searchInput::placeholder { color: #ccc; }
+.search-stats {
+    background: rgba(30,30,50,0.6);
+    backdrop-filter: blur(20px);
+    border-radius: 30px;
+    padding: 12px 20px;
+    margin: 15px 0 10px;
+    border-left: 5px solid #ffaa33;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+/* 段落卡片 */
+.segment {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
+    border-radius: 24px;
+    padding: 18px 22px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    line-height: 1.7;
+    font-size: clamp(15px, 2vw, 18px);
+    transition: all 0.2s;
+}
+.segment:hover { background: rgba(255,255,255,0.2); border-color: #00ffcc; }
+.segment.highlight { background: rgba(0,255,200,0.2); border-left: 8px solid #00ffcc; }
+.segment.search-match { border-left: 5px solid #ffaa33; background: rgba(255,170,51,0.15); }
+.segment.current-match { border-left: 8px solid #ff5500; background: rgba(255,85,0,0.2); }
+/* ==================== 左上角控制面板 (背景/声音/玻璃) ==================== */
+#video-controls-panel {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 1000;
+}
+.control-glass-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #00ffcc;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 10px 20px black;
+}
+.control-glass-btn:active { transform: scale(0.9); background: #00ffcc30; }
+/* ==================== 底部控制栏 (保留原风格) ==================== */
+#bottom-bar {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 700px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(30px);
+    border-radius: 60px;
+    padding: 8px 20px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 15px 35px black;
+    z-index: 900;
+}
+.bottom-btn {
+    width: 44px; height: 44px;
+    border-radius: 40px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #00ffcc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: 0.15s;
+    flex-shrink: 0;
+}
+.bottom-btn:active { background: #00ffcc30; transform: scale(0.9); }
+#speedDisplay {
+    color: #00ffcc;
+    font-weight: 600;
+    background: rgba(0,0,0,0.4);
+    padding: 6px 12px;
+    border-radius: 40px;
+    min-width: 65px;
+    text-align: center;
+    border: 1px solid #00ffcc40;
+}
+#persistent-toggle {
+    position: fixed;
+    bottom: 90px; right: 20px;
+    width: 56px; height: 56px;
+    border-radius: 30px;
+    background: rgba(156,39,176,0.6);
+    backdrop-filter: blur(15px);
+    border: 1px solid white;
+    color: white;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    cursor: pointer;
+}
+/* 隐藏底部栏 */
+.controls-hidden #bottom-bar {
+    transform: translateX(-50%) translateY(120%);
+    opacity: 0;
+    pointer-events: none;
+}
+audio { display: none; }
+</style>
+</head>
+<body>
+
+<!-- 量子视频背景 (自动播放、静音、循环) -->
+<video id="quantum-bg-video" autoplay muted loop playsinline preload="auto">
+    <!-- 主视频：如果存在本地背景则用，否则使用mixkit备用 -->
+    <source src="../database/homeicon/background.MP4" type="video/mp4">
+    <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-geometric-pattern-loop-3495-large.mp4" type="video/mp4">
+</video>
+<!-- 玻璃双层 -->
+<div class="glass-frost"></div>
+<div class="glass-refraction"></div>
+
+<!-- 左上角控制面板 (背景/音频/玻璃/颜色) 完全保留第二段代码的交互，且仅会话有效 -->
+<div id="video-controls-panel">
+    <button class="control-glass-btn" id="toggleVideoBtn" title="视频背景开关"><i class="fas fa-video"></i></button>
+    <button class="control-glass-btn" id="toggleBgAudioBtn" title="背景音开关"><i class="fas fa-volume-mute"></i></button>
+    <button class="control-glass-btn" id="toggleGlassBtn" title="玻璃效果开关"><i class="fas fa-cube"></i></button>
+    <button class="control-glass-btn" id="cycleColorBtn" title="背景颜色切换"><i class="fas fa-paint-brush"></i></button>
+</div>
+
+<!-- 主内容卡片 -->
+<div id="content">
+    <div id="chapter-title">📡 量子载入中...</div>
+    
+    <!-- 搜索区域 (第二段风格) -->
+    <div class="search-section flex gap-2 items-center">
+        <input type="text" id="searchInput" placeholder="搜索段落..." class="flex-1">
+        <button class="bottom-btn special !w-auto px-5" onclick="performSearch()"><i class="fas fa-search mr-1"></i> 搜</button>
+    </div>
+    
+    <!-- 搜索结果统计栏 (动态) 初始隐藏 -->
+    <div id="searchStats" class="search-stats hidden">
+        <span id="statsText">等待搜索</span>
+        <div id="searchNav" class="flex gap-2 hidden">
+            <button class="bottom-btn !w-10 !h-10" onclick="prevMatch()"><i class="fas fa-arrow-left"></i></button>
+            <button class="bottom-btn !w-10 !h-10" onclick="nextMatch()"><i class="fas fa-arrow-right"></i></button>
+            <button class="bottom-btn !w-10 !h-10" onclick="clearSearch()" style="color:#ff5555"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+    
+    <!-- 章节正文容器 -->
+    <div id="chapter-body" class="mt-2">✨ 打开量子图书馆...</div>
+</div>
+
+<!-- 底部控制栏 (原版风格) -->
+<div id="bottom-bar">
+    <button class="bottom-btn" onclick="togglePlay()" id="playBtn"><i class="fas fa-play"></i></button>
+    <button class="bottom-btn" onclick="prevChapter()"><i class="fas fa-backward"></i></button>
+    <button class="bottom-btn" onclick="nextChapter()"><i class="fas fa-forward"></i></button>
+    <span id="speedDisplay">1.0x</span>
+    <button class="bottom-btn" onclick="changeSpeed(-0.25)"><i class="fas fa-minus"></i></button>
+    <button class="bottom-btn" onclick="changeSpeed(0.25)"><i class="fas fa-plus"></i></button>
+    <button class="bottom-btn" onclick="goHome()"><i class="fas fa-home"></i></button>
+</div>
+
+<!-- 持久切换按钮 (显示/隐藏底部栏) -->
+<button id="persistent-toggle" onclick="toggleBottomBar()"><i class="fas fa-eye-slash"></i></button>
+
+<!-- 隐藏的audio播放器 (有声读物) -->
+<audio id="audio" preload="metadata"></audio>
+
+<script>
+(function() {
+    // -------------------- 读取URL参数 (用于章节和背景状态保持) --------------------
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category') || 'default';
+    const book = urlParams.get('book') || 'demo';
+    let chapter = urlParams.get('chapter') || 'cover';        // cover or 数字
+
+    // 背景控制状态 —— 从URL获取，仅会话保留 (翻页时通过url传递)
+    let bgVideoEnabled = urlParams.get('bgVideo') !== 'false';      // 默认true
+    let bgAudioEnabled = urlParams.get('bgAudio') === 'true';       // 默认false (视频原声)
+    let glassEnabled = urlParams.get('glassFx') !== 'false';        // 默认true
+    let colorIndex = parseInt(urlParams.get('colorIdx') || '0');
+
+    // DOM 元素
+    const video = document.getElementById('quantum-bg-video');
+    const frost = document.querySelector('.glass-frost');
+    const refraction = document.querySelector('.glass-refraction');
+    const toggleVideoBtn = document.getElementById('toggleVideoBtn');
+    const toggleBgAudioBtn = document.getElementById('toggleBgAudioBtn');
+    const toggleGlassBtn = document.getElementById('toggleGlassBtn');
+    const cycleColorBtn = document.getElementById('cycleColorBtn');
+
+    // 可用背景色
+    const bgColors = ['#0a0a1a', '#1a2a3a', '#2a1a3a', '#1a3a2a'];
+
+    // 应用初始状态
+    if (video) {
+        video.style.opacity = bgVideoEnabled ? '0.7' : '0';
+        video.muted = !bgAudioEnabled;          // muted为true则无背景音，false则放出原声(如果有)
+    }
+    if (frost) frost.style.display = glassEnabled ? 'block' : 'none';
+    if (refraction) refraction.style.display = glassEnabled ? 'block' : 'none';
+    document.body.style.backgroundColor = bgColors[colorIndex % bgColors.length];
+
+    // 更新图标
+    function updateVideoIcon() {
+        toggleVideoBtn.innerHTML = bgVideoEnabled ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
+    }
+    function updateAudioIcon() {
+        toggleBgAudioBtn.innerHTML = bgAudioEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+    }
+    updateVideoIcon(); updateAudioIcon();
+
+    // 生成带背景状态的URL (用于翻页跳转)
+    function buildPreserveUrl(newChapter) {
+        let base = window.location.pathname + '?';
+        base += `category=${category}&book=${book}&chapter=${newChapter}`;
+        base += `&bgVideo=${bgVideoEnabled}`;
+        base += `&bgAudio=${bgAudioEnabled}`;
+        base += `&glassFx=${glassEnabled}`;
+        base += `&colorIdx=${colorIndex}`;
+        // 如果需要自动续播标记 (保留原逻辑)
+        if (isPlayingSequence) base += '&autoplay=true';
+        return base;
+    }
+
+    // 切换事件: 视频开关
+    toggleVideoBtn.addEventListener('click', () => {
+        bgVideoEnabled = !bgVideoEnabled;
+        if (video) video.style.opacity = bgVideoEnabled ? '0.7' : '0';
+        updateVideoIcon();
+        playFeedback();
+    });
+    // 背景音频开关 (解除静音/静音)
+    toggleBgAudioBtn.addEventListener('click', () => {
+        bgAudioEnabled = !bgAudioEnabled;
+        if (video) video.muted = !bgAudioEnabled;
+        updateAudioIcon();
+        playFeedback();
+    });
+    // 玻璃效果开关
+    toggleGlassBtn.addEventListener('click', () => {
+        glassEnabled = !glassEnabled;
+        if (frost) frost.style.display = glassEnabled ? 'block' : 'none';
+        if (refraction) refraction.style.display = glassEnabled ? 'block' : 'none';
+        playFeedback();
+    });
+    // 背景颜色切换
+    cycleColorBtn.addEventListener('click', () => {
+        colorIndex = (colorIndex + 1) % bgColors.length;
+        document.body.style.backgroundColor = bgColors[colorIndex];
+        playFeedback();
+    });
+
+    function playFeedback() {
+        try {
+            let actx = new (window.AudioContext || window.webkitAudioContext)();
+            let osc = actx.createOscillator();
+            let gain = actx.createGain();
+            osc.connect(gain); gain.connect(actx.destination);
+            osc.frequency.value = 600;
+            gain.gain.setValueAtTime(0.1, actx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.15);
+            osc.start(); osc.stop(actx.currentTime + 0.15);
+        } catch(e){}
+    }
+
+    // -------------------- 核心有声读物逻辑 (完全保留第一段代码的自动播放、章节加载、高亮) --------------------
+    const titleEl = document.getElementById('chapter-title');
+    const bodyEl = document.getElementById('chapter-body');
+    const audioEl = document.getElementById('audio');
+    const playBtn = document.getElementById('playBtn');
+    const speedDisplay = document.getElementById('speedDisplay');
+
+    let isPlayingSequence = true;          // 自动连续播放
+    let playbackRate = parseFloat(localStorage.getItem('quantumRate')) || 1.0;
+    let segmentIndex = 0;
+    let searchMatches = [], currentMatchIdx = -1;
+
+    speedDisplay.innerText = playbackRate.toFixed(2) + 'x';
+    audioEl.playbackRate = playbackRate;
+
+    // 工具: 检查章节是否存在
+    async function chapterExists(num) {
+        let name = (num === 'cover') ? 'cover' : `chapter${num}`;
+        try {
+            let r = await fetch(`database/${category}/${book}/${name}.html`, { method: 'HEAD' });
+            return r.ok;
+        } catch { return false; }
+    }
+
+    // 加载章节 (兼容第一段逻辑)
+    async function loadChapter() {
+        let chName = (chapter === 'cover') ? 'cover' : `chapter${chapter}`;
+        let htmlPath = `database/${category}/${book}/${chName}.html`;
+        let audioPath = `database/${category}/${book}/audio/${chName}.mp3`;
+
+        titleEl.innerText = (chapter === 'cover') ? '📖 封面' : `第 ${chapter} 章`;
+        bodyEl.innerHTML = '<div class="segment">🌀 加载段落...</div>';
+
+        try {
+            let resp = await fetch(htmlPath);
+            if (!resp.ok) throw new Error('404');
+            let html = await resp.text();
+            // 将<p>转换为带segment类的可点击元素
+            let processed = html.replace(/<p>/g, '<p class="segment" onclick="seekToSegment(this)">');
+            bodyEl.innerHTML = processed;
+        } catch (e) {
+            bodyEl.innerHTML = '<div class="segment">❌ 章节缺失</div>';
+        }
+
+        // 设置音频
+        try {
+            let audioCheck = await fetch(audioPath, { method: 'HEAD' });
+            if (audioCheck.ok) {
+                audioEl.src = audioPath;
+                audioEl.load();
+                audioEl.onended = nextChapterAuto;
+                audioEl.ontimeupdate = highlightCurrentSegment;
+                playBtn.disabled = false;
+            } else {
+                audioEl.src = '';
+                playBtn.disabled = true;
+            }
+        } catch { audioEl.src = ''; playBtn.disabled = true; }
+
+        // 如果URL有autoplay标记，尝试播放
+        if (urlParams.get('autoplay') === 'true' && audioEl.src) {
+            setTimeout(() => { togglePlay(); }, 500);
+        }
+        // 重置搜索高亮
+        clearSearch();
+    }
+
+    // 自动下一章 (模仿第一段nextAuto)
+    async function nextChapterAuto() {
+        if (!isPlayingSequence) return;
+        let next = (chapter === 'cover') ? 1 : parseInt(chapter) + 1;
+        if (!(await chapterExists(next))) {
+            alert('🎉 全书结束，返回封面');
+            chapter = 'cover';
+            window.location.href = buildPreserveUrl('cover');
+            return;
+        }
+        chapter = next.toString();
+        window.location.href = buildPreserveUrl(chapter);
+    }
+
+    // 手动下一章
+    window.nextChapter = async function() {
+        let next = (chapter === 'cover') ? 1 : parseInt(chapter) + 1;
+        if (!(await chapterExists(next))) {
+            alert('没有下一章');
+            return;
+        }
+        chapter = next.toString();
+        window.location.href = buildPreserveUrl(chapter);
+    };
+
+    window.prevChapter = async function() {
+        if (chapter === 'cover') return;
+        let prev = parseInt(chapter) - 1;
+        chapter = (prev <= 0) ? 'cover' : prev.toString();
+        window.location.href = buildPreserveUrl(chapter);
+    };
+
+    // 播放/暂停
+    window.togglePlay = function() {
+        if (!audioEl.src) return;
+        if (audioEl.paused) {
+            audioEl.play().then(() => playBtn.innerHTML = '<i class="fas fa-pause"></i>');
+        } else {
+            audioEl.pause();
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        }
+    };
+
+    // 高亮当前段落 (根据进度)
+    function highlightCurrentSegment() {
+        if (!audioEl.duration) return;
+        let paras = document.querySelectorAll('#chapter-body .segment');
+        if (!paras.length) return;
+        let idx = Math.floor((audioEl.currentTime / audioEl.duration) * paras.length);
+        if (idx !== segmentIndex) {
+            paras.forEach(p => p.classList.remove('highlight'));
+            if (paras[idx]) {
+                paras[idx].classList.add('highlight');
+                paras[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            segmentIndex = idx;
+        }
+    }
+
+    // 点击段落跳转
+    window.seekToSegment = function(p) {
+        if (!audioEl.duration) return;
+        let paras = Array.from(document.querySelectorAll('#chapter-body .segment'));
+        let idx = paras.indexOf(p);
+        if (idx === -1) return;
+        audioEl.currentTime = (idx / paras.length) * audioEl.duration;
+        if (audioEl.paused) togglePlay();
+    };
+
+    // 速度调节
+    window.changeSpeed = function(delta) {
+        playbackRate = Math.min(2.0, Math.max(0.5, playbackRate + delta));
+        playbackRate = Math.round(playbackRate * 100) / 100;
+        audioEl.playbackRate = playbackRate;
+        speedDisplay.innerText = playbackRate.toFixed(2) + 'x';
+        localStorage.setItem('quantumRate', playbackRate);
+    };
+
+    window.goHome = function() { window.location.href = 'library.html'; };
+
+    // 底部栏隐藏/显示
+    window.toggleBottomBar = function() {
+        document.body.classList.toggle('controls-hidden');
+        let icon = document.querySelector('#persistent-toggle i');
+        if (icon) icon.className = document.body.classList.contains('controls-hidden') ? 'fas fa-eye' : 'fas fa-eye-slash';
+    };
+
+    // -------------------- 搜索 (第二段精简版) --------------------
+    window.performSearch = function() {
+        let term = document.getElementById('searchInput').value.trim().toLowerCase();
+        if (!term) return;
+        clearSearch();
+        let segs = document.querySelectorAll('#chapter-body .segment');
+        searchMatches = [];
+        segs.forEach((s, i) => {
+            if (s.innerText.toLowerCase().includes(term)) {
+                s.classList.add('search-match');
+                searchMatches.push({ idx: i, el: s });
+            }
+        });
+        let stats = document.getElementById('searchStats');
+        let nav = document.getElementById('searchNav');
+        let statsText = document.getElementById('statsText');
+        if (searchMatches.length) {
+            statsText.innerText = `找到 ${searchMatches.length} 处`;
+            nav.classList.remove('hidden');
+            stats.classList.remove('hidden');
+            currentMatchIdx = -1;
+            nextMatch(); // 跳转到第一个
+        } else {
+            statsText.innerText = `无匹配 “${term}”`;
+            nav.classList.add('hidden');
+            stats.classList.remove('hidden');
+        }
+    };
+
+    window.nextMatch = function() {
+        if (!searchMatches.length) return;
+        if (currentMatchIdx >= 0) searchMatches[currentMatchIdx].el.classList.remove('current-match');
+        currentMatchIdx = (currentMatchIdx + 1) % searchMatches.length;
+        let m = searchMatches[currentMatchIdx];
+        m.el.classList.add('current-match');
+        m.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    window.prevMatch = function() {
+        if (!searchMatches.length) return;
+        if (currentMatchIdx >= 0) searchMatches[currentMatchIdx].el.classList.remove('current-match');
+        currentMatchIdx = (currentMatchIdx - 1 + searchMatches.length) % searchMatches.length;
+        let m = searchMatches[currentMatchIdx];
+        m.el.classList.add('current-match');
+        m.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    window.clearSearch = function() {
+        document.querySelectorAll('.segment').forEach(s => s.classList.remove('search-match', 'current-match'));
+        document.getElementById('searchStats')?.classList.add('hidden');
+        document.getElementById('searchNav')?.classList.add('hidden');
+        searchMatches = []; currentMatchIdx = -1;
+    };
+
+    // 双击标题切换主题 (保留趣味)
+    titleEl.addEventListener('dblclick', () => {
+        let themes = ['default', 'sepia', 'dark'];
+        let cur = document.body.className.includes('sepia') ? 'sepia' : (document.body.className.includes('dark')?'dark':'default');
+        let idx = themes.indexOf(cur);
+        idx = (idx + 1) % themes.length;
+        document.body.className = (themes[idx] === 'default') ? '' : 'theme-' + themes[idx];
+    });
+
+    // 初始化加载
+    if (category && book) {
+        loadChapter();
+    } else {
+        bodyEl.innerHTML = '<div class="segment">请提供分类与书籍参数</div>';
+    }
+
+})();
+</script>
+</body>
+</html>
